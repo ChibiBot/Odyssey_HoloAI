@@ -38,18 +38,6 @@
         <def>Social</def>
         <level>14</level>
       </li>
-      <li>
-        <def>Animals</def>
-        <level>4</level>
-      </li>
-      <li>
-        <def>Construction</def>
-        <level>6</level>
-      </li>
-      <li>
-        <def>Crafting</def>
-        <level>6</level>
-      </li>
     </skills>
     <traitTags />
     <traits>
@@ -61,6 +49,12 @@
         <degree>2</degree>
       </li>
     </traits>
-    <workTags>None</workTags>
+    <workTags>Violent</workTags>
+    <workTypes>
+      <li>Doctor</li>
+      <li>Warden</li>
+      <li>Research</li>
+      <li>Hauling</li>
+    </workTypes>
   </PawnKindDef>
 </Defs>
