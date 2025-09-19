@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <ThingDef ParentName="BasePawn">
+    <defName>Odyssey_HoloAI_Race</defName>
+    <label>holographic intelligence</label>
+    <description>A projected avatar of the gravship mainframe. The hologram can interact with colonists but cannot exist outside the ship's gravitic field.</description>
+    <statBases>
+      <MoveSpeed>4.7</MoveSpeed>
+      <MarketValue>0</MarketValue>
+      <ComfyTemperatureMin>-273</ComfyTemperatureMin>
+      <ComfyTemperatureMax>500</ComfyTemperatureMax>
+      <Flammability>0</Flammability>
+      <LeatherAmount>0</LeatherAmount>
+    </statBases>
+    <thingClass>Odyssey_HoloAI.Pawn_HolographicAI</thingClass>
+    <uiIconPath>Things/Pawn/Colonist</uiIconPath>
+    <race>
+      <intelligence>ToolUser</intelligence>
+      <body>Human</body>
+      <baseBodySize>0.75</baseBodySize>
+      <baseHealthScale>1</baseHealthScale>
+      <hasGenders>false</hasGenders>
+      <humanlike>true</humanlike>
+      <fleshType>Mechanoid</fleshType>
+      <isFlesh>false</isFlesh>
+      <needsFood>false</needsFood>
+      <needsRest>false</needsRest>
+      <needsJoy>false</needsJoy>
+      <needsMood>true</needsMood>
+      <usesHitPoints>false</usesHitPoints>
+      <makesFootprints>false</makesFootprints>
+      <thinkTreeMain>Humanlike</thinkTreeMain>
+      <thinkTreeConstant>HumanlikeConstant</thinkTreeConstant>
+      <lifeExpectancy>1000</lifeExpectancy>
+      <soundMeleeHitPawn>Pawn_Melee_Punch_HitPawn</soundMeleeHitPawn>
+      <soundMeleeHitBuilding>Pawn_Melee_Punch_HitBuilding</soundMeleeHitBuilding>
+      <soundMeleeMiss>Pawn_Melee_Punch_Miss</soundMeleeMiss>
+      <wildness>0</wildness>
+      <manhunterOnDamageChance>0</manhunterOnDamageChance>
+      <hediffGiverSets />
+      <gestationPeriodDays>0</gestationPeriodDays>
+      <leatherAmount>0</leatherAmount>
+      <lifeStageAges>
+        <li>
+          <def>HumanlikeAdult</def>
+          <minAge>0</minAge>
+        </li>
+      </lifeStageAges>
+      <immunityGainSpeedFactor>1</immunityGainSpeedFactor>
+      <gathering>
+        <canSteal>false</canSteal>
+      </gathering>
+      <thoughts>
+        <needs>Minimal</needs>
+      </thoughts>
+    </race>
+    <techLevel>Ultratech</techLevel>
+    <tools />
+    <drawingSize>1</drawingSize>
+    <drawGUIOverlay>true</drawGUIOverlay>
+    <drawOffscreen>false</drawOffscreen>
+  </ThingDef>
+</Defs>
