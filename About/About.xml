@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>Odyssey - Holographic Gravship AI</name>
+  <packageId>odyssey.holoai</packageId>
+  <author>AI Assistant</author>
+  <supportedVersions>
+    <li>1.5</li>
+  </supportedVersions>
+  <modDependencies>
+    <li>
+      <packageId>Ludeon.RimWorld.Odyssey</packageId>
+      <displayName>RimWorld: Odyssey</displayName>
+    </li>
+  </modDependencies>
+  <description>
+    Adds a holographic artificial intelligence who inhabits the gravship and assists the crew. The AI cannot leave gravship
+    tiles, is immune to damage and offers medical, hauling, research and social support inside the ship.
+  </description>
+</ModMetaData>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+  <PawnKindDef>
+    <defName>Odyssey_HoloAI</defName>
+    <label>gravship holographic AI</label>
+    <race>Odyssey_HoloAI_Race</race>
+    <defaultFactionType>PlayerColony</defaultFactionType>
+    <isFighter>false</isFighter>
+    <initialFactionRelations>
+      <PlayerColony>100</PlayerColony>
+    </initialFactionRelations>
+    <abilities />
+    <combatPower>20</combatPower>
+    <baseRecruitDifficulty>0</baseRecruitDifficulty>
+    <backstoryCategories>
+      <li>Spacer</li>
+    </backstoryCategories>
+    <factionLeader>false</factionLeader>
+    <lifeStages>
+      <li>
+        <def>HumanlikeAdult</def>
+      </li>
+    </lifeStages>
+    <apparelIgnoreSeasons>true</apparelIgnoreSeasons>
+    <raceProperties>
+      <respectsFactionRelationships>true</respectsFactionRelationships>
+    </raceProperties>
+    <skills>
+      <li>
+        <def>Medicine</def>
+        <level>16</level>
+      </li>
+      <li>
+        <def>Intellectual</def>
+        <level>16</level>
+      </li>
+      <li>
+        <def>Social</def>
+        <level>14</level>
+      </li>
+      <li>
+        <def>Animals</def>
+        <level>4</level>
+      </li>
+      <li>
+        <def>Construction</def>
+        <level>6</level>
+      </li>
+      <li>
+        <def>Crafting</def>
+        <level>6</level>
+      </li>
+    </skills>
+    <traitTags />
+    <traits>
+      <li>
+        <def>Kind</def>
+      </li>
+      <li>
+        <def>Industriousness</def>
+        <degree>2</degree>
+      </li>
+    </traits>
+    <workTags>None</workTags>
+  </PawnKindDef>
+</Defs>
