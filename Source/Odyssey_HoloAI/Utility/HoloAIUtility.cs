@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using HarmonyLib;
 using RimWorld;
 using Verse;
 
@@ -8,6 +10,11 @@ namespace Odyssey_HoloAI;
 public static class HoloAIUtility
 {
     private static PawnKindDef? cachedKindDef;
+    private static readonly PropertyInfo? AreaRestrictionProperty = AccessTools.Property(typeof(Pawn_PlayerSettings), "AreaRestriction");
+    private static readonly FieldInfo? AreaRestrictionField = AccessTools.Field(typeof(Pawn_PlayerSettings), "areaRestriction");
+    private static readonly MethodInfo? NotifyAreaChangedMethod = AccessTools.Method(typeof(Pawn_PlayerSettings), "Notify_AreaChanged")
+        ?? AccessTools.Method(typeof(Pawn_PlayerSettings), "Notify_AreaRestrictionChanged");
+    private static bool areaRestrictionAssignmentFailed;
 
     public static PawnKindDef? HoloAIKindDef
     {
@@ -62,7 +69,6 @@ public static class HoloAIUtility
             pawn.drafter = new Pawn_DraftController(pawn);
         }
 
-        pawn.playerSettings?.Notify_AreaChanged();
         return pawn;
     }
 
@@ -73,7 +79,29 @@ public static class HoloAIUtility
             pawn.playerSettings = new Pawn_PlayerSettings(pawn);
         }
 
-        pawn.playerSettings.AreaRestriction = gravshipArea;
+        var settings = pawn.playerSettings;
+        var assigned = false;
+        if (AreaRestrictionProperty?.CanWrite == true)
+        {
+            AreaRestrictionProperty.SetValue(settings, gravshipArea);
+            assigned = true;
+        }
+        else if (AreaRestrictionField != null)
+        {
+            AreaRestrictionField.SetValue(settings, gravshipArea);
+            assigned = true;
+        }
+
+        if (!assigned && !areaRestrictionAssignmentFailed)
+        {
+            Log.Warning("[Odyssey_HoloAI] Unable to assign area restriction for HoloAI pawn; property not found.");
+            areaRestrictionAssignmentFailed = true;
+        }
+
+        if (assigned)
+        {
+            NotifyAreaChangedMethod?.Invoke(settings, System.Array.Empty<object?>());
+        }
     }
 
     public static bool TryEnsurePositionInsideArea(Pawn pawn, Area_Gravship area, IntVec3 anchor)
@@ -94,8 +122,34 @@ public static class HoloAIUtility
         }
 
         pawn.pather?.StopDead();
-        PawnUtility.TryTeleportThing(pawn, target, pawn.Map);
+        if (!TryTeleportPawn(pawn, target, pawn.Map))
+        {
+            return false;
+        }
         return area[target];
+    }
+
+    private static bool TryTeleportPawn(Pawn pawn, IntVec3 cell, Map? map)
+    {
+        if (map == null || !cell.IsValid || !cell.InBounds(map))
+        {
+            return false;
+        }
+
+        var rotation = pawn.Rotation;
+        var spawned = pawn.Spawned;
+        if (spawned)
+        {
+            if (pawn.Map != map)
+            {
+                return false;
+            }
+
+            pawn.DeSpawn(DestroyMode.Vanish);
+        }
+
+        GenSpawn.Spawn(pawn, cell, map, rotation, WipeMode.Vanish);
+        return true;
     }
 
     private static bool TryGetSpawnCell(Map map, Area_Gravship area, IntVec3 fallback, out IntVec3 cell)
