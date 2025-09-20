@@ -30,16 +30,16 @@ public class HoloAIMod : Mod
         listing.Label("Odyssey.HoloAI.Settings.Description".Translate());
         listing.GapLine();
 
-        DrawEditableList(listing,
+        settings.AllowedTerrainsBuffer = DrawEditableList(listing,
             "Odyssey.HoloAI.Settings.AllowedTerrains".Translate(),
-            ref settings.AllowedTerrainsBuffer,
+            settings.AllowedTerrainsBuffer,
             "Odyssey.HoloAI.Settings.AllowedTerrainsTooltip".Translate());
 
         listing.Gap();
 
-        DrawEditableList(listing,
+        settings.AnchorThingsBuffer = DrawEditableList(listing,
             "Odyssey.HoloAI.Settings.AnchorBuildings".Translate(),
-            ref settings.AnchorThingsBuffer,
+            settings.AnchorThingsBuffer,
             "Odyssey.HoloAI.Settings.AnchorBuildingsTooltip".Translate());
 
         listing.GapLine();
@@ -53,17 +53,18 @@ public class HoloAIMod : Mod
         settings.SyncListsFromBuffers();
     }
 
-    private static void DrawEditableList(Listing_Standard listing, string label, ref string buffer, string tooltip)
+    private static string DrawEditableList(Listing_Standard listing, string label, string buffer, string tooltip)
     {
         listing.Label(label);
         var rect = listing.GetRect(60f);
         Widgets.DrawMenuSection(rect);
         var textRect = rect.ContractedBy(4f);
-        buffer = Widgets.TextArea(textRect, buffer);
+        var result = Widgets.TextArea(textRect, buffer);
         if (!tooltip.NullOrEmpty())
         {
             Widgets.DrawHighlightIfMouseover(rect);
             TooltipHandler.TipRegion(rect, tooltip);
         }
+        return result;
     }
 }
