@@ -17,10 +17,9 @@ public class Pawn_HolographicAI : Pawn
         base.DeSpawn(DestroyMode.Vanish);
     }
 
-    public override bool PreApplyDamage(ref DamageInfo dinfo, out bool absorbed)
+    public override void PreApplyDamage(ref DamageInfo dinfo, out bool absorbed)
     {
         absorbed = true;
-        return false;
     }
 
     public override void Kill(DamageInfo? dinfo, Hediff? exactCulprit = null)
