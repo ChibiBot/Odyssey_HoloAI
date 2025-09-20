@@ -17,4 +17,20 @@ You can also list the anchor buildings (projectors, bridges, computers) that sho
 
 ## Source
 
-The `Source/` directory contains a C# project targeting `net472`. Reference it against your RimWorld installation (for example `RimWorldWin64_Data/Managed`) and build to the `Assemblies/` folder to ship the compiled DLL.
+The `Source/` directory contains a C# project targeting `net472`.
+
+### Building
+
+1. Install the .NET SDK (6.0 or newer works well for building `net472` projects).
+2. Point the build at your RimWorld managed assemblies. You can either:
+   - set the `RIMWORLD_MANAGED_PATH` environment variable to the game's `*Data/Managed` directory (for example `RimWorldWin64_Data/Managed`, `RimWorldWin_Data/Managed`, or `RimWorldLinux_Data/Managed`), or
+   - pass the `RimWorldManagedPath` MSBuild property (e.g. `dotnet build Source/Odyssey_HoloAI/Odyssey_HoloAI.csproj -p:RimWorldManagedPath="/path/to/RimWorldWin64_Data/Managed"`).
+
+   When the mod folder is placed alongside the game installation, the project also attempts to discover these directories automatically.
+3. Build the project:
+
+   ```bash
+   dotnet build Source/Odyssey_HoloAI/Odyssey_HoloAI.csproj
+   ```
+
+The compiled assembly is written to `Source/Assemblies/`. Copy the resulting DLL into the mod's `Assemblies/` folder when packaging a release.
