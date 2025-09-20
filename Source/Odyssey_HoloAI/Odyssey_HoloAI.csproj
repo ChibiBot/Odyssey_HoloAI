@@ -9,53 +9,68 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <RimWorldManagedPath Condition="'$(RimWorldManagedPath)' == '' and '$(RIMWORLD_MANAGED_PATH)' != ''">$(RIMWORLD_MANAGED_PATH)</RimWorldManagedPath>
+    <RimWorldManagedPath Condition="'$(RimWorldManagedPath)' == '' and Exists('$(MSBuildThisFileDirectory)..\..\..\RimWorldWin64_Data\Managed\Assembly-CSharp.dll')">$(MSBuildThisFileDirectory)..\..\..\RimWorldWin64_Data\Managed</RimWorldManagedPath>
+    <RimWorldManagedPath Condition="'$(RimWorldManagedPath)' == '' and Exists('$(MSBuildThisFileDirectory)..\..\..\RimWorldWin_Data\Managed\Assembly-CSharp.dll')">$(MSBuildThisFileDirectory)..\..\..\RimWorldWin_Data\Managed</RimWorldManagedPath>
+    <RimWorldManagedPath Condition="'$(RimWorldManagedPath)' == '' and Exists('$(MSBuildThisFileDirectory)..\..\..\RimWorldLinux_Data\Managed\Assembly-CSharp.dll')">$(MSBuildThisFileDirectory)..\..\..\RimWorldLinux_Data\Managed</RimWorldManagedPath>
+    <RimWorldManagedPath Condition="'$(RimWorldManagedPath)' == '' and Exists('$(MSBuildThisFileDirectory)..\..\..\RimWorld64_Data\Managed\Assembly-CSharp.dll')">$(MSBuildThisFileDirectory)..\..\..\RimWorld64_Data\Managed</RimWorldManagedPath>
+  </PropertyGroup>
+
   <ItemGroup>
-    <Compile Include="**\*.cs" />
+    <Compile Include="**\*.cs" Exclude="bin\**;obj\**" />
   </ItemGroup>
-  <ItemGroup>
+
+  <ItemGroup Condition="'$(RimWorldManagedPath)' != ''">
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>$(RimWorldManagedPath)/Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>$(RimWorldManagedPath)/UnityEngine.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>$(RimWorldManagedPath)/UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>$(RimWorldManagedPath)/UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>$(RimWorldManagedPath)/UnityEngine.IMGUIModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>$(RimWorldManagedPath)/UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.AudioModule">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+      <HintPath>$(RimWorldManagedPath)/UnityEngine.AudioModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>$(RimWorldManagedPath)/UnityEngine.PhysicsModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Verse">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\Verse.dll</HintPath>
+      <HintPath>$(RimWorldManagedPath)/Verse.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="0Harmony">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\0Harmony.dll</HintPath>
+      <HintPath>$(RimWorldManagedPath)/0Harmony.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="RimWorld">
-      <HintPath>..\..\..\RimWorldWin64_Data\Managed\RimWorld.dll</HintPath>
+      <HintPath>$(RimWorldManagedPath)/RimWorld.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
+
+  <Target Name="EnsureRimWorldManagedPath" BeforeTargets="ResolveReferences">
+    <Error Condition="'$(RimWorldManagedPath)' == ''" Text="Unable to locate the RimWorld managed assemblies. Set the RimWorldManagedPath MSBuild property or the RIMWORLD_MANAGED_PATH environment variable to the RimWorld *Data/Managed directory." />
+    <Error Condition="'$(RimWorldManagedPath)' != '' and !Exists('$(RimWorldManagedPath)/Assembly-CSharp.dll')" Text="The directory '$(RimWorldManagedPath)' does not appear to contain the RimWorld managed assemblies. Ensure it points to the game's *Data/Managed folder." />
+  </Target>
 </Project>
