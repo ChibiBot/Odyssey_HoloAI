@@ -83,7 +83,7 @@ public class Pawn_HolographicAI : Pawn
         }
     }
 
-    public override void Tick()
+    protected override void Tick()
     {
         base.Tick();
         StabilizeNeeds();
