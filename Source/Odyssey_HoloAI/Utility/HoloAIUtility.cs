@@ -15,6 +15,7 @@ public static class HoloAIUtility
     private static readonly MethodInfo? NotifyAreaChangedMethod = AccessTools.Method(typeof(Pawn_PlayerSettings), "Notify_AreaChanged")
         ?? AccessTools.Method(typeof(Pawn_PlayerSettings), "Notify_AreaRestrictionChanged");
     private static readonly FieldInfo? MapComponentsField = AccessTools.Field(typeof(Map), "components");
+    private static readonly PropertyInfo? MapComponentsProperty = AccessTools.Property(typeof(Map), "components");
     private static bool areaRestrictionAssignmentFailed;
     private static bool mapComponentInjectionFailed;
 
@@ -44,6 +45,14 @@ public static class HoloAIUtility
         {
             component = new GravshipMapComponent(map);
             components.Add(component);
+            component.FinalizeInit();
+            return component;
+        }
+
+        if (MapComponentsProperty?.GetValue(map) is IList<MapComponent> propertyComponents)
+        {
+            component = new GravshipMapComponent(map);
+            propertyComponents.Add(component);
             component.FinalizeInit();
             return component;
         }

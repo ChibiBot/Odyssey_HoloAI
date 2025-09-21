@@ -21,9 +21,12 @@ public class Pawn_HolographicAI : Pawn
         WorkTypeDefOf.Hauling
     };
 
+    private static bool needsStabilizationWarningEmitted;
+
     public override void SpawnSetup(Map map, bool respawningAfterLoad)
     {
         base.SpawnSetup(map, respawningAfterLoad);
+        StabilizeNeeds();
         var component = HoloAIUtility.EnsureGravshipComponent(map);
         component?.RegisterPawn(this);
     }
@@ -67,6 +70,23 @@ public class Pawn_HolographicAI : Pawn
         EnsureTraits();
         ApplySkillLevels();
         ConfigureWorkPriorities();
+        StabilizeNeeds();
+    }
+
+    public override void ExposeData()
+    {
+        base.ExposeData();
+
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
+            StabilizeNeeds();
+        }
+    }
+
+    public override void Tick()
+    {
+        base.Tick();
+        StabilizeNeeds();
     }
 
     private void EnsureTraits()
@@ -127,6 +147,46 @@ public class Pawn_HolographicAI : Pawn
             {
                 workSettings.SetPriority(workType, 0);
                 workSettings.Disable(workType);
+            }
+        }
+    }
+
+    private void StabilizeNeeds()
+    {
+        if (needs == null)
+        {
+            return;
+        }
+
+        var allNeeds = needs.AllNeeds;
+        if (allNeeds == null)
+        {
+            return;
+        }
+
+        foreach (var need in allNeeds)
+        {
+            if (need == null)
+            {
+                continue;
+            }
+
+            try
+            {
+                if (need.def.maxLevel <= 0f)
+                {
+                    continue;
+                }
+
+                need.CurLevel = need.MaxLevel;
+            }
+            catch (System.Exception ex)
+            {
+                if (!needsStabilizationWarningEmitted)
+                {
+                    Log.Warning($"[Odyssey_HoloAI] Unable to stabilise need '{need.def?.defName ?? "(unknown)"}' for the holographic AI pawn: {ex.Message}");
+                    needsStabilizationWarningEmitted = true;
+                }
             }
         }
     }

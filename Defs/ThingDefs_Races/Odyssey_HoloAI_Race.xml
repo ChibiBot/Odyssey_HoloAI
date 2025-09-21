@@ -11,18 +11,7 @@
       <MarketValue>0</MarketValue>
       <Flammability>0</Flammability>
     </statBases>
-    <race>
-      <fleshType>Mechanoid</fleshType>
-      <hediffGiverSets />
-      <lifeStageAges>
-        <li>
-          <def>HumanlikeAdult</def>
-          <minAge>0</minAge>
-        </li>
-      </lifeStageAges>
-    </race>
     <techLevel>Ultra</techLevel>
-    <tools />
     <drawGUIOverlay>true</drawGUIOverlay>
     <drawOffscreen>false</drawOffscreen>
   </ThingDef>
