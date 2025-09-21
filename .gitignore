@@ -1,0 +1,54 @@
+# Build output
+Assemblies/
+[Bb]in/
+[Oo]bj/
+*.dll
+*.exe
+*.pdb
+*.mdb
+
+# User-specific & IDE files
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# NuGet / packages
+*.nupkg
+packages/
+.nuget/
+*.snupkg
+
+# VS Code / VSCodium extensions cache
+.vscode-test/
+
+# Rider / JetBrains
+*.iml
+*.ipr
+*.iws
+out/
+.idea/
+
+# Dotnet user secrets & caches
+.vs/
+.project
+*.tmp
+*.cache
+*.bak
+
+# Auto-generated lock files
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Backup files
+*~
