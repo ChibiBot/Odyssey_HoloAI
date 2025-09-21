@@ -75,8 +75,6 @@ public class Pawn_HolographicAI : Pawn
 
         EnsureTrait(TraitDefOf.Kind);
         EnsureTrait(TraitDefOf.Industriousness, 2);
-
-        story.DisabledWorkTags |= WorkTags.Violent;
     }
 
     private void EnsureTrait(TraitDef traitDef, int degree = 0)
@@ -128,6 +126,7 @@ public class Pawn_HolographicAI : Pawn
             if ((workType.workTags & WorkTags.Violent) != 0)
             {
                 workSettings.SetPriority(workType, 0);
+                workSettings.Disable(workType);
             }
         }
     }
