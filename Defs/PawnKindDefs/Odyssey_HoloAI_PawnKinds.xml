@@ -4,9 +4,33 @@
     <defName>Odyssey_HoloAI</defName>
     <label>gravship holographic AI</label>
     <race>Odyssey_HoloAI_Race</race>
-    <defaultFactionType>PlayerColony</defaultFactionType>
+    <defaultFactionDef>PlayerColony</defaultFactionDef>
     <isFighter>false</isFighter>
     <combatPower>20</combatPower>
     <apparelIgnoreSeasons>true</apparelIgnoreSeasons>
+    <skills>
+      <li>
+        <skill>Medicine</skill>
+        <range>16~16</range>
+      </li>
+      <li>
+        <skill>Intellectual</skill>
+        <range>16~16</range>
+      </li>
+      <li>
+        <skill>Social</skill>
+        <range>14~14</range>
+      </li>
+    </skills>
+    <forcedTraits>
+      <li>
+        <def>Kind</def>
+      </li>
+      <li>
+        <def>Industriousness</def>
+        <degree>2</degree>
+      </li>
+    </forcedTraits>
+    <disabledWorkTags>Violent</disabledWorkTags>
   </PawnKindDef>
 </Defs>
