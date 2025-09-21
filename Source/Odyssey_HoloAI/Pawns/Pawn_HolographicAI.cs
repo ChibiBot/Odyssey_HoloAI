@@ -173,7 +173,7 @@ public class Pawn_HolographicAI : Pawn
 
             try
             {
-                if (need.def.maxLevel <= 0f)
+                if (need.MaxLevel <= 0f)
                 {
                     continue;
                 }
