@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
-  <MapComponentDef>
-    <defName>Odyssey_GravshipMapComponent</defName>
-    <componentClass>Odyssey_HoloAI.GravshipMapComponent</componentClass>
-  </MapComponentDef>
+  <!-- Map component registration handled dynamically in code for RimWorld 1.6. -->
 </Defs>

@@ -14,7 +14,9 @@ public static class HoloAIUtility
     private static readonly FieldInfo? AreaRestrictionField = AccessTools.Field(typeof(Pawn_PlayerSettings), "areaRestriction");
     private static readonly MethodInfo? NotifyAreaChangedMethod = AccessTools.Method(typeof(Pawn_PlayerSettings), "Notify_AreaChanged")
         ?? AccessTools.Method(typeof(Pawn_PlayerSettings), "Notify_AreaRestrictionChanged");
+    private static readonly FieldInfo? MapComponentsField = AccessTools.Field(typeof(Map), "components");
     private static bool areaRestrictionAssignmentFailed;
+    private static bool mapComponentInjectionFailed;
 
     public static PawnKindDef? HoloAIKindDef
     {
@@ -23,6 +25,36 @@ public static class HoloAIUtility
             cachedKindDef ??= DefDatabase<PawnKindDef>.GetNamedSilentFail("Odyssey_HoloAI");
             return cachedKindDef;
         }
+    }
+
+    public static GravshipMapComponent? EnsureGravshipComponent(Map? map)
+    {
+        if (map == null)
+        {
+            return null;
+        }
+
+        var component = map.GetComponent<GravshipMapComponent>();
+        if (component != null)
+        {
+            return component;
+        }
+
+        if (MapComponentsField?.GetValue(map) is List<MapComponent> components)
+        {
+            component = new GravshipMapComponent(map);
+            components.Add(component);
+            component.FinalizeInit();
+            return component;
+        }
+
+        if (!mapComponentInjectionFailed)
+        {
+            Log.Warning("[Odyssey_HoloAI] Unable to attach gravship map component; map components field unavailable.");
+            mapComponentInjectionFailed = true;
+        }
+
+        return null;
     }
 
     public static bool IsHoloAI(Pawn pawn)
@@ -38,6 +70,8 @@ public static class HoloAIUtility
 
     public static Pawn? EnsureHoloAI(Map map, IntVec3 fallbackCell, Area_Gravship gravshipArea)
     {
+        EnsureGravshipComponent(map);
+
         var existing = FindExistingHoloAI(map);
         if (existing != null)
         {
