@@ -1,0 +1,9 @@
+<Defs>
+  <PawnKindDef ParentName="BasePlayerPawnKind">
+    <defName>OH_ShipAI</defName>
+    <label>ship AI</label>
+    <race>Human</race>
+    <combatPower>0</combatPower>
+    <apparelTags/>
+  </PawnKindDef>
+</Defs>
