@@ -9,10 +9,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>$(RIMWORLD_DLL_PATH)/0Harmony.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
       <HintPath>$(RIMWORLD_DLL_PATH)/Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
     </Reference>
@@ -26,6 +22,10 @@
     </Reference>
     <Reference Include="netstandard">
       <HintPath>/usr/lib/mono/4.8-api/Facades/netstandard.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(RIMWORLD_DLL_PATH)/0Harmony.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
