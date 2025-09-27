@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LanguageData>
+  <OH_CommandSpawnShipAI>Project ship AI</OH_CommandSpawnShipAI>
+  <OH_CommandSpawnShipAIDesc>Materialise the gravship's holographic assistant beside this console.</OH_CommandSpawnShipAIDesc>
+  <OH_CommandSpawnShipAI_NoPawnKind>No ship AI pawn kind is configured.</OH_CommandSpawnShipAI_NoPawnKind>
+  <OH_CommandSpawnShipAI_NoMap>The console must be built before projecting the ship AI.</OH_CommandSpawnShipAI_NoMap>
+  <OH_CommandSpawnShipAI_AlreadySpawned>The ship AI has already been projected from this console.</OH_CommandSpawnShipAI_AlreadySpawned>
+  <OH_CommandSpawnShipAI_AlreadyPresent>A ship AI is already active on this map.</OH_CommandSpawnShipAI_AlreadyPresent>
+  <OH_CommandSpawnShipAI_NoSpace>No clear space is available to project the ship AI.</OH_CommandSpawnShipAI_NoSpace>
+  <OH_CommandSpawnShipAI_Spawned>{PAWN_labelShort} materialises beside the console.</OH_CommandSpawnShipAI_Spawned>
+</LanguageData>
