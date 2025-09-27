@@ -8,7 +8,7 @@ namespace Odyssey_HoloAI;
 
 public class CompProperties_ShipAIConsole : CompProperties
 {
-    public PawnKindDef pawnKind = DefDatabase<PawnKindDef>.GetNamed("OH_ShipAI_Kind");
+    public PawnKindDef pawnKind;
 
     public CompProperties_ShipAIConsole()
     {

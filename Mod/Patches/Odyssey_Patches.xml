@@ -4,7 +4,7 @@
     <xpath>Defs/ThingDef[defName="PilotConsole"]/comps</xpath>
     <value>
       <li Class="Odyssey_HoloAI.CompProperties_ShipAIConsole">
-        <pawnKind>OH_ShipAI</pawnKind>
+        <pawnKind>OH_ShipAI_Kind</pawnKind>
       </li>
     </value>
   </Operation>
