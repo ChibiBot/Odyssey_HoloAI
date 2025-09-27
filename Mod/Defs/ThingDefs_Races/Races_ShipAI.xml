@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Defs>
-    <ThingDef ParentName="BasePawn">
+    <ThingDef ParentName="Human">
         <defName>OH_ShipAI</defName>
         <label>ship AI</label>
         <description>A holographic artificial intelligence given form. She isn’t truly human, but mimics their appearance with uncanny precision.</description>
@@ -29,8 +29,6 @@
             <foodType>None</foodType>
             <hasGenders>true</hasGenders>
             <lifeExpectancy>9999</lifeExpectancy>
-            <leatherDef>Leather_Human</leatherDef>
-            <butcherProducts />
         </race>
         <tradeTags>
             <li>AI</li>

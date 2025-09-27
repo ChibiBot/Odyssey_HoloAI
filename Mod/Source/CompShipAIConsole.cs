@@ -8,7 +8,7 @@ namespace Odyssey_HoloAI;
 
 public class CompProperties_ShipAIConsole : CompProperties
 {
-    public PawnKindDef pawnKind;
+    public PawnKindDef pawnKind = DefDatabase<PawnKindDef>.GetNamedSilentFail("OH_ShipAI_Kind");
 
     public CompProperties_ShipAIConsole()
     {
