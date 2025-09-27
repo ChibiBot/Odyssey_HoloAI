@@ -26,10 +26,11 @@
             <baseHealthScale>1.0</baseHealthScale>
             <foodType>None</foodType> <!-- No hunger -->
             <needsRest>false</needsRest>
-            <foodType>None</foodType>            
+            <foodType>None</foodType>
             <hasGenders>true</hasGenders>
             <lifeExpectancy>9999</lifeExpectancy>
             <leatherDef>Leather_Human</leatherDef>
+            <butcherProducts />
         </race>
         <tradeTags>
             <li>AI</li>
