@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Patch>
-  <!-- Reserved for future compatibility patches. -->
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/ThingDef[defName="PilotConsole"]/comps</xpath>
+    <value>
+      <li Class="Odyssey_HoloAI.CompProperties_ShipAIConsole">
+        <pawnKind>OH_ShipAI</pawnKind>
+      </li>
+    </value>
+  </Operation>
 </Patch>
