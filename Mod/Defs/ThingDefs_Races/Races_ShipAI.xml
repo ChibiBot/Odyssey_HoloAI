@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+    <ThingDef ParentName="BasePawn">
+        <defName>OH_ShipAI</defName>
+        <label>ship AI</label>
+        <description>A holographic artificial intelligence given form. She isn’t truly human, but mimics their appearance with uncanny precision.</description>
+        <statBases>
+            <ToxicResistance>1</ToxicResistance>
+            <Flammability>0</Flammability>
+            <MoveSpeed>4.5</MoveSpeed>
+            <MeleeHitChance>0.0</MeleeHitChance>
+            <ComfyTemperatureMin>-1000</ComfyTemperatureMin>
+            <ComfyTemperatureMax>5000</ComfyTemperatureMax>
+            <PsychicSensitivity>1.2</PsychicSensitivity>
+            <MeatAmount>0</MeatAmount>
+            <ArmorRating_Heat>2.00</ArmorRating_Heat>
+        </statBases>
+        <race>
+            <fleshType>Mechanoid</fleshType>
+            <thinkTreeMain>Humanlike</thinkTreeMain>
+            <thinkTreeConstant>HumanlikeConstant</thinkTreeConstant>
+            <intelligence>Humanlike</intelligence>
+            <makesFootprints>false</makesFootprints>
+            <body>Human</body>
+            <baseBodySize>1.0</baseBodySize>
+            <baseHealthScale>1.0</baseHealthScale>
+            <foodType>None</foodType> <!-- No hunger -->
+            <needsRest>false</needsRest>
+            <foodType>None</foodType>            
+            <hasGenders>true</hasGenders>
+            <lifeExpectancy>9999</lifeExpectancy>
+            <leatherDef>Leather_Human</leatherDef>
+        </race>
+        <tradeTags>
+            <li>AI</li>
+        </tradeTags>
+    </ThingDef>
+</Defs>

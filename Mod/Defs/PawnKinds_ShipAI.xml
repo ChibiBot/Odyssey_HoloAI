@@ -1,9 +1,67 @@
-<Defs>
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>  
   <PawnKindDef ParentName="BasePlayerPawnKind">
-    <defName>OH_ShipAI</defName>
+    <defName>OH_ShipAI_Kind</defName>
     <label>ship AI</label>
-    <race>Human</race>
+    <race>OH_ShipAI</race>
     <combatPower>0</combatPower>
-    <apparelTags/>
+    <apparelTags>
+      <li>IndustrialAdvanced</li>
+    </apparelTags>
+    <weaponTags/>
+    <disallowedTraits>
+      <li>Nudist</li>
+    </disallowedTraits>
+    <skills>
+      <li>
+        <skill>Shooting</skill>
+        <range>0~0</range>
+      </li>
+      <li>
+        <skill>Melee</skill>
+        <range>0~0</range>
+      </li>
+      <li>
+        <skill>Construction</skill>
+        <range>0~0</range>
+      </li>
+      <li>
+        <skill>Mining</skill>
+        <range>0~0</range>
+      </li>
+      <li>
+        <skill>Cooking</skill>
+        <range>0~0</range>
+      </li>
+      <li>
+        <skill>Plants</skill>
+        <range>0~0</range>
+      </li>
+      <li>
+        <skill>Animals</skill>
+        <range>0~0</range>
+      </li>
+      <li>
+        <skill>Crafting</skill>
+        <range>0~0</range>
+      </li>
+      <li>
+        <skill>Artistic</skill>
+        <range>0~0</range>
+      </li>
+      <li>
+        <skill>Medicine</skill>
+        <range>14~14</range>
+      </li>
+      <li>
+        <skill>Social</skill>
+        <range>10~10</range>
+      </li>
+      <li>
+        <skill>Intellectual</skill>
+        <range>20~20</range>
+      </li>
+    </skills>
+    <initialResistanceRange>14~23</initialResistanceRange>
   </PawnKindDef>
 </Defs>

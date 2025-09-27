@@ -8,7 +8,7 @@ namespace Odyssey_HoloAI;
 
 public class CompProperties_ShipAIConsole : CompProperties
 {
-    public PawnKindDef pawnKind;
+    public PawnKindDef pawnKind = DefDatabase<PawnKindDef>.GetNamed("OH_ShipAI_Kind");
 
     public CompProperties_ShipAIConsole()
     {
@@ -128,6 +128,11 @@ public class CompShipAIConsole : ThingComp
 
         PawnGenerationRequest request = new PawnGenerationRequest(Props.pawnKind, Faction.OfPlayer, forceGenerateNewPawn: true);
         Pawn pawn = PawnGenerator.GeneratePawn(request);
+
+        pawn.Name = new NameSingle("Aki"); // Awww~ you’d like that, wouldn’t you, baka.        
+        pawn.story.HairColor = new Color(0f, 0f, 0f); // Black hair
+
+        // Spawn it
         GenSpawn.Spawn(pawn, spawnCell, map);
 
         shipAiSpawned = true;
@@ -144,7 +149,7 @@ public class CompShipAIConsole : ThingComp
             return true;
         }
 
-        if (CellFinder.TryFindRandomClosewalkCellNear(parent.Position, map, 2, out result))
+        if (CellFinder.TryRandomClosewalkCellNear(parent.Position, map, 2, out result))
         {
             return true;
         }
