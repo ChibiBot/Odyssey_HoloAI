@@ -4,6 +4,7 @@
     <defName>OH_ShipAI_Kind</defName>
     <label>ship AI</label>
     <race>OH_ShipAI</race>
+    <gender>female</gender>
     <combatPower>0</combatPower>
     <apparelTags>
       <li>IndustrialAdvanced</li>

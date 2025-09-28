@@ -14,8 +14,11 @@
             <PsychicSensitivity>1.2</PsychicSensitivity>
             <MeatAmount>0</MeatAmount>
             <ArmorRating_Heat>2.00</ArmorRating_Heat>
+            <VacuumResistance MayRequire="Ludeon.RimWorld.Odyssey">1</VacuumResistance>
         </statBases>
         <race>
+            <hasCorpse>false</hasCorpse>
+            <alwaysAwake>true</alwaysAwake>
             <makesFootprints>false</makesFootprints>
             <baseBodySize>1.0</baseBodySize>
             <baseHealthScale>1.0</baseHealthScale>
@@ -23,6 +26,7 @@
             <needsRest>false</needsRest>
             <foodType>None</foodType>
             <lifeExpectancy>9999</lifeExpectancy>
+            <trainability>None</trainability>
         </race>
         <tradeTags>
             <li>AI</li>
