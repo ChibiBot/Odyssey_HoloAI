@@ -4,11 +4,41 @@
     <defName>OH_ShipAI_Kind</defName>
     <label>ship AI</label>
     <race>OH_ShipAI</race>
-    <gender>female</gender>
+    <fixedGender>Female</fixedGender>
     <combatPower>0</combatPower>
+    <minGenerationAge>19</minGenerationAge>
+    <maxGenerationAge>19</maxGenerationAge>
     <apparelTags>
       <li>IndustrialAdvanced</li>
     </apparelTags>
+    <apparelRequired>
+      <li>Apparel_BasicShirt</li>
+      <li>Apparel_Pants</li>
+    </apparelRequired>
+    <apparelAllowHeadgearChance>0</apparelAllowHeadgearChance>
+    <styleItemTags>
+      <li>
+        <tag>HairLong</tag>
+        <baseWeight>10</baseWeight>
+        <weightFactor>1</weightFactor>
+      </li>
+      <li>
+        <tag>NoBeard</tag>
+        <baseWeight>10</baseWeight>
+        <weightFactor>1</weightFactor>
+      </li>
+      <li>
+        <tag>NoTattoo</tag>
+        <baseWeight>10</baseWeight>
+        <weightFactor>1</weightFactor>
+      </li>
+    </styleItemTags>
+    <useFactionXenotypes>false</useFactionXenotypes>
+    <xenotypeSet MayRequire="Ludeon.RimWorld.Biotech">
+      <xenotypeChances>
+        <OH_ShipAI_Xenotype>1</OH_ShipAI_Xenotype>
+      </xenotypeChances>
+    </xenotypeSet>
     <weaponTags/>
     <disallowedTraits>
       <li>Nudist</li>
