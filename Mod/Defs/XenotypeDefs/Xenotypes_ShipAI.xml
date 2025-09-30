@@ -6,5 +6,6 @@
     <description>An artificial xenotype used to anchor Odyssey's holographic ship intelligence in a humanoid frame.</description>
     <inheritable>false</inheritable>
     <factionlessGenerationWeight>0</factionlessGenerationWeight>
+    <iconPath>UI/Icons/Xenotypes/Highmate</iconPath>
   </XenotypeDef>
 </Defs>
