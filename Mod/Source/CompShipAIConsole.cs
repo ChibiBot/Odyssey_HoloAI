@@ -135,6 +135,9 @@ public class CompShipAIConsole : ThingComp
         // Spawn it
         GenSpawn.Spawn(pawn, spawnCell, map);
 
+        CompShipAILeash leash = pawn.TryGetComp<CompShipAILeash>();
+        leash?.Initialize(parent, spawnCell);
+
         shipAiSpawned = true;
 
         Messages.Message("OH_CommandSpawnShipAI_Spawned".Translate(pawn.Named("PAWN")), pawn, MessageTypeDefOf.PositiveEvent);
