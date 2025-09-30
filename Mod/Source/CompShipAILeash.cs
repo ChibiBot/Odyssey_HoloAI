@@ -111,7 +111,7 @@ public class CompShipAILeash : ThingComp
         if (pather != null && pather.Moving)
         {
             LocalTargetInfo destination = pather.Destination;
-            if (destination.IsValid && destination.HasCell && !ShipAIGravUtility.IsOnAllowedTile(map, destination.Cell))
+            if (destination.IsValid && !ShipAIGravUtility.IsOnAllowedTile(map, destination.Cell))
             {
                 pawn.jobs?.EndCurrentJob(JobCondition.Incompletable);
                 pather.StopDead();
