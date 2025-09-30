@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+  <XenotypeDef MayRequire="Ludeon.RimWorld.Biotech">
+    <defName>OH_ShipAI_Xenotype</defName>
+    <label>ship AI</label>
+    <description>An artificial xenotype used to anchor Odyssey's holographic ship intelligence in a humanoid frame.</description>
+    <inheritable>false</inheritable>
+    <factionlessGenerationWeight>0</factionlessGenerationWeight>
+  </XenotypeDef>
+</Defs>
