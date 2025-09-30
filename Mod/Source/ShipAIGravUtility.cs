@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using RimWorld;
 using Verse;
 
@@ -13,6 +14,8 @@ internal static class ShipAIGravUtility
         "Gravship"
     };
 
+    private const string SubstructureToken = "Substructure";
+
     public static bool IsOnAllowedTile(Map map, IntVec3 cell)
     {
         if (map == null || !cell.InBounds(map))
@@ -23,24 +26,16 @@ internal static class ShipAIGravUtility
         TerrainDef terrain = map.terrainGrid?.TerrainAt(cell);
         if (terrain == null)
         {
-            return false;
+            return IsOnAllowedStructure(map, cell);
         }
 
         string defName = terrain.defName;
-        if (defName.NullOrEmpty())
+        if (MatchesAllowedSurface(defName))
         {
-            return false;
+            return true;
         }
 
-        for (int i = 0; i < GravshipTerrainPrefixes.Length; i++)
-        {
-            if (defName.StartsWith(GravshipTerrainPrefixes[i], StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return IsOnAllowedStructure(map, cell);
     }
 
     public static bool IsAllowedStandable(Map map, IntVec3 cell)
@@ -98,5 +93,48 @@ internal static class ShipAIGravUtility
         }
 
         GenSpawn.Spawn(pawn, cell, map);
+    }
+
+    private static bool MatchesAllowedSurface(string defName)
+    {
+        if (defName.NullOrEmpty())
+        {
+            return false;
+        }
+
+        for (int i = 0; i < GravshipTerrainPrefixes.Length; i++)
+        {
+            if (defName.StartsWith(GravshipTerrainPrefixes[i], StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return defName.IndexOf(SubstructureToken, StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+    private static bool IsOnAllowedStructure(Map map, IntVec3 cell)
+    {
+        if (map?.thingGrid == null)
+        {
+            return false;
+        }
+
+        List<Thing> thingList = map.thingGrid.ThingsListAtFast(cell);
+        for (int i = 0; i < thingList.Count; i++)
+        {
+            Thing thing = thingList[i];
+            if (thing?.def == null)
+            {
+                continue;
+            }
+
+            if (MatchesAllowedSurface(thing.def.defName))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
