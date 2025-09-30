@@ -28,6 +28,9 @@
             <lifeExpectancy>9999</lifeExpectancy>
             <trainability>None</trainability>
         </race>
+        <comps>
+            <li Class="Odyssey_HoloAI.CompProperties_ShipAILeash" />
+        </comps>
         <tradeTags>
             <li>AI</li>
         </tradeTags>
