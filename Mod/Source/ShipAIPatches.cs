@@ -26,14 +26,14 @@ internal static class ShipAIUtility
 [HarmonyPatch(typeof(Pawn), nameof(Pawn.TakeDamage))]
 internal static class Pawn_TakeDamage_ShipAIPatch
 {
-    private static bool Prefix(Pawn __instance, ref DamageResult __result)
+    private static bool Prefix(Pawn __instance, ref DamageWorker.DamageResult __result)
     {
         if (!ShipAIUtility.IsShipAI(__instance))
         {
             return true;
         }
 
-        __result = new DamageResult();
+        __result = new DamageWorker.DamageResult();
         return false;
     }
 }
