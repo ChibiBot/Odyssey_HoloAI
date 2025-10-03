@@ -37,6 +37,14 @@ public class CompShipAILeash : ThingComp
             return;
         }
 
+        pawn.drafter?.SetDrafted(false);
+        if (pawn.playerSettings != null)
+        {
+            pawn.playerSettings.hostilityResponse = HostilityResponseMode.Flee;
+        }
+
+        pawn.needs?.AddOrRemoveNeedsAsAppropriate();
+
         if (!lastValidCell.IsValid || !ShipAIGravUtility.IsOnAllowedTile(pawn.Map, lastValidCell))
         {
             if (ShipAIGravUtility.IsOnAllowedTile(pawn.Map, pawn.Position))
