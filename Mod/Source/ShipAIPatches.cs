@@ -100,7 +100,7 @@ internal static class Pawn_NeedsTracker_ShouldHaveNeed_ShipAIPatch
 {
     private static void Postfix(Pawn_NeedsTracker __instance, NeedDef nd, ref bool __result)
     {
-        if (__result && nd == NeedDefOf.Outdoors)
+        if (__result && nd == NeedDefOf.Indoors)
         {
             Pawn pawn = Traverse.Create(__instance).Field("pawn").GetValue<Pawn>();
             if (ShipAIUtility.IsShipAI(pawn))

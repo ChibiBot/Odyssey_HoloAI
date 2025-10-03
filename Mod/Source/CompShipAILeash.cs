@@ -37,7 +37,7 @@ public class CompShipAILeash : ThingComp
             return;
         }
 
-        pawn.drafter?.SetDrafted(false);
+        pawn.drafter?.Drafted = false;
         if (pawn.playerSettings != null)
         {
             pawn.playerSettings.hostilityResponse = HostilityResponseMode.Flee;
