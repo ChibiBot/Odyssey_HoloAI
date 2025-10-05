@@ -23,12 +23,17 @@ internal static class ShipAIUtility
     }
 }
 
-[HarmonyPatch(typeof(Pawn), nameof(Pawn.TakeDamage))]
+[HarmonyPatch(typeof(Thing), nameof(Thing.TakeDamage))]
 internal static class Pawn_TakeDamage_ShipAIPatch
 {
-    private static bool Prefix(Pawn __instance, ref DamageWorker.DamageResult __result)
+    private static bool Prefix(Thing __instance, ref DamageWorker.DamageResult __result)
     {
-        if (!ShipAIUtility.IsShipAI(__instance))
+        if (__instance is not Pawn pawn)
+        {
+            return true;
+        }
+
+        if (!ShipAIUtility.IsShipAI(pawn))
         {
             return true;
         }
