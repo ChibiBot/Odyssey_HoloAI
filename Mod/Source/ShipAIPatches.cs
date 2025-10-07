@@ -227,28 +227,30 @@ internal static class WorkGiver_Researcher_TryGiveJob_ShipAIPatch
         return targetMethod;
     }
 
-    private static void Postfix(WorkGiver_Researcher __instance, Pawn pawn, ref Job __result)
+    private static bool Prefix(WorkGiver_Researcher __instance, Pawn pawn, ref Job __result)
     {
         if (!ShipAIUtility.IsShipAI(pawn))
         {
-            return;
+            return true;
         }
 
-        if (__result == null)
-        {
-            return;
-        }
-
-        if (!ShipAIResearchUtility.CanShipAIResearchNow() || !MeditationUtility.CanMeditateNow(pawn))
+        if (!ShipAIResearchUtility.CanShipAIResearchNow())
         {
             __result = null;
-            return;
+            return false;
+        }
+
+        if (!MeditationUtility.CanMeditateNow(pawn))
+        {
+            __result = null;
+            return false;
         }
 
         Job job = MeditationUtility.GetMeditationJob(pawn) ?? JobMaker.MakeJob(JobDefOf.Meditate);
         job.workGiverDef = __instance.def;
         job.ignoreJoyTimeAssignment = true;
         __result = job;
+        return false;
     }
 }
 
