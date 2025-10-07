@@ -254,12 +254,31 @@ internal static class WorkGiver_Researcher_TryGiveJob_ShipAIPatch
     }
 }
 
-[HarmonyPatch(typeof(JobDriver_Meditate), nameof(JobDriver_Meditate.DriverTick))]
+[HarmonyPatch]
 internal static class JobDriver_Meditate_DriverTick_ShipAIPatch
 {
-    private static void Postfix(JobDriver_Meditate __instance)
+    private static readonly MethodInfo targetMethod =
+        AccessTools.Method(typeof(JobDriver_Meditate), nameof(JobDriver.DriverTick))
+        ?? AccessTools.Method(typeof(JobDriver), nameof(JobDriver.DriverTick));
+
+    private static bool Prepare()
     {
-        Pawn pawn = __instance.pawn;
+        return targetMethod != null;
+    }
+
+    private static MethodBase TargetMethod()
+    {
+        return targetMethod;
+    }
+
+    private static void Postfix(JobDriver __instance)
+    {
+        if (__instance is not JobDriver_Meditate meditateDriver)
+        {
+            return;
+        }
+
+        Pawn pawn = meditateDriver.pawn;
         if (!ShipAIUtility.IsShipAI(pawn))
         {
             return;
