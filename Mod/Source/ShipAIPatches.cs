@@ -295,14 +295,16 @@ internal static class ShipAIResearchUtility
 
         float factor = 1f;
         
-        if (ThingDefOf.HiTechResearchBench != null)
+        ThingDef hiTechResearchBench = DefDatabase<ThingDef>.GetNamedSilentFail("HiTechResearchBench");
+        if (hiTechResearchBench != null)
         {
-            factor = ThingDefOf.HiTechResearchBench.GetStatValueAbstract(StatDefOf.ResearchSpeedFactor);
+            factor = hiTechResearchBench.GetStatValueAbstract(StatDefOf.ResearchSpeedFactor);
         }
 
-        if (ThingDefOf.MultiAnalyzer != null)
+        ThingDef multiAnalyzer = DefDatabase<ThingDef>.GetNamedSilentFail("MultiAnalyzer");
+        if (multiAnalyzer != null)
         {
-            factor += ThingDefOf.MultiAnalyzer.GetStatValueAbstract(StatDefOf.ResearchSpeedFactor);
+            factor += multiAnalyzer.GetStatValueAbstract(StatDefOf.ResearchSpeedFactor);
         }
 
         cachedHighTechBenchFactor = factor;
