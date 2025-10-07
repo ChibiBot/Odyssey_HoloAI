@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using RimWorld;
@@ -124,5 +125,92 @@ internal static class Pawn_NeedsTracker_ShouldHaveNeed_ShipAIPatch
                 __result = false;
             }
         }
+    }
+}
+
+[HarmonyPatch(typeof(JobGiver_Work), nameof(JobGiver_Work.TryGiveJob))]
+internal static class JobGiver_Work_TryGiveJob_ShipAIPatch
+{
+    private static void Postfix(Pawn pawn, ref Job __result)
+    {
+        if (__result == null || !ShipAIUtility.IsShipAI(pawn))
+        {
+            return;
+        }
+
+        Map map = pawn.Map;
+        if (map == null)
+        {
+            return;
+        }
+
+        if (!JobTargetsWithinAllowedArea(map, __result))
+        {
+            __result = null;
+        }
+    }
+
+    private static bool JobTargetsWithinAllowedArea(Map map, Job job)
+    {
+        if (!TargetsWithinAllowedArea(map, job.targetA, job.targetQueueA))
+        {
+            return false;
+        }
+
+        if (!TargetsWithinAllowedArea(map, job.targetB, job.targetQueueB))
+        {
+            return false;
+        }
+
+        if (!TargetsWithinAllowedArea(map, job.targetC, job.targetQueueC))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static bool TargetsWithinAllowedArea(Map map, LocalTargetInfo target, List<LocalTargetInfo> queue)
+    {
+        if (!TargetWithinAllowedArea(map, target))
+        {
+            return false;
+        }
+
+        if (queue == null)
+        {
+            return true;
+        }
+
+        for (int i = 0; i < queue.Count; i++)
+        {
+            if (!TargetWithinAllowedArea(map, queue[i]))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool TargetWithinAllowedArea(Map map, LocalTargetInfo target)
+    {
+        if (!target.IsValid)
+        {
+            return true;
+        }
+
+        if (target.HasThing)
+        {
+            Thing thing = target.Thing;
+            if (thing.Spawned && thing.Map == map)
+            {
+                return ShipAIGravUtility.IsOnAllowedTile(map, thing.Position);
+            }
+
+            return true;
+        }
+
+        return ShipAIGravUtility.IsOnAllowedTile(map, target.Cell);
     }
 }
