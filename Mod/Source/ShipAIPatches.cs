@@ -1,3 +1,4 @@
+using System.Reflection;
 using HarmonyLib;
 using RimWorld;
 using Verse;
@@ -67,9 +68,19 @@ internal static class Pawn_TryGetAttackVerb_ShipAIPatch
     }
 }
 
-[HarmonyPatch(typeof(Pawn_DraftController), "get_CanDraft")]
+[HarmonyPatch]
 internal static class Pawn_DraftController_CanDraft_ShipAIPatch
 {
+    private static bool Prepare()
+    {
+        return AccessTools.PropertyGetter(typeof(Pawn_DraftController), "CanDraft") != null;
+    }
+
+    private static MethodBase TargetMethod()
+    {
+        return AccessTools.PropertyGetter(typeof(Pawn_DraftController), "CanDraft");
+    }
+
     private static void Postfix(Pawn_DraftController __instance, ref bool __result)
     {
         Pawn pawn = Traverse.Create(__instance).Field("pawn").GetValue<Pawn>();
