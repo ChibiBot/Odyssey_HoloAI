@@ -214,6 +214,11 @@ internal static class JobGiver_Work_TryGiveJob_ShipAIPatch
 [HarmonyPatch(typeof(WorkGiver_Researcher), nameof(WorkGiver_Researcher.NonScanJob))]
 internal static class WorkGiver_Researcher_NonScanJob_ShipAIPatch
 {
+    private static bool Prepare()
+    {
+        return AccessTools.Method(typeof(WorkGiver_Researcher), nameof(WorkGiver_Researcher.NonScanJob)) != null;
+    }
+
     private static bool Prefix(WorkGiver_Researcher __instance, Pawn pawn, ref Job __result)
     {
         if (!ShipAIUtility.IsShipAI(pawn))
