@@ -214,8 +214,8 @@ internal static class JobGiver_Work_TryGiveJob_ShipAIPatch
 [HarmonyPatch(typeof(WorkGiver_Researcher))]
 internal static class WorkGiver_Researcher_TryGiveJob_ShipAIPatch
 {
-    private static readonly MethodBase targetMethod = AccessTools.Method(typeof(WorkGiver_Researcher), nameof(WorkGiver_Researcher.TryGiveJob), new[] { typeof(Pawn) })
-        ?? AccessTools.Method(typeof(WorkGiver_Researcher), nameof(WorkGiver_Researcher.TryGiveJob), new[] { typeof(Pawn), typeof(bool) });
+    private static readonly MethodBase targetMethod = AccessTools.Method(typeof(WorkGiver_Researcher), nameof(WorkGiver_Researcher.NonScanJob), new[] { typeof(Pawn) })
+        ?? AccessTools.Method(typeof(WorkGiver_Researcher), nameof(WorkGiver_Researcher.NonScanJob), new[] { typeof(Pawn), typeof(bool) });
 
     private static bool Prepare()
     {
