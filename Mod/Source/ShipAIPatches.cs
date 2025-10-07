@@ -234,7 +234,18 @@ internal static class WorkGiver_Researcher_TryGiveJob_ShipAIPatch
             return true;
         }
 
+        if (ShipAIResearchUtility.SuppressResearchOverride)
+        {
+            return true;
+        }
+
         if (!ShipAIResearchUtility.CanShipAIResearchNow())
+        {
+            __result = null;
+            return false;
+        }
+
+        if (ShipAIResearchUtility.HasNonMeditationWork(pawn))
         {
             __result = null;
             return false;
@@ -293,6 +304,7 @@ internal static class ShipAIResearchUtility
     private const float ResearchPerTickFactor = 0.00825f;
     private const float IntellectualXpPerTick = 0.11f;
     private static float? cachedHighTechBenchFactor;
+    private static bool suppressResearchOverride;
 
     public static bool CanShipAIResearchNow()
     {
@@ -302,6 +314,52 @@ internal static class ShipAIResearchUtility
         }
 
         return Find.ResearchManager.GetProject != null;
+    }
+
+    public static bool SuppressResearchOverride => suppressResearchOverride;
+
+    public static bool HasNonMeditationWork(Pawn pawn)
+    {
+        if (pawn == null || pawn.workSettings == null || !pawn.workSettings.EverWork)
+        {
+            return false;
+        }
+
+        JobIssueParams jobParams = default;
+        if (pawn.mindState?.priorityWork.IsPrioritized ?? false)
+        {
+            jobParams.emergency = true;
+        }
+
+        JobGiver_Work jobGiverWork = new JobGiver_Work();
+
+        suppressResearchOverride = true;
+        try
+        {
+            ThinkResult result = jobGiverWork.TryIssueJobPackage(pawn, jobParams);
+            Job job = result.Job;
+            if (job == null)
+            {
+                return false;
+            }
+
+            if (job.def == JobDefOf.Meditate || job.def == JobDefOf.Research)
+            {
+                return false;
+            }
+
+            WorkGiverDef workGiver = job.workGiverDef;
+            if (workGiver == null)
+            {
+                return false;
+            }
+
+            return workGiver.workType != WorkTypeDefOf.Research;
+        }
+        finally
+        {
+            suppressResearchOverride = false;
+        }
     }
 
     public static void PerformResearchTick(Pawn pawn)
