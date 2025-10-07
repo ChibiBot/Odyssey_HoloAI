@@ -211,12 +211,20 @@ internal static class JobGiver_Work_TryGiveJob_ShipAIPatch
     }
 }
 
-[HarmonyPatch(typeof(WorkGiver_Researcher), nameof(WorkGiver_Researcher.NonScanJob))]
-internal static class WorkGiver_Researcher_NonScanJob_ShipAIPatch
+[HarmonyPatch(typeof(WorkGiver_Researcher))]
+internal static class WorkGiver_Researcher_TryGiveJob_ShipAIPatch
 {
+    private static readonly MethodBase targetMethod = AccessTools.Method(typeof(WorkGiver_Researcher), nameof(WorkGiver_Researcher.TryGiveJob), new[] { typeof(Pawn) })
+        ?? AccessTools.Method(typeof(WorkGiver_Researcher), nameof(WorkGiver_Researcher.TryGiveJob), new[] { typeof(Pawn), typeof(bool) });
+
     private static bool Prepare()
     {
-        return AccessTools.Method(typeof(WorkGiver_Researcher), nameof(WorkGiver_Researcher.NonScanJob)) != null;
+        return targetMethod != null;
+    }
+
+    private static MethodBase TargetMethod()
+    {
+        return targetMethod;
     }
 
     private static bool Prefix(WorkGiver_Researcher __instance, Pawn pawn, ref Job __result)
