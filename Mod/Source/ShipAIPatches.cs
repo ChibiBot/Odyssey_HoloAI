@@ -233,7 +233,7 @@ internal static class WorkGiver_Researcher_NonScanJob_ShipAIPatch
             return false;
         }
 
-        Job job = MeditationUtility.GetMeditationJob(pawn, forced: false) ?? JobMaker.MakeJob(JobDefOf.Meditate);
+        Job job = MeditationUtility.GetMeditationJob(pawn) ?? JobMaker.MakeJob(JobDefOf.Meditate);
         job.workGiverDef = __instance.def;
         job.ignoreJoyTimeAssignment = true;
         __result = job;
@@ -248,11 +248,6 @@ internal static class JobDriver_Meditate_DriverTick_ShipAIPatch
     {
         Pawn pawn = __instance.pawn;
         if (!ShipAIUtility.IsShipAI(pawn))
-        {
-            return;
-        }
-
-        if (__instance.job?.workGiverDef != WorkGiverDefOf.Research)
         {
             return;
         }
@@ -274,7 +269,7 @@ internal static class ShipAIResearchUtility
             return false;
         }
 
-        return Find.ResearchManager.currentProj != null;
+        return Find.ResearchManager.GetProject != null;
     }
 
     public static void PerformResearchTick(Pawn pawn)
@@ -299,6 +294,7 @@ internal static class ShipAIResearchUtility
         }
 
         float factor = 1f;
+        
         if (ThingDefOf.HiTechResearchBench != null)
         {
             factor = ThingDefOf.HiTechResearchBench.GetStatValueAbstract(StatDefOf.ResearchSpeedFactor);
