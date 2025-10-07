@@ -128,7 +128,7 @@ internal static class Pawn_NeedsTracker_ShouldHaveNeed_ShipAIPatch
     }
 }
 
-[HarmonyPatch(typeof(JobGiver_Work), nameof(JobGiver_Work.TryGiveJob))]
+[HarmonyPatch(typeof(JobGiver_Work), nameof(JobGiver_Work.TryIssueJobPackage))]
 internal static class JobGiver_Work_TryGiveJob_ShipAIPatch
 {
     private static void Postfix(Pawn pawn, ref Job __result)
@@ -161,12 +161,7 @@ internal static class JobGiver_Work_TryGiveJob_ShipAIPatch
         {
             return false;
         }
-
-        if (!TargetsWithinAllowedArea(map, job.targetC, job.targetQueueC))
-        {
-            return false;
-        }
-
+        
         return true;
     }
 
