@@ -210,3 +210,106 @@ internal static class JobGiver_Work_TryGiveJob_ShipAIPatch
         return ShipAIGravUtility.IsOnAllowedTile(map, target.Cell);
     }
 }
+
+[HarmonyPatch(typeof(WorkGiver_Researcher), nameof(WorkGiver_Researcher.NonScanJob))]
+internal static class WorkGiver_Researcher_NonScanJob_ShipAIPatch
+{
+    private static bool Prefix(WorkGiver_Researcher __instance, Pawn pawn, ref Job __result)
+    {
+        if (!ShipAIUtility.IsShipAI(pawn))
+        {
+            return true;
+        }
+
+        if (!ShipAIResearchUtility.CanShipAIResearchNow())
+        {
+            __result = null;
+            return false;
+        }
+
+        if (!MeditationUtility.CanMeditateNow(pawn))
+        {
+            __result = null;
+            return false;
+        }
+
+        Job job = MeditationUtility.GetMeditationJob(pawn, forced: false) ?? JobMaker.MakeJob(JobDefOf.Meditate);
+        job.workGiverDef = __instance.def;
+        job.ignoreJoyTimeAssignment = true;
+        __result = job;
+        return false;
+    }
+}
+
+[HarmonyPatch(typeof(JobDriver_Meditate), nameof(JobDriver_Meditate.DriverTick))]
+internal static class JobDriver_Meditate_DriverTick_ShipAIPatch
+{
+    private static void Postfix(JobDriver_Meditate __instance)
+    {
+        Pawn pawn = __instance.pawn;
+        if (!ShipAIUtility.IsShipAI(pawn))
+        {
+            return;
+        }
+
+        if (__instance.job?.workGiverDef != WorkGiverDefOf.Research)
+        {
+            return;
+        }
+
+        ShipAIResearchUtility.PerformResearchTick(pawn);
+    }
+}
+
+internal static class ShipAIResearchUtility
+{
+    private const float ResearchPerTickFactor = 0.00825f;
+    private const float IntellectualXpPerTick = 0.11f;
+    private static float? cachedHighTechBenchFactor;
+
+    public static bool CanShipAIResearchNow()
+    {
+        if (Find.ResearchManager == null)
+        {
+            return false;
+        }
+
+        return Find.ResearchManager.currentProj != null;
+    }
+
+    public static void PerformResearchTick(Pawn pawn)
+    {
+        if (!CanShipAIResearchNow())
+        {
+            return;
+        }
+
+        float researchSpeed = pawn.GetStatValue(StatDefOf.ResearchSpeed);
+        float progress = researchSpeed * GetHighTechBenchFactor() * ResearchPerTickFactor;
+        Find.ResearchManager.ResearchPerformed(progress, pawn);
+
+        pawn.skills?.Learn(SkillDefOf.Intellectual, IntellectualXpPerTick);
+    }
+
+    private static float GetHighTechBenchFactor()
+    {
+        if (cachedHighTechBenchFactor.HasValue)
+        {
+            return cachedHighTechBenchFactor.Value;
+        }
+
+        float factor = 1f;
+        if (ThingDefOf.HiTechResearchBench != null)
+        {
+            factor = ThingDefOf.HiTechResearchBench.GetStatValueAbstract(StatDefOf.ResearchSpeedFactor);
+        }
+
+        if (ThingDefOf.MultiAnalyzer != null)
+        {
+            factor += ThingDefOf.MultiAnalyzer.GetStatValueAbstract(StatDefOf.ResearchSpeedFactor);
+        }
+
+        cachedHighTechBenchFactor = factor;
+        return factor;
+    }
+}
