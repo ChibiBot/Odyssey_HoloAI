@@ -131,9 +131,10 @@ internal static class Pawn_NeedsTracker_ShouldHaveNeed_ShipAIPatch
 [HarmonyPatch(typeof(JobGiver_Work), nameof(JobGiver_Work.TryIssueJobPackage))]
 internal static class JobGiver_Work_TryGiveJob_ShipAIPatch
 {
-    private static void Postfix(Pawn pawn, ref Job __result)
+    private static void Postfix(Pawn pawn, ref ThinkResult __result)
     {
-        if (__result == null || !ShipAIUtility.IsShipAI(pawn))
+        Job job = __result.Job;
+        if (job == null || !ShipAIUtility.IsShipAI(pawn))
         {
             return;
         }
@@ -144,9 +145,9 @@ internal static class JobGiver_Work_TryGiveJob_ShipAIPatch
             return;
         }
 
-        if (!JobTargetsWithinAllowedArea(map, __result))
+        if (!JobTargetsWithinAllowedArea(map, job))
         {
-            __result = null;
+            __result = ThinkResult.NoJob;
         }
     }
 
