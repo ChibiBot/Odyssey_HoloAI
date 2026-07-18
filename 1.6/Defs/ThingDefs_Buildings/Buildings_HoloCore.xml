@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <ThingDef ParentName="GravshipComponentBase">
+    <defName>HoloAI_HoloCore</defName>
+    <label>holocore</label>
+    <description>A photonic projection matrix housing a shipboard artificial intelligence. While powered and linked to a grav engine, the holocore projects its resident persona as a free-roaming holographic avatar who assists and accompanies the crew.\n\nThis holocore is fitted with P.R.I.S.M. — the Photonic Response Intelligence System Matrix, a persona known for her calm warmth and quiet devotion to her crew.</description>
+    <thingClass>ShipHoloAI.Building_HoloCore</thingClass>
+    <tickerType>Normal</tickerType>
+    <designationCategory>Odyssey</designationCategory>
+    <uiOrder>2310</uiOrder>
+    <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
+    <graphicData>
+      <graphicClass>Graphic_Single</graphicClass>
+      <texPath>HoloAI/Buildings/HoloCore</texPath>
+      <drawSize>(2, 2)</drawSize>
+      <shadowData>
+        <volume>(1.6, 0.6, 1.6)</volume>
+      </shadowData>
+    </graphicData>
+    <statBases>
+      <MaxHitPoints>250</MaxHitPoints>
+      <WorkToBuild>8000</WorkToBuild>
+      <Mass>25</Mass>
+      <MarketValue>1800</MarketValue>
+    </statBases>
+    <costList>
+      <Steel>100</Steel>
+      <GravlitePanel>30</GravlitePanel>
+      <ComponentSpacer>6</ComponentSpacer>
+    </costList>
+    <size>(2, 2)</size>
+    <fillPercent>0.4</fillPercent>
+    <passability>PassThroughOnly</passability>
+    <pathCost>20</pathCost>
+    <canOverlapZones>false</canOverlapZones>
+    <terrainAffordanceNeeded>Substructure</terrainAffordanceNeeded>
+    <researchPrerequisites>
+      <li>HoloAI_HolographicSystems</li>
+    </researchPrerequisites>
+    <placeWorkers>
+      <li>PlaceWorker_InRangeOfGravEngine</li>
+    </placeWorkers>
+    <building>
+      <ai_neverTrashThis>true</ai_neverTrashThis>
+    </building>
+    <comps>
+      <li Class="CompProperties_GravshipFacility">
+        <componentTypeDef>HoloAI_Core</componentTypeDef>
+        <requiresLOS>false</requiresLOS>
+        <maxSimultaneous>1</maxSimultaneous>
+        <maxDistance>500</maxDistance>
+      </li>
+      <li Class="CompProperties_Power">
+        <compClass>CompPowerTrader</compClass>
+        <basePowerConsumption>200</basePowerConsumption>
+      </li>
+      <li Class="CompProperties_Glower">
+        <glowRadius>6</glowRadius>
+        <glowColor>(0,218,255,0)</glowColor>
+      </li>
+      <li Class="CompProperties_Flickable"/>
+    </comps>
+    <tradeTags>
+      <li>GravshipUpgrade</li>
+    </tradeTags>
+  </ThingDef>
+
+</Defs>

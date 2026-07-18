@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+
+  <!-- The grav engine only links facilities on this whitelist; add the holocore. -->
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/ThingDef[defName="GravEngine"]/comps/li[@Class="CompProperties_AffectedByFacilities"]/linkableFacilities</xpath>
+    <value>
+      <li>HoloAI_HoloCore</li>
+    </value>
+  </Operation>
+
+</Patch>
