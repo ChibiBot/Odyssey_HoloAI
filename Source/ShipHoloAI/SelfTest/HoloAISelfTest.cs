@@ -175,6 +175,7 @@ namespace ShipHoloAI
             coreThing.SetFaction(Faction.OfPlayer);
             core = (Building_HoloCore)GenSpawn.Spawn(coreThing, center, map);
             testColonist = PawnGenerator.GeneratePawn(PawnKindDefOf.Colonist, Faction.OfPlayer);
+            testColonist.Name = new NameSingle("HoloAI-TestSubject");
             GenSpawn.Spawn(testColonist, center + new IntVec3(3, 0, 0), map);
             Find.CameraDriver?.JumpToCurrentMapLoc(center);
             Log.Message("[HoloAI SelfTest] setup complete at " + center);
@@ -350,9 +351,12 @@ namespace ShipHoloAI
 
         private void ObserveChat()
         {
-            // The colonist AI may walk them off the test patch; anchor them near the core
-            // so the avatar gets her chance to chat.
-            if (testColonist != null && testColonist.Spawned && !testColonist.Dead
+            // The colonist AI may walk them off the test patch; anchor them near the
+            // core so the avatar gets her chance to chat. Stop once the chat evidence
+            // is in, and never fight a player who drafted the pawn mid-test.
+            bool stillNeedChat = !chatMemoryObserved || !chatLogObserved;
+            if (stillNeedChat && testColonist != null && testColonist.Spawned && !testColonist.Dead
+                && !testColonist.Drafted
                 && !testColonist.Position.InHorDistOf(core.Position, 8f))
             {
                 testColonist.Position = core.Position + new IntVec3(3, 0, 0);
