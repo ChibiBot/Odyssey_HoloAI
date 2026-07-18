@@ -33,6 +33,14 @@ dotnet build Source/ShipHoloAI/ShipHoloAI.csproj -c Release   # → 1.6/Assembli
   Krafs.Rimworld.Ref is the CI alternative if ever needed).
 - Smoke test: launch `<game>/RimWorldLinux -quicktest`, then
   `grep -iE "error|exception|HoloAI" Player.log`. Kill the game after the map loads.
+- **Full self-test** (the standard QA gate): `HOLOAI_SELFTEST=1 <game>/RimWorldLinux
+  -quicktest`, wait for `[HoloAI SelfTest] COMPLETE` in Player.log (~4 min), expect
+  `0 failures`. The harness (`Source/ShipHoloAI/SelfTest/HoloAISelfTest.cs`, env-gated,
+  inert for players) spawns a substructure patch + core and asserts the avatar
+  lifecycle, chat memory/log, and announcement patch — 12 assertions.
+- Kill the game with explicit PIDs (`kill $(ps aux | grep -i "[R]imWorldLinux" | awk
+  '{print $2}')`); `pkill -f RimWorldLinux` matches its own cmdline and returns 144,
+  aborting `&&` chains, and stray instances corrupt Player.log for the next run.
 - Gravship testing needs a dev-mode Odyssey start (god-mode place `GravEngine`; it
   generates its own substructure footprint).
 - Decompile vanilla for API signatures with `ilspycmd` into `Decompiled/` (gitignored).

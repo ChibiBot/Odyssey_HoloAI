@@ -10,12 +10,13 @@
     <symbol>Things/Mote/SpeechSymbols/Chitchat</symbol>
     <logRulesInitiator>
       <rulesStrings>
-        <li>r_logentry->[INITIATOR_nameDef] [chatted] [RECIPIENT_nameDef] [subject].</li>
+        <li>r_logentry(p=3)->[INITIATOR_nameDef] [chatted] [RECIPIENT_nameDef] [subject].</li>
+        <li>r_logentry->[INITIATOR_nameDef] appeared beside [RECIPIENT_nameDef] and [did].</li>
 
-        <li>chatted(p=3)->chatted with</li>
+        <li>chatted(p=2)->chatted with</li>
         <li>chatted->checked in on</li>
-        <li>chatted->drifted alongside</li>
-        <li>chatted->appeared beside</li>
+        <li>chatted->traded a quiet word with</li>
+        <li>chatted->spoke with</li>
 
         <li>subject->about the hum of the grav engine</li>
         <li>subject->about the view from the hull cameras</li>
@@ -24,7 +25,11 @@
         <li>subject->about how the corridors feel quieter at night</li>
         <li>subject->about a dream she had between power cycles</li>
         <li>subject->about the constellations ahead</li>
-        <li>subject->and hummed an old docking chime</li>
+
+        <li>did->hummed an old docking chime</li>
+        <li>did->recited the hull integrity report like a lullaby</li>
+        <li>did->shared a memory of a port she once knew</li>
+        <li>did->dimmed the lights to something gentler</li>
       </rulesStrings>
     </logRulesInitiator>
   </InteractionDef>

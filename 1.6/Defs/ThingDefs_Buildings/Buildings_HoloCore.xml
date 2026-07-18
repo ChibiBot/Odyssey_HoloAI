@@ -4,7 +4,7 @@
   <ThingDef ParentName="GravshipComponentBase">
     <defName>HoloAI_HoloCore</defName>
     <label>holocore</label>
-    <description>A photonic projection matrix housing a shipboard artificial intelligence. While powered and linked to a grav engine, the holocore projects its resident persona as a free-roaming holographic avatar who assists and accompanies the crew.\n\nThis holocore is fitted with P.R.I.S.M. — the Photonic Response Intelligence System Matrix, a persona known for her calm warmth and quiet devotion to her crew.</description>
+    <description>A photonic projection matrix housing a shipboard artificial intelligence. While powered and linked to a grav engine, the holocore projects its resident persona as a free-roaming holographic avatar who accompanies the crew, lifts their spirits, and speaks for the ship when danger nears. Her fine-grained control of the burn curve also improves fuel efficiency and flight range.\n\nThis holocore is fitted with P.R.I.S.M. — the Photonic Response Intelligence System Matrix, a persona known for her calm warmth and quiet devotion to her crew.</description>
     <thingClass>ShipHoloAI.Building_HoloCore</thingClass>
     <tickerType>Normal</tickerType>
     <designationCategory>Odyssey</designationCategory>
@@ -50,6 +50,10 @@
         <requiresLOS>false</requiresLOS>
         <maxSimultaneous>1</maxSimultaneous>
         <maxDistance>500</maxDistance>
+        <fuelSavingsPercent>0.1</fuelSavingsPercent>
+        <statOffsets>
+          <GravshipRange>2</GravshipRange>
+        </statOffsets>
       </li>
       <li Class="CompProperties_Power">
         <compClass>CompPowerTrader</compClass>

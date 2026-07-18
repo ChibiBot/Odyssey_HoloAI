@@ -19,6 +19,29 @@ namespace ShipHoloAI
             nextChatTick = Find.TickManager.TicksGame + ChatCooldownTicks.RandomInRange;
         }
 
+        protected override void Tick()
+        {
+            base.Tick();
+            if (!Spawned)
+            {
+                return;
+            }
+            // Soft photonic shimmer, and the occasional idle remark.
+            if (this.IsHashIntervalTick(900))
+            {
+                FleckMaker.ThrowLightningGlow(DrawPos, Map, 0.35f);
+            }
+            if (this.IsHashIntervalTick(2500) && Rand.Chance(0.3f) && !Position.Fogged(Map))
+            {
+                string line = PrismSpeech.ResolveLine("bark");
+                if (!line.NullOrEmpty())
+                {
+                    MoteMaker.ThrowText(DrawPos + new UnityEngine.Vector3(0f, 0f, 0.65f),
+                        Map, line, new UnityEngine.Color(0f, 0.855f, 1f), 5f);
+                }
+            }
+        }
+
         public override void PreApplyDamage(ref DamageInfo dinfo, out bool absorbed)
         {
             absorbed = true;
