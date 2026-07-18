@@ -38,12 +38,17 @@ namespace ShipHoloAI
 
         public override Graphic GraphicFor(Pawn pawn)
         {
-            HairDef hair = (pawn as Pawn_HoloAvatar)?.CurrentHairDef;
+            Pawn_HoloAvatar avatar = pawn as Pawn_HoloAvatar;
+            HairDef hair = avatar?.CurrentHairDef;
             if (hair == null || hair.noGraphic || hair.texPath.NullOrEmpty())
             {
                 return null;
             }
-            return HoloGraphicPool.Get(hair.texPath, props.color ?? new Color(0.05f, 0.68f, 1f, 0.62f));
+            // RGB follows the avatar's chosen color (styling dialog); alpha stays the
+            // node's hologram translucency.
+            Color rgb = avatar.HoloHairColor;
+            float alpha = (props.color ?? new Color(0f, 0f, 0f, 0.62f)).a;
+            return HoloGraphicPool.Get(hair.texPath, new Color(rgb.r, rgb.g, rgb.b, alpha));
         }
     }
 }

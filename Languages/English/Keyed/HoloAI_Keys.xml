@@ -8,4 +8,6 @@
   <HoloAI_StateDormant>Avatar: dormant</HoloAI_StateDormant>
   <HoloAI_Hairstyle>hairstyle</HoloAI_Hairstyle>
   <HoloAI_HairstyleDesc>Cycle the avatar's holographic hairstyle. Light is easily restyled.</HoloAI_HairstyleDesc>
+  <HoloAI_Restyle>restyle</HoloAI_Restyle>
+  <HoloAI_RestyleDesc>Open the styling interface to reshape the avatar's holographic hair and color. Light is easily restyled.</HoloAI_RestyleDesc>
 </LanguageData>

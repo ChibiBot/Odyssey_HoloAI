@@ -13,7 +13,10 @@
     <graphicData>
       <graphicClass>Graphic_Single</graphicClass>
       <texPath>HoloAI/Buildings/HoloCore</texPath>
-      <drawSize>(2, 2)</drawSize>
+      <!-- Taller than the 2x2 footprint: cabinet base sits on the tiles, the
+           projector plate and prism rise above for depth. -->
+      <drawSize>(2, 2.5)</drawSize>
+      <drawOffset>(0, 0, 0.25)</drawOffset>
       <shadowData>
         <volume>(1.6, 0.6, 1.6)</volume>
       </shadowData>

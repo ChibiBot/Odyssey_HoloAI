@@ -23,6 +23,17 @@
           <overrideMeshSize>(1.5, 1.5)</overrideMeshSize>
           <baseLayer>10</baseLayer>
         </li>
+        <!-- Appearance-only uniform: vanilla button-down worn graphic, synthread tint -->
+        <li>
+          <debugLabel>HoloOutfit</debugLabel>
+          <nodeClass>ShipHoloAI.PawnRenderNode_HoloPart</nodeClass>
+          <workerClass>PawnRenderNodeWorker</workerClass>
+          <texPath>Things/Pawn/Humanlike/Apparel/ShirtButton/ShirtButton_Female</texPath>
+          <colorType>Custom</colorType>
+          <color>(0.682, 0.859, 0.894, 0.92)</color>
+          <overrideMeshSize>(1.5, 1.5)</overrideMeshSize>
+          <baseLayer>20</baseLayer>
+        </li>
         <li>
           <debugLabel>HoloHead</debugLabel>
           <nodeClass>ShipHoloAI.PawnRenderNode_HoloPart</nodeClass>

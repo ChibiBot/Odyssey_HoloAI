@@ -20,7 +20,6 @@ namespace ShipHoloAI
     public class CompHoloShimmer : ThingComp
     {
         private static readonly Vector2 OverlaySize = new Vector2(1.5f, 1.5f);
-        private static readonly Color PulseColor = new Color(0.05f, 0.68f, 1f);
         private static MaterialPropertyBlock mpb;
 
         public override void PostDraw()
@@ -44,8 +43,9 @@ namespace ShipHoloAI
             float phase = Time.realtimeSinceStartup * 2.2f + avatar.thingIDNumber * 0.7f;
             float alpha = 0.10f + 0.08f * Mathf.Sin(phase);
 
+            Color pulseColor = avatar.HoloHairColor;
             mpb = mpb ?? new MaterialPropertyBlock();
-            mpb.SetColor(ShaderPropertyIDs.Color, new Color(PulseColor.r, PulseColor.g, PulseColor.b, alpha));
+            mpb.SetColor(ShaderPropertyIDs.Color, new Color(pulseColor.r, pulseColor.g, pulseColor.b, alpha));
 
             Vector3 pos = avatar.DrawPos + HeadOffsetFor(rot);
             pos.y += 0.06f; // just above the hair layer

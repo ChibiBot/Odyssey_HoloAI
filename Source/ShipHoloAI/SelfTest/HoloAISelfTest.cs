@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using HarmonyLib;
 using RimWorld;
 using Verse;
 
@@ -105,6 +106,17 @@ namespace ShipHoloAI
                     Find.LetterStack.ReceiveLetter("self-test threat", "letter sent by the HoloAI self-test",
                         LetterDefOf.ThreatSmall, new LookTargets(core));
                     break;
+                case 9300:
+                    TestUnattackable();
+                    TestStylingTrackers();
+                    StartTeleportTest(map);
+                    break;
+                case 9800:
+                    Check("avatar teleported back to substructure near core",
+                        core.Avatar != null && core.Avatar.Spawned
+                        && map.terrainGrid.FoundationAt(core.Avatar.Position)?.IsSubstructure == true
+                        && core.Avatar.Position.InHorDistOf(core.Position, 6f));
+                    break;
                 case 9200:
                     Check("letter triggered a P.R.I.S.M. announcement",
                         PrismSpeech.LastSpokenTick >= ticks - 200 && !PrismSpeech.LastLine.NullOrEmpty());
@@ -112,6 +124,8 @@ namespace ShipHoloAI
                     {
                         Log.Message("[HoloAI SelfTest] announcement line: " + PrismSpeech.LastLine);
                     }
+                    break;
+                case 9900:
                     Finish();
                     break;
             }
@@ -192,6 +206,70 @@ namespace ShipHoloAI
             }
             Log.Warning("[HoloAI SelfTest] no fully viable test site found; using map center");
             return best;
+        }
+
+        private void TestUnattackable()
+        {
+            Pawn_HoloAvatar avatar = core.Avatar;
+            if (avatar == null || !avatar.Spawned)
+            {
+                Check("avatar unattackable (AI ThreatDisabled)", pass: false);
+                return;
+            }
+            Check("avatar unattackable (AI ThreatDisabled)", avatar.ThreatDisabled(null));
+            System.Reflection.MethodInfo canTarget = AccessTools.Method(
+                typeof(FloatMenuOptionProvider_DraftedAttack), "CanTarget");
+            if (canTarget == null)
+            {
+                Check("avatar unattackable (force-attack menu)", pass: false);
+                return;
+            }
+            bool result = (bool)canTarget.Invoke(null, new object[] { avatar });
+            Check("avatar unattackable (force-attack menu)", !result);
+        }
+
+        private void TestStylingTrackers()
+        {
+            Pawn_HoloAvatar avatar = core.Avatar;
+            if (!ModsConfig.IdeologyActive || avatar == null || !avatar.Spawned)
+            {
+                Log.Message("[HoloAI SelfTest] styling test skipped (no Ideology or no avatar)");
+                return;
+            }
+            try
+            {
+                avatar.AttachStyleTrackers();
+                _ = new Dialog_HoloStyling(avatar);
+                avatar.DetachStyleTrackers();
+                Check("styling dialog constructs and trackers detach",
+                    avatar.story == null && avatar.style == null);
+            }
+            catch (System.Exception e)
+            {
+                Log.Message("[HoloAI SelfTest] styling dialog threw: " + e);
+                Check("styling dialog constructs and trackers detach", pass: false);
+            }
+        }
+
+        private void StartTeleportTest(Map map)
+        {
+            Pawn_HoloAvatar avatar = core.Avatar;
+            if (avatar == null || !avatar.Spawned)
+            {
+                return;
+            }
+            // Drop her on bare ground outside the patch; the 5s ship-bound rule
+            // should snap her back near the core well before the 9800 check.
+            if (CellFinder.TryFindRandomCellNear(siteCenter, map, 40,
+                    c => c.Standable(map) && map.terrainGrid.FoundationAt(c) == null
+                        && !c.InHorDistOf(siteCenter, 15f),
+                    out IntVec3 offShip))
+            {
+                avatar.jobs?.StopAll();
+                avatar.Position = offShip;
+                avatar.Notify_Teleported();
+                Log.Message("[HoloAI SelfTest] avatar exiled to " + offShip + " for teleport test");
+            }
         }
 
         private void ForcePower(bool on)
