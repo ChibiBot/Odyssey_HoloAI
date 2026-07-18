@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>Ship HoloAI</name>
+  <author>chibi</author>
+  <packageId>chibi.shipholoai</packageId>
+  <supportedVersions>
+    <li>1.6</li>
+  </supportedVersions>
+  <description>Your gravship comes alive. Adds the HoloCore, a gravship facility housing a shipboard AI personified as a holographic avatar who roams your ship, chats with the crew, and keeps watch over your voyage.
+
+Default persona: P.R.I.S.M. (Photonic Response Intelligence System Matrix).
+
+Features:
+- HoloCore gravship facility, linked to your grav engine
+- A roaming, intangible holographic avatar bound to your ship
+- Crew interactions and mood boosts
+- Personality-flavored alerts and announcements
+- Ambient holographic charm
+
+Requires the Odyssey expansion and Harmony.</description>
+  <modDependencies>
+    <li>
+      <packageId>brrainz.harmony</packageId>
+      <displayName>Harmony</displayName>
+      <downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
+      <steamWorkshopUrl>https://steamcommunity.com/workshop/filedetails/?id=2009463077</steamWorkshopUrl>
+    </li>
+    <li>
+      <packageId>Ludeon.RimWorld.Odyssey</packageId>
+      <displayName>Odyssey</displayName>
+      <steamWorkshopUrl>https://store.steampowered.com/app/3022790/RimWorld__Odyssey</steamWorkshopUrl>
+    </li>
+  </modDependencies>
+  <loadAfter>
+    <li>brrainz.harmony</li>
+    <li>Ludeon.RimWorld</li>
+    <li>Ludeon.RimWorld.Odyssey</li>
+  </loadAfter>
+</ModMetaData>

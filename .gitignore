@@ -1,0 +1,12 @@
+# Build output
+1.6/Assemblies/*.dll
+1.6/Assemblies/*.pdb
+Source/**/bin/
+Source/**/obj/
+
+# Decompile scratch (dev aid, never shipped)
+Decompiled/
+
+# Editor/OS noise
+*.swp
+.DS_Store
