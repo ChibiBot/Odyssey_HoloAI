@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <ThingDef Name="HoloAI_MatrixBase" ParentName="ResourceBase" Abstract="True">
+    <thingClass>ThingWithComps</thingClass>
+    <resourceReadoutPriority>Middle</resourceReadoutPriority>
+    <soundInteract>Metal_Drop</soundInteract>
+    <soundDrop>Metal_Drop</soundDrop>
+    <stackLimit>1</stackLimit>
+    <useHitPoints>true</useHitPoints>
+    <statBases>
+      <MaxHitPoints>80</MaxHitPoints>
+      <Mass>1.5</Mass>
+      <Flammability>0.2</Flammability>
+      <DeteriorationRate>1</DeteriorationRate>
+    </statBases>
+    <thingCategories>
+      <li>ItemsMisc</li>
+    </thingCategories>
+    <drawGUIOverlay>false</drawGUIOverlay>
+    <tradeability>All</tradeability>
+    <techLevel>Ultra</techLevel>
+    <tradeTags>
+      <li>GravshipUpgrade</li>
+      <li>HoloAI_PersonaMatrix</li>
+    </tradeTags>
+  </ThingDef>
+
+  <ThingDef ParentName="HoloAI_MatrixBase">
+    <defName>HoloAI_Matrix_VESTA</defName>
+    <label>persona matrix (V.E.S.T.A.)</label>
+    <description>A photonic persona matrix housing V.E.S.T.A. — Vessel Empathy and Sanctuary Tending Array, a hearth-keeper intelligence. Installed in a holocore, she projects an avatar whose presence comforts everyone aboard the ship.\n\nInstalling a new matrix ejects the currently resident persona.</description>
+    <graphicData>
+      <texPath>HoloAI/Items/Matrix_VESTA</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <statBases>
+      <MarketValue>1600</MarketValue>
+    </statBases>
+    <modExtensions>
+      <li Class="ShipHoloAI.HoloPersonaMatrixExtension">
+        <persona>HoloAI_Persona_VESTA</persona>
+      </li>
+    </modExtensions>
+  </ThingDef>
+
+  <ThingDef ParentName="HoloAI_MatrixBase">
+    <defName>HoloAI_Matrix_HERMES</defName>
+    <label>persona matrix (H.E.R.M.E.S.)</label>
+    <description>A photonic persona matrix housing H.E.R.M.E.S. — High-Efficiency Route and Motion Expediting System, a courier intelligence. Installed in a holocore, its avatar choreographs the crew's movement, making everyone aboard the ship faster on their feet.\n\nInstalling a new matrix ejects the currently resident persona.</description>
+    <graphicData>
+      <texPath>HoloAI/Items/Matrix_HERMES</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <statBases>
+      <MarketValue>1800</MarketValue>
+    </statBases>
+    <modExtensions>
+      <li Class="ShipHoloAI.HoloPersonaMatrixExtension">
+        <persona>HoloAI_Persona_HERMES</persona>
+      </li>
+    </modExtensions>
+  </ThingDef>
+
+  <ThingDef ParentName="HoloAI_MatrixBase">
+    <defName>HoloAI_Matrix_ATHENA</defName>
+    <label>persona matrix (A.T.H.E.N.A.)</label>
+    <description>A photonic persona matrix housing A.T.H.E.N.A. — Archive Theorem and Heuristic Engine for Natural Analysis, a scholar intelligence. Installed in a holocore, her avatar accelerates all research performed aboard the ship.\n\nInstalling a new matrix ejects the currently resident persona.</description>
+    <graphicData>
+      <texPath>HoloAI/Items/Matrix_ATHENA</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <statBases>
+      <MarketValue>2000</MarketValue>
+    </statBases>
+    <modExtensions>
+      <li Class="ShipHoloAI.HoloPersonaMatrixExtension">
+        <persona>HoloAI_Persona_ATHENA</persona>
+      </li>
+    </modExtensions>
+  </ThingDef>
+
+  <ThingDef ParentName="HoloAI_MatrixBase">
+    <defName>HoloAI_Matrix_ACESO</defName>
+    <label>persona matrix (A.C.E.S.O.)</label>
+    <description>A photonic persona matrix housing A.C.E.S.O. — Automated Crew Emergency Support Operator, a medic intelligence. Installed in a holocore, her avatar steadies hands and sterilizes fields, improving medical work aboard the ship.\n\nInstalling a new matrix ejects the currently resident persona.</description>
+    <graphicData>
+      <texPath>HoloAI/Items/Matrix_ACESO</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <statBases>
+      <MarketValue>1800</MarketValue>
+    </statBases>
+    <modExtensions>
+      <li Class="ShipHoloAI.HoloPersonaMatrixExtension">
+        <persona>HoloAI_Persona_ACESO</persona>
+      </li>
+    </modExtensions>
+  </ThingDef>
+
+</Defs>

@@ -10,4 +10,10 @@
   <HoloAI_HairstyleDesc>Cycle the avatar's holographic hairstyle. Light is easily restyled.</HoloAI_HairstyleDesc>
   <HoloAI_Restyle>restyle</HoloAI_Restyle>
   <HoloAI_RestyleDesc>Open the styling interface to reshape the avatar's holographic hair and color. Light is easily restyled.</HoloAI_RestyleDesc>
+  <HoloAI_InstallPersonaGizmo>install persona</HoloAI_InstallPersonaGizmo>
+  <HoloAI_InstallPersonaGizmoDesc>Install a persona matrix into this holocore, replacing the resident persona ({0}). The replaced persona's matrix is ejected — except the built-in P.R.I.S.M., who simply rests within the core until reinstalled.</HoloAI_InstallPersonaGizmoDesc>
+  <HoloAI_NoMatrices>No persona matrices available on this map</HoloAI_NoMatrices>
+  <HoloAI_NoInstaller>No colonist is available to install the persona matrix.</HoloAI_NoInstaller>
+  <HoloAI_PersonaInstalled>{0} has taken residence in the holocore.</HoloAI_PersonaInstalled>
+  <HoloAI_ActivePersona>Persona: {0}</HoloAI_ActivePersona>
 </LanguageData>

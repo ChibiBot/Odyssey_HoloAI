@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Patch>
+
+  <!-- Exotic orbital traders occasionally carry persona matrices for sale. -->
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/TraderKindDef[defName="Orbital_Exotic"]/stockGenerators</xpath>
+    <value>
+      <li Class="StockGenerator_Tag">
+        <tradeTag>HoloAI_PersonaMatrix</tradeTag>
+        <thingDefCountRange>1~2</thingDefCountRange>
+        <countRange>1~1</countRange>
+      </li>
+    </value>
+  </Operation>
+
+  <!-- Persona matrices can also roll as gravship-upgrade quest rewards. -->
+  <Operation Class="PatchOperationAdd">
+    <xpath>Defs/ThingSetMakerDef[defName="Reward_GravshipUpgrade"]/root/options</xpath>
+    <value>
+      <li>
+        <weight>0.6</weight>
+        <thingSetMaker Class="ThingSetMaker_StackCount">
+          <fixedParams>
+            <filter>
+              <thingDefs>
+                <li>HoloAI_Matrix_VESTA</li>
+                <li>HoloAI_Matrix_HERMES</li>
+                <li>HoloAI_Matrix_ATHENA</li>
+                <li>HoloAI_Matrix_ACESO</li>
+              </thingDefs>
+            </filter>
+            <countRange>1~1</countRange>
+          </fixedParams>
+        </thingSetMaker>
+      </li>
+    </value>
+  </Operation>
+
+</Patch>

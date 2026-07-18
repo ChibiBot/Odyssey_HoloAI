@@ -19,4 +19,19 @@
     </stages>
   </ThoughtDef>
 
+  <!-- Mood side of V.E.S.T.A.'s hearthlight aura: active while the hediff is present. -->
+  <ThoughtDef>
+    <defName>HoloAI_HearthlightMood</defName>
+    <workerClass>ThoughtWorker_Hediff</workerClass>
+    <hediff>HoloAI_Aura_Hearthlight</hediff>
+    <validWhileDespawned>true</validWhileDespawned>
+    <stages>
+      <li>
+        <label>hearthlight presence</label>
+        <description>The ship herself is keeping me company. The corridors feel warm and safe.</description>
+        <baseMoodEffect>4</baseMoodEffect>
+      </li>
+    </stages>
+  </ThoughtDef>
+
 </Defs>

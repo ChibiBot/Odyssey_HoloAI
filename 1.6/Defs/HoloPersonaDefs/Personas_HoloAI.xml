@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <ShipHoloAI.HoloPersonaDef>
+    <defName>HoloAI_Persona_PRISM</defName>
+    <label>P.R.I.S.M.</label>
+    <description>Photonic Response Intelligence System Matrix. The companion persona: calm, warm, devoted to her crew. Balanced in all things, specialized in none — except perhaps in being missed when she is dormant.</description>
+    <avatarName>P.R.I.S.M.</avatarName>
+    <hairColor>(0.05, 0.68, 1.0)</hairColor>
+    <defaultHairDefName>Flowy</defaultHairDefName>
+  </ShipHoloAI.HoloPersonaDef>
+
+  <ShipHoloAI.HoloPersonaDef>
+    <defName>HoloAI_Persona_VESTA</defName>
+    <label>V.E.S.T.A.</label>
+    <description>Vessel Empathy and Sanctuary Tending Array. A hearth-keeper persona who fills the corridors with quiet warmth. Crew aboard the ship feel genuinely at home while she walks its decks.</description>
+    <avatarName>V.E.S.T.A.</avatarName>
+    <hairColor>(1.0, 0.72, 0.5)</hairColor>
+    <defaultHairDefName>FancyBun</defaultHairDefName>
+    <auraHediff>HoloAI_Aura_Hearthlight</auraHediff>
+    <matrixItem>HoloAI_Matrix_VESTA</matrixItem>
+  </ShipHoloAI.HoloPersonaDef>
+
+  <ShipHoloAI.HoloPersonaDef>
+    <defName>HoloAI_Persona_HERMES</defName>
+    <label>H.E.R.M.E.S.</label>
+    <description>High-Efficiency Route and Motion Expediting System. A courier persona who choreographs the crew's movement — doors held at the right moment, corridors subtly relit, footfalls guided. Everyone aboard simply moves faster.</description>
+    <avatarName>H.E.R.M.E.S.</avatarName>
+    <hairColor>(0.4, 1.0, 0.72)</hairColor>
+    <defaultHairDefName>Bob</defaultHairDefName>
+    <auraHediff>HoloAI_Aura_Slipstream</auraHediff>
+    <matrixItem>HoloAI_Matrix_HERMES</matrixItem>
+  </ShipHoloAI.HoloPersonaDef>
+
+  <ShipHoloAI.HoloPersonaDef>
+    <defName>HoloAI_Persona_ATHENA</defName>
+    <label>A.T.H.E.N.A.</label>
+    <description>Archive Theorem and Heuristic Engine for Natural Analysis. A scholar persona who whispers cross-references, pre-fetches papers, and keeps every workbench annotated. Research aboard the ship proceeds noticeably faster.</description>
+    <avatarName>A.T.H.E.N.A.</avatarName>
+    <hairColor>(0.72, 0.55, 1.0)</hairColor>
+    <defaultHairDefName>Princess</defaultHairDefName>
+    <auraHediff>HoloAI_Aura_Archivelight</auraHediff>
+    <matrixItem>HoloAI_Matrix_ATHENA</matrixItem>
+  </ShipHoloAI.HoloPersonaDef>
+
+  <ShipHoloAI.HoloPersonaDef>
+    <defName>HoloAI_Persona_ACESO</defName>
+    <label>A.C.E.S.O.</label>
+    <description>Automated Crew Emergency Support Operator. A medic persona who projects sterile fields, steadies hands, and reads vitals before the patient knows they have any. Medical work aboard the ship is faster and cleaner.</description>
+    <avatarName>A.C.E.S.O.</avatarName>
+    <hairColor>(0.85, 0.97, 1.0)</hairColor>
+    <defaultHairDefName>Cute</defaultHairDefName>
+    <auraHediff>HoloAI_Aura_Stericalm</auraHediff>
+    <matrixItem>HoloAI_Matrix_ACESO</matrixItem>
+  </ShipHoloAI.HoloPersonaDef>
+
+</Defs>

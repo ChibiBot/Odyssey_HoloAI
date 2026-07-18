@@ -126,6 +126,10 @@ namespace ShipHoloAI
                     }
                     break;
                 case 9900:
+                    TestPersonaInstall(map);
+                    break;
+                case 10600:
+                    TestPersonaAura(map);
                     Finish();
                     break;
             }
@@ -270,6 +274,69 @@ namespace ShipHoloAI
                 avatar.Notify_Teleported();
                 Log.Message("[HoloAI SelfTest] avatar exiled to " + offShip + " for teleport test");
             }
+        }
+
+        private void TestPersonaInstall(Map map)
+        {
+            ThingDef matrixDef = DefDatabase<ThingDef>.GetNamedSilentFail("HoloAI_Matrix_HERMES");
+            if (matrixDef == null)
+            {
+                Check("persona matrix def exists", pass: false);
+                return;
+            }
+            Check("persona matrix def exists", pass: true);
+            Thing matrix = GenSpawn.Spawn(ThingMaker.MakeThing(matrixDef),
+                siteCenter + new IntVec3(-3, 0, 0), map);
+            core.InstallPersona(matrix);
+            Check("persona installed (H.E.R.M.E.S. active)",
+                core.ActivePersona?.defName == "HoloAI_Persona_HERMES");
+            Check("consumed matrix destroyed", matrix.Destroyed);
+        }
+
+        private void TestPersonaAura(Map map)
+        {
+            Check("new avatar renamed to persona",
+                core.Avatar != null && core.Avatar.Spawned
+                && core.Avatar.Name?.ToStringFull == "H.E.R.M.E.S.");
+
+            HediffDef aura = core.ActivePersona?.auraHediff;
+            bool auraSeen = false;
+            float speedBefore = -1f, speedAfter = -1f;
+            if (aura != null)
+            {
+                foreach (Pawn colonist in map.mapPawns.FreeColonistsSpawned)
+                {
+                    Hediff h = colonist.health.hediffSet.GetFirstHediffOfDef(aura);
+                    if (h != null)
+                    {
+                        auraSeen = true;
+                        speedAfter = colonist.GetStatValue(StatDefOf.MoveSpeed);
+                        h.Severity = 0f;
+                        colonist.health.RemoveHediff(h);
+                        speedBefore = colonist.GetStatValue(StatDefOf.MoveSpeed);
+                        break;
+                    }
+                }
+            }
+            Check("aura hediff applied to crew on ship", auraSeen);
+            Check("aura grants move speed", auraSeen && speedAfter > speedBefore);
+
+            // Swap back to a second persona to verify ejection of the old matrix.
+            ThingDef vestaDef = DefDatabase<ThingDef>.GetNamedSilentFail("HoloAI_Matrix_VESTA");
+            Thing vesta = GenSpawn.Spawn(ThingMaker.MakeThing(vestaDef),
+                siteCenter + new IntVec3(-3, 0, 2), map);
+            core.InstallPersona(vesta);
+            bool ejected = false;
+            foreach (IntVec3 c in GenRadial.RadialCellsAround(core.Position, 6f, useCenter: true))
+            {
+                if (c.InBounds(map) && c.GetThingList(map)
+                        .Any(t => t.def.defName == "HoloAI_Matrix_HERMES"))
+                {
+                    ejected = true;
+                    break;
+                }
+            }
+            Check("previous persona matrix ejected on swap", ejected);
         }
 
         private void ForcePower(bool on)

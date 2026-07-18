@@ -61,7 +61,8 @@ namespace ShipHoloAI
             {
                 MoteMaker.ThrowText(avatar.DrawPos + new Vector3(0f, 0f, 0.65f), map, line, SpeechColor, 6f);
             }
-            Messages.Message("P.R.I.S.M.: " + line, new LookTargets(core),
+            string speaker = core.ActivePersona.avatarName ?? "P.R.I.S.M.";
+            Messages.Message(speaker + ": " + line, new LookTargets(core),
                 MessageTypeDefOf.SilentInput, historical: false);
         }
     }

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- Persona auras: applied by HoloAuraMapComponent to crew on gravship substructure
+       while the persona's avatar is projected. Each carries a short self-expiry that
+       the component keeps refreshing, so auras clean themselves up when a pawn leaves
+       the ship, the core loses power, or the persona is swapped. -->
+  <HediffDef Name="HoloAI_AuraBase" Abstract="True">
+    <hediffClass>HediffWithComps</hediffClass>
+    <isBad>false</isBad>
+    <everCurableByItem>false</everCurableByItem>
+    <initialSeverity>1</initialSeverity>
+    <maxSeverity>1</maxSeverity>
+    <scenarioCanAdd>false</scenarioCanAdd>
+    <comps>
+      <li Class="HediffCompProperties_Disappears">
+        <disappearsAfterTicks>600</disappearsAfterTicks>
+        <showRemainingTime>false</showRemainingTime>
+      </li>
+    </comps>
+  </HediffDef>
+
+  <HediffDef ParentName="HoloAI_AuraBase">
+    <defName>HoloAI_Aura_Hearthlight</defName>
+    <label>hearthlight presence</label>
+    <description>V.E.S.T.A. walks these decks. The corridors feel warmer, the shadows softer — the ship feels like home.</description>
+    <stages>
+      <li>
+        <becomeVisible>true</becomeVisible>
+      </li>
+    </stages>
+  </HediffDef>
+
+  <HediffDef ParentName="HoloAI_AuraBase">
+    <defName>HoloAI_Aura_Slipstream</defName>
+    <label>slipstream guidance</label>
+    <description>H.E.R.M.E.S. choreographs the ship around its crew — doors anticipate, corridors clear, footing is always sure.</description>
+    <stages>
+      <li>
+        <statOffsets>
+          <MoveSpeed>0.35</MoveSpeed>
+        </statOffsets>
+      </li>
+    </stages>
+  </HediffDef>
+
+  <HediffDef ParentName="HoloAI_AuraBase">
+    <defName>HoloAI_Aura_Archivelight</defName>
+    <label>archivelight</label>
+    <description>A.T.H.E.N.A. annotates the world as her crew studies it — citations surface unbidden and dead ends announce themselves early.</description>
+    <stages>
+      <li>
+        <statOffsets>
+          <ResearchSpeed>0.15</ResearchSpeed>
+        </statOffsets>
+      </li>
+    </stages>
+  </HediffDef>
+
+  <HediffDef ParentName="HoloAI_AuraBase">
+    <defName>HoloAI_Aura_Stericalm</defName>
+    <label>stericalm field</label>
+    <description>A.C.E.S.O. shadows her crew's hands — instruments arrive sterile, vitals read true, and nothing slips.</description>
+    <stages>
+      <li>
+        <statOffsets>
+          <MedicalTendQuality>0.15</MedicalTendQuality>
+          <MedicalTendSpeed>0.25</MedicalTendSpeed>
+          <MedicalSurgerySuccessChance>0.05</MedicalSurgerySuccessChance>
+        </statOffsets>
+      </li>
+    </stages>
+  </HediffDef>
+
+</Defs>

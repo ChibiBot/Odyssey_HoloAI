@@ -66,6 +66,14 @@ dotnet build Source/ShipHoloAI/ShipHoloAI.csproj -c Release   # → 1.6/Assembli
 - `PawnRenderer.RenderPawnAt` indexes `kindDef.lifeStages` for every non-humanlike
   pawn: the PawnKindDef must keep one lifeStage entry even though the render tree
   ignores it.
+- **Personas**: `HoloPersonaDef` (custom def) = identity (avatarName, hair, color) +
+  optional `auraHediff`; purchased ones ship as matrix items (`HoloPersonaMatrixExtension`
+  links item→persona, trade tag `HoloAI_PersonaMatrix` sold by Orbital_Exotic via patch).
+  `Building_HoloCore.InstallPersona` swaps (ejects the old persona's matrix; P.R.I.S.M.
+  has none). Auras are applied by `HoloAuraMapComponent` as self-expiring hediffs
+  (600-tick `HediffComp_Disappears`, refreshed each 250-tick pass) — never remove them
+  manually, let them lapse. New personas = one HoloPersonaDef + item def + hediff +
+  icon; no C# needed.
 - Thought/interaction defs must resolve grammar with a named pawn: P.R.I.S.M. gets a
   `NameSingle` at generation.
 

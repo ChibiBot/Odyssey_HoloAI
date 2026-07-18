@@ -8,4 +8,10 @@
     <casualInterruptible>false</casualInterruptible>
   </JobDef>
 
+  <JobDef>
+    <defName>HoloAI_InstallPersona</defName>
+    <driverClass>ShipHoloAI.JobDriver_InstallPersona</driverClass>
+    <reportString>installing TargetA into TargetB.</reportString>
+  </JobDef>
+
 </Defs>

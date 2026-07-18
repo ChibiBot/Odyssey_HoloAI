@@ -65,6 +65,22 @@ namespace ShipHoloAI
             }
         }
 
+        /// <summary>Adopt a persona's identity: name, default hair, and hair color.</summary>
+        public void ApplyPersonaStyle(HoloPersonaDef persona)
+        {
+            Name = new NameSingle(persona.avatarName ?? persona.label);
+            HairDef personaHair = persona.DefaultHair;
+            if (personaHair != null)
+            {
+                hairDef = personaHair;
+            }
+            hairColorInt = persona.hairColor;
+            if (Spawned)
+            {
+                Drawer.renderer.SetAllGraphicsDirty();
+            }
+        }
+
         public void CycleHairstyle()
         {
             int current = System.Array.IndexOf(CuratedHairDefNames, CurrentHairDef?.defName);
