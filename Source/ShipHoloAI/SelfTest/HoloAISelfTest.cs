@@ -81,6 +81,20 @@ namespace ShipHoloAI
                 case 9000:
                     Check("colonist gained chat memory", chatMemoryObserved);
                     Check("interaction play-log entry recorded and resolvable", chatLogObserved);
+                    break;
+                case 9100:
+                    Check("low-fuel line resolves from grammar",
+                        !PrismSpeech.ResolveLine("announce_lowfuel").NullOrEmpty());
+                    Find.LetterStack.ReceiveLetter("self-test threat", "letter sent by the HoloAI self-test",
+                        LetterDefOf.ThreatSmall, new LookTargets(core));
+                    break;
+                case 9200:
+                    Check("letter triggered a P.R.I.S.M. announcement",
+                        PrismSpeech.LastSpokenTick >= ticks - 200 && !PrismSpeech.LastLine.NullOrEmpty());
+                    if (!PrismSpeech.LastLine.NullOrEmpty())
+                    {
+                        Log.Message("[HoloAI SelfTest] announcement line: " + PrismSpeech.LastLine);
+                    }
                     Finish();
                     break;
             }
@@ -115,8 +129,9 @@ namespace ShipHoloAI
                     }
                 }
             }
-            core = (Building_HoloCore)GenSpawn.Spawn(
-                ThingMaker.MakeThing(HoloAI_DefOf.HoloAI_HoloCore), center, map);
+            Thing coreThing = ThingMaker.MakeThing(HoloAI_DefOf.HoloAI_HoloCore);
+            coreThing.SetFaction(Faction.OfPlayer);
+            core = (Building_HoloCore)GenSpawn.Spawn(coreThing, center, map);
             testColonist = PawnGenerator.GeneratePawn(PawnKindDefOf.Colonist, Faction.OfPlayer);
             GenSpawn.Spawn(testColonist, center + new IntVec3(3, 0, 0), map);
             Log.Message("[HoloAI SelfTest] setup complete at " + center);

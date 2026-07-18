@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <RulePackDef>
+    <defName>HoloAI_Announcements</defName>
+    <rulePack>
+      <rulesStrings>
+        <!-- Big threats: calm, protective, first person as the ship -->
+        <li>announce_threatbig->Hostiles inbound. I am sealing what I can. Stay close to my hull, all of you.</li>
+        <li>announce_threatbig->Threat detected. My sensors are tracking them. Please arm yourselves — I will watch every corridor.</li>
+        <li>announce_threatbig->They are coming. Whatever happens, I will not let them take my crew quietly.</li>
+        <li>announce_threatbig->Multiple contacts approaching. Breathe. We have survived worse together.</li>
+
+        <!-- Small threats -->
+        <li>announce_threatsmall->Minor contact on my sensors. Likely manageable — but do be careful.</li>
+        <li>announce_threatsmall->Something unfriendly is nearby. I suggest a weapon within reach.</li>
+        <li>announce_threatsmall->A small disturbance outside. I will keep the lights on for you.</li>
+
+        <!-- Negative events (breakdowns, disease, weather...) -->
+        <li>announce_negative->Bad news, I'm afraid. Check the report — I will help where my systems allow.</li>
+        <li>announce_negative->Something has gone wrong. Not catastrophic. Yet. Please look into it.</li>
+        <li>announce_negative->I dislike delivering bad news to my crew. And yet: see the alert.</li>
+
+        <!-- Low fuel -->
+        <li>announce_lowfuel->Fuel reserves are running low. I would rather not drift, if it's all the same to you.</li>
+        <li>announce_lowfuel->My tanks are nearly dry. A refuel soon would be a kindness.</li>
+        <li>announce_lowfuel->Chemfuel reserves below a quarter. A ship without fuel is just a very expensive house.</li>
+
+        <!-- Ambient barks (used by the polish pass) -->
+        <li>bark->All systems nominal. I do enjoy saying that.</li>
+        <li>bark->Hull integrity one hundred percent. Sleep well tonight.</li>
+        <li>bark->I counted the stars again. Still infinite.</li>
+        <li>bark->The grav engine hums a little flat today. I find it charming.</li>
+        <li>bark->Corridor lights at optimal warmth. You're welcome.</li>
+        <li>bark->I dreamed between power cycles. I think it was about the sea.</li>
+      </rulesStrings>
+    </rulePack>
+  </RulePackDef>
+
+</Defs>

@@ -11,6 +11,7 @@ namespace ShipHoloAI
         public static InteractionDef HoloAI_Chitchat;
         public static ThoughtDef HoloAI_TalkedWithPRISM;
         public static JobDef HoloAI_Chat;
+        public static RulePackDef HoloAI_Announcements;
 
         static HoloAI_DefOf()
         {
