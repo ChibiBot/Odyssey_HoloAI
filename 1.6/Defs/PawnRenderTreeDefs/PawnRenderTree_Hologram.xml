@@ -12,25 +12,28 @@
       <debugLabel>Root</debugLabel>
       <tagDef>Root</tagDef>
       <children>
-        <li>
+        <li Class="ShipHoloAI.PawnRenderNodeProperties_Holo">
           <debugLabel>HoloBody</debugLabel>
           <nodeClass>ShipHoloAI.PawnRenderNode_HoloPart</nodeClass>
           <workerClass>PawnRenderNodeWorker</workerClass>
           <tagDef>Body</tagDef>
           <texPath>Things/Pawn/Humanlike/Bodies/Naked_Female</texPath>
           <colorType>Custom</colorType>
-          <color>(0.78, 0.94, 1.0, 0.92)</color>
+          <color>(0.55, 0.82, 1.0, 0.95)</color>
+          <dissolveFrom>0.38</dissolveFrom>
           <overrideMeshSize>(1.5, 1.5)</overrideMeshSize>
           <baseLayer>10</baseLayer>
         </li>
-        <!-- Appearance-only uniform: vanilla button-down worn graphic, synthread tint -->
-        <li>
+        <!-- Appearance-only uniform: vanilla button-down worn graphic. Bright
+             white-blue ramp per the concept art; hem dissolves with the body. -->
+        <li Class="ShipHoloAI.PawnRenderNodeProperties_Holo">
           <debugLabel>HoloOutfit</debugLabel>
           <nodeClass>ShipHoloAI.PawnRenderNode_HoloPart</nodeClass>
           <workerClass>PawnRenderNodeWorker</workerClass>
           <texPath>Things/Pawn/Humanlike/Apparel/ShirtButton/ShirtButton_Female</texPath>
           <colorType>Custom</colorType>
-          <color>(0.682, 0.859, 0.894, 0.92)</color>
+          <color>(0.80, 0.93, 1.0, 0.95)</color>
+          <dissolveFrom>0.30</dissolveFrom>
           <overrideMeshSize>(1.5, 1.5)</overrideMeshSize>
           <baseLayer>20</baseLayer>
         </li>
@@ -41,7 +44,7 @@
           <tagDef>Head</tagDef>
           <texPath>Things/Pawn/Humanlike/Heads/Female/Female_Average_Normal</texPath>
           <colorType>Custom</colorType>
-          <color>(0.78, 0.94, 1.0, 0.92)</color>
+          <color>(0.60, 0.85, 1.0, 0.95)</color>
           <overrideMeshSize>(1.5, 1.5)</overrideMeshSize>
           <baseLayer>50</baseLayer>
           <drawData>
@@ -57,7 +60,7 @@
               <nodeClass>ShipHoloAI.PawnRenderNode_HoloHair</nodeClass>
               <workerClass>PawnRenderNodeWorker</workerClass>
               <colorType>Custom</colorType>
-              <color>(0.05, 0.68, 1.0, 0.62)</color>
+              <color>(0.05, 0.68, 1.0, 0.72)</color>
               <overrideMeshSize>(1.5, 1.5)</overrideMeshSize>
               <baseLayer>62</baseLayer>
             </li>

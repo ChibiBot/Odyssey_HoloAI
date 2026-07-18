@@ -28,6 +28,7 @@ namespace ShipHoloAI
             {
                 return;
             }
+            DrawEmitterRing(avatar);
             HairDef hair = avatar.CurrentHairDef;
             if (hair == null || hair.noGraphic)
             {
@@ -52,6 +53,25 @@ namespace ShipHoloAI
             Mesh mesh = rot == Rot4.West
                 ? MeshPool.GridPlaneFlip(OverlaySize)
                 : MeshPool.GridPlane(OverlaySize);
+            Graphics.DrawMesh(mesh, Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one), mat, 0, null, 0, mpb);
+        }
+
+        /// <summary>Soft projection ring at her feet — she is being projected, after
+        /// all. Drawn at floor altitude so pawns and items layer above it.</summary>
+        private static void DrawEmitterRing(Pawn_HoloAvatar avatar)
+        {
+            Material mat = HoloGraphicPool.EmitterRingMat;
+            if (mat == null)
+            {
+                return;
+            }
+            float breathe = 0.30f + 0.10f * Mathf.Sin(Time.realtimeSinceStartup * 1.6f + avatar.thingIDNumber);
+            mpb = mpb ?? new MaterialPropertyBlock();
+            mpb.SetColor(ShaderPropertyIDs.Color, new Color(1f, 1f, 1f, breathe));
+            Vector3 pos = avatar.DrawPos;
+            pos.z -= 0.28f;
+            pos.y = AltitudeLayer.FloorEmplacement.AltitudeFor() + 0.005f;
+            Mesh mesh = MeshPool.GridPlane(new Vector2(1.25f, 0.9f));
             Graphics.DrawMesh(mesh, Matrix4x4.TRS(pos, Quaternion.identity, Vector3.one), mat, 0, null, 0, mpb);
         }
 

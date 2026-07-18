@@ -4,9 +4,17 @@ using Verse;
 
 namespace ShipHoloAI
 {
+    /// <summary>Node properties with hologram-filter extras (set from the tree XML).</summary>
+    public class PawnRenderNodeProperties_Holo : PawnRenderNodeProperties
+    {
+        /// <summary>Fraction of the sprite (from the bottom) that dissolves into
+        /// light particles; negative = no dissolution.</summary>
+        public float dissolveFrom = -1f;
+    }
+
     /// <summary>
     /// Renders a fixed vanilla texture (props.texPath) through the hologram filter.
-    /// Used for the avatar's body and head so no story tracker is needed.
+    /// Used for the avatar's body, head, and outfit so no story tracker is needed.
     /// </summary>
     public class PawnRenderNode_HoloPart : PawnRenderNode
     {
@@ -21,13 +29,15 @@ namespace ShipHoloAI
             {
                 return null;
             }
-            return HoloGraphicPool.Get(props.texPath, props.color ?? Color.white);
+            Color color = props.color ?? Color.white;
+            float dissolve = (props as PawnRenderNodeProperties_Holo)?.dissolveFrom ?? -1f;
+            return HoloGraphicPool.Get(props.texPath, new HoloFilter(color, color.a, dissolve));
         }
     }
 
     /// <summary>
     /// Renders the avatar's currently selected vanilla HairDef through the hologram
-    /// filter in electric blue. Reads from Pawn_HoloAvatar, not pawn.story.
+    /// filter in her chosen color. Reads from Pawn_HoloAvatar, not pawn.story.
     /// </summary>
     public class PawnRenderNode_HoloHair : PawnRenderNode
     {
@@ -47,8 +57,8 @@ namespace ShipHoloAI
             // RGB follows the avatar's chosen color (styling dialog); alpha stays the
             // node's hologram translucency.
             Color rgb = avatar.HoloHairColor;
-            float alpha = (props.color ?? new Color(0f, 0f, 0f, 0.62f)).a;
-            return HoloGraphicPool.Get(hair.texPath, new Color(rgb.r, rgb.g, rgb.b, alpha));
+            float alpha = (props.color ?? new Color(0f, 0f, 0f, 0.7f)).a;
+            return HoloGraphicPool.Get(hair.texPath, new HoloFilter(rgb, alpha));
         }
     }
 }
