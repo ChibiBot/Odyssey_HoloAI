@@ -23,8 +23,12 @@
       <LeatherAmount>0</LeatherAmount>
     </statBases>
     <tradeability>None</tradeability>
+    <comps>
+      <li Class="ShipHoloAI.CompProperties_HoloShimmer"/>
+    </comps>
     <race>
       <intelligence>ToolUser</intelligence>
+      <renderTree>HoloAI_Hologram</renderTree>
       <thinkTreeMain>HoloAI_Hologram</thinkTreeMain>
       <thinkTreeConstant>HoloAI_HologramConstant</thinkTreeConstant>
       <fleshType>Drone</fleshType>

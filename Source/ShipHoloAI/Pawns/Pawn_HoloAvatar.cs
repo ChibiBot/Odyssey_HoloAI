@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using RimWorld;
 using Verse;
 
@@ -12,7 +14,45 @@ namespace ShipHoloAI
         public Building_HoloCore holoCore;
         public int nextChatTick;
 
+        private HairDef hairDef;
+
         private static readonly IntRange ChatCooldownTicks = new IntRange(2500, 7500);
+
+        // 4 long styles, 4 cute ones — all Core assets.
+        private static readonly string[] CuratedHairDefNames =
+        {
+            "Long", "Flowy", "Princess", "Senorita",
+            "Cute", "Bob", "Pigtails", "FancyBun",
+        };
+
+        public HairDef CurrentHairDef
+        {
+            get
+            {
+                if (hairDef == null)
+                {
+                    hairDef = DefDatabase<HairDef>.GetNamedSilentFail("Flowy")
+                        ?? DefDatabase<HairDef>.AllDefsListForReading.FirstOrDefault(h => !h.noGraphic);
+                }
+                return hairDef;
+            }
+        }
+
+        public void CycleHairstyle()
+        {
+            int current = System.Array.IndexOf(CuratedHairDefNames, CurrentHairDef?.defName);
+            for (int offset = 1; offset <= CuratedHairDefNames.Length; offset++)
+            {
+                HairDef next = DefDatabase<HairDef>.GetNamedSilentFail(
+                    CuratedHairDefNames[(current + offset) % CuratedHairDefNames.Length]);
+                if (next != null && !next.noGraphic)
+                {
+                    hairDef = next;
+                    break;
+                }
+            }
+            Drawer.renderer.SetAllGraphicsDirty();
+        }
 
         public void SetChatCooldown()
         {
@@ -62,11 +102,27 @@ namespace ShipHoloAI
             }
         }
 
+        public override IEnumerable<Gizmo> GetGizmos()
+        {
+            foreach (Gizmo gizmo in base.GetGizmos())
+            {
+                yield return gizmo;
+            }
+            yield return new Command_Action
+            {
+                defaultLabel = "HoloAI_Hairstyle".Translate() + ": " + (CurrentHairDef?.LabelCap ?? "-"),
+                defaultDesc = "HoloAI_HairstyleDesc".Translate(),
+                icon = holoCore?.def.uiIcon,
+                action = CycleHairstyle,
+            };
+        }
+
         public override void ExposeData()
         {
             base.ExposeData();
             Scribe_References.Look(ref holoCore, "holoCore");
             Scribe_Values.Look(ref nextChatTick, "nextChatTick");
+            Scribe_Defs.Look(ref hairDef, "hairDef");
         }
     }
 }

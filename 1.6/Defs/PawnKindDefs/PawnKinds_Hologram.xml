@@ -8,12 +8,15 @@
     <combatPower>0</combatPower>
     <canOpenDoors>true</canOpenDoors>
     <canOpenAnyDoor>false</canOpenAnyDoor>
+    <!-- Actual visuals come from the HoloAI_Hologram render tree. This entry exists
+         because PawnRenderer.RenderPawnAt indexes kindDef.lifeStages for every
+         non-humanlike pawn (verified 1.6 decompile) — an empty list throws every frame. -->
     <lifeStages>
       <li>
         <bodyGraphicData>
-          <texPath>HoloAI/Pawns/PRISM</texPath>
+          <texPath>Things/Pawn/Humanlike/Bodies/Naked_Female</texPath>
           <shaderType>Transparent</shaderType>
-          <drawSize>1.25</drawSize>
+          <drawSize>1.5</drawSize>
         </bodyGraphicData>
       </li>
     </lifeStages>

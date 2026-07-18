@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- Reconstructs a humanlike-looking pawn from vanilla body/head/hair assets without
+       needing a story tracker: custom nodes feed fixed texture paths (body, head) and
+       the avatar's chosen HairDef through the hologram filter (edge-faded translucent
+       textures, electric blue hair). Hair is a child of the head, so it inherits the
+       head's per-rotation offsets. -->
+  <PawnRenderTreeDef>
+    <defName>HoloAI_Hologram</defName>
+    <root Class="PawnRenderNodeProperties_Parent">
+      <debugLabel>Root</debugLabel>
+      <tagDef>Root</tagDef>
+      <children>
+        <li>
+          <debugLabel>HoloBody</debugLabel>
+          <nodeClass>ShipHoloAI.PawnRenderNode_HoloPart</nodeClass>
+          <workerClass>PawnRenderNodeWorker</workerClass>
+          <tagDef>Body</tagDef>
+          <texPath>Things/Pawn/Humanlike/Bodies/Naked_Female</texPath>
+          <colorType>Custom</colorType>
+          <color>(0.78, 0.94, 1.0, 0.92)</color>
+          <overrideMeshSize>(1.5, 1.5)</overrideMeshSize>
+          <baseLayer>10</baseLayer>
+        </li>
+        <li>
+          <debugLabel>HoloHead</debugLabel>
+          <nodeClass>ShipHoloAI.PawnRenderNode_HoloPart</nodeClass>
+          <workerClass>PawnRenderNodeWorker</workerClass>
+          <tagDef>Head</tagDef>
+          <texPath>Things/Pawn/Humanlike/Heads/Female/Female_Average_Normal</texPath>
+          <colorType>Custom</colorType>
+          <color>(0.78, 0.94, 1.0, 0.92)</color>
+          <overrideMeshSize>(1.5, 1.5)</overrideMeshSize>
+          <baseLayer>50</baseLayer>
+          <drawData>
+            <defaultData>
+              <offset>(0, 0, 0.34)</offset>
+            </defaultData>
+            <dataEast><offset>(0.10, 0, 0.34)</offset></dataEast>
+            <dataWest><offset>(-0.10, 0, 0.34)</offset></dataWest>
+          </drawData>
+          <children>
+            <li>
+              <debugLabel>HoloHair</debugLabel>
+              <nodeClass>ShipHoloAI.PawnRenderNode_HoloHair</nodeClass>
+              <workerClass>PawnRenderNodeWorker</workerClass>
+              <colorType>Custom</colorType>
+              <color>(0.05, 0.68, 1.0, 0.62)</color>
+              <overrideMeshSize>(1.5, 1.5)</overrideMeshSize>
+              <baseLayer>62</baseLayer>
+            </li>
+          </children>
+        </li>
+      </children>
+    </root>
+  </PawnRenderTreeDef>
+
+</Defs>

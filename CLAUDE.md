@@ -56,6 +56,16 @@ dotnet build Source/ShipHoloAI/ShipHoloAI.csproj -c Release   # → 1.6/Assembli
   survives gravship launch/landing and how save/load stays consistent.
 - Mood from chats is a **plain `Thought_Memory`**, not a social thought — social opinion
   math about a ToolUser breaks things.
+- The avatar's look = **vanilla assets through a hologram filter**: a custom
+  `PawnRenderTreeDef` (`HoloAI_Hologram`) whose nodes render the vanilla female
+  body/head textures plus the avatar's chosen vanilla `HairDef` (8 curated styles,
+  cycled by gizmo). `HoloGraphicPool` bakes edge-faded translucent copies of the
+  textures at runtime (chamfer distance transform on a readable copy); hair is electric
+  blue; `CompHoloShimmer` draws a pulsing additive hair overlay in `PostDraw` (bypasses
+  the pawn atlas cache). Do NOT draw pawn textures directly — extend the pool/tree.
+- `PawnRenderer.RenderPawnAt` indexes `kindDef.lifeStages` for every non-humanlike
+  pawn: the PawnKindDef must keep one lifeStage entry even though the render tree
+  ignores it.
 - Thought/interaction defs must resolve grammar with a named pawn: P.R.I.S.M. gets a
   `NameSingle` at generation.
 

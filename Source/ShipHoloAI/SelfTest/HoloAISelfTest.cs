@@ -17,6 +17,7 @@ namespace ShipHoloAI
 
         private int ticks;
         private int failures;
+        private IntVec3 siteCenter;
         private Building_HoloCore core;
         private Pawn testColonist;
         private bool chatMemoryObserved;
@@ -50,6 +51,22 @@ namespace ShipHoloAI
                     ForcePower(true);
                     Check("avatar projected while powered", core.Avatar != null && core.Avatar.Spawned);
                     break;
+                case 1400:
+                    if (core.Avatar != null && core.Avatar.Spawned)
+                    {
+                        Check("render tree resolved", core.Avatar.Drawer.renderer.renderTree.Resolved);
+                        HairDef before = core.Avatar.CurrentHairDef;
+                        Check("default hairstyle resolved", before != null);
+                        core.Avatar.CycleHairstyle();
+                        Check("hairstyle cycles", core.Avatar.CurrentHairDef != before);
+                        Log.Message("[HoloAI SelfTest] hair: " + before?.defName + " -> "
+                            + core.Avatar.CurrentHairDef?.defName);
+                    }
+                    else
+                    {
+                        Check("render tree resolved", false);
+                    }
+                    break;
                 case 1500:
                     Check("avatar named P.R.I.S.M.", core.Avatar != null && core.Avatar.Name?.ToStringFull == "P.R.I.S.M.");
                     Check("avatar wanders on substructure",
@@ -70,7 +87,7 @@ namespace ShipHoloAI
                     Check("avatar travels inside despawned core",
                         core.Avatar != null && !core.Avatar.Spawned &&
                         core.GetDirectlyHeldThings().Contains(core.Avatar));
-                    GenSpawn.Spawn(core, map.Center + new IntVec3(4, 0, 4), map);
+                    GenSpawn.Spawn(core, siteCenter + new IntVec3(4, 0, 4), map);
                     break;
                 case 3600:
                     ForcePower(true);
@@ -113,7 +130,8 @@ namespace ShipHoloAI
 
         private void Setup(Map map)
         {
-            IntVec3 center = map.Center;
+            IntVec3 center = FindTestSite(map);
+            siteCenter = center;
             TerrainDef substructure = DefDatabase<TerrainDef>.GetNamed("Substructure");
             foreach (IntVec3 c in CellRect.CenteredOn(center, 12))
             {
@@ -129,12 +147,51 @@ namespace ShipHoloAI
                     }
                 }
             }
+            // A grav engine legitimizes the substructure — without one the support
+            // system collapses the patch (and the core) shortly after placement.
+            Thing engine = ThingMaker.MakeThing(ThingDef.Named("GravEngine"));
+            engine.SetFaction(Faction.OfPlayer);
+            GenSpawn.Spawn(engine, center + new IntVec3(-6, 0, -6), map);
+
             Thing coreThing = ThingMaker.MakeThing(HoloAI_DefOf.HoloAI_HoloCore);
             coreThing.SetFaction(Faction.OfPlayer);
             core = (Building_HoloCore)GenSpawn.Spawn(coreThing, center, map);
             testColonist = PawnGenerator.GeneratePawn(PawnKindDefOf.Colonist, Faction.OfPlayer);
             GenSpawn.Spawn(testColonist, center + new IntVec3(3, 0, 0), map);
+            Find.CameraDriver?.JumpToCurrentMapLoc(center);
             Log.Message("[HoloAI SelfTest] setup complete at " + center);
+        }
+
+        /// <summary>
+        /// SetFoundation refuses cells with under-terrain (bridges, water beds), and a
+        /// core on unsupported ground gets destroyed by the substructure system — so
+        /// scan for a patch where every cell accepts a foundation.
+        /// </summary>
+        private static IntVec3 FindTestSite(Map map)
+        {
+            IntVec3 best = map.Center;
+            for (int attempt = 0; attempt < 300; attempt++)
+            {
+                IntVec3 candidate = attempt == 0
+                    ? map.Center
+                    : CellFinder.RandomCell(map);
+                bool viable = true;
+                foreach (IntVec3 c in CellRect.CenteredOn(candidate, 12))
+                {
+                    if (!c.InBounds(map) || map.terrainGrid.UnderTerrainAt(c) != null
+                        || c.GetTerrain(map).IsWater)
+                    {
+                        viable = false;
+                        break;
+                    }
+                }
+                if (viable)
+                {
+                    return candidate;
+                }
+            }
+            Log.Warning("[HoloAI SelfTest] no fully viable test site found; using map center");
+            return best;
         }
 
         private void ForcePower(bool on)
