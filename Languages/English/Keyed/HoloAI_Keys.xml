@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+  <HoloAI_ToggleProjection>projection</HoloAI_ToggleProjection>
+  <HoloAI_ToggleProjectionDesc>Toggle whether this holocore projects its avatar. While disabled, the persona rests dormant inside the core.</HoloAI_ToggleProjectionDesc>
+  <HoloAI_Summon>summon</HoloAI_Summon>
+  <HoloAI_SummonDesc>Ask the avatar to appear at a location on the ship.</HoloAI_SummonDesc>
+  <HoloAI_StateProjected>Avatar: projected</HoloAI_StateProjected>
+  <HoloAI_StateDormant>Avatar: dormant</HoloAI_StateDormant>
+</LanguageData>

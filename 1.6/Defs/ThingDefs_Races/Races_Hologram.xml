@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- The hologram is modeled on Odyssey's drones (ToolUser, fleshType Drone) rather
+       than mechanoids: FleshTypeDefOf.Mechanoid would make RaceProps.IsMechanoid true
+       and drag in Biotech's mech-control systems for a player-faction pawn. -->
+  <ThingDef ParentName="BasePawn">
+    <defName>HoloAI_Hologram</defName>
+    <label>holographic avatar</label>
+    <description>A photonic projection given form and mind by a holocore. Intangible but present, she walks the ship she embodies.</description>
+    <thingClass>ShipHoloAI.Pawn_HoloAvatar</thingClass>
+    <statBases>
+      <MoveSpeed>4.6</MoveSpeed>
+      <MarketValue>0</MarketValue>
+      <Flammability>0</Flammability>
+      <PsychicSensitivity>0</PsychicSensitivity>
+      <ToxicResistance>1</ToxicResistance>
+      <ToxicEnvironmentResistance>1</ToxicEnvironmentResistance>
+      <VacuumResistance>1</VacuumResistance>
+      <ComfyTemperatureMin>-273</ComfyTemperatureMin>
+      <ComfyTemperatureMax>1000</ComfyTemperatureMax>
+      <MeatAmount>0</MeatAmount>
+      <LeatherAmount>0</LeatherAmount>
+    </statBases>
+    <tradeability>None</tradeability>
+    <race>
+      <intelligence>ToolUser</intelligence>
+      <thinkTreeMain>HoloAI_Hologram</thinkTreeMain>
+      <thinkTreeConstant>HoloAI_HologramConstant</thinkTreeConstant>
+      <fleshType>Drone</fleshType>
+      <body>Drone</body>
+      <alwaysAwake>true</alwaysAwake>
+      <needsRest>false</needsRest>
+      <foodType>None</foodType>
+      <hasGenders>true</hasGenders>
+      <hasCorpse>false</hasCorpse>
+      <lifeExpectancy>10000</lifeExpectancy>
+      <trainability>None</trainability>
+      <hideTrainingTab>true</hideTrainingTab>
+      <disableIgniteVerb>true</disableIgniteVerb>
+      <baseHealthScale>1</baseHealthScale>
+      <baseBodySize>1</baseBodySize>
+      <lifeStageAges>
+        <li>
+          <def>MechanoidFullyFormed</def>
+          <minAge>0</minAge>
+        </li>
+      </lifeStageAges>
+    </race>
+  </ThingDef>
+
+</Defs>

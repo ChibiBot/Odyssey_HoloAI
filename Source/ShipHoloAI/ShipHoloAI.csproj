@@ -38,6 +38,11 @@
       <HintPath>$(HarmonyDll)</HintPath>
       <Private>false</Private>
     </Reference>
+    <!-- The game assembly is netstandard2.1-facaded; use the game's own facade -->
+    <Reference Include="netstandard">
+      <HintPath>$(RimWorldManaged)/netstandard.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
   </ItemGroup>
 
 </Project>

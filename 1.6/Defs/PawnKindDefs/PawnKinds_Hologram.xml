@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <PawnKindDef>
+    <defName>HoloAI_PRISM</defName>
+    <label>P.R.I.S.M.</label>
+    <race>HoloAI_Hologram</race>
+    <combatPower>0</combatPower>
+    <canOpenDoors>true</canOpenDoors>
+    <canOpenAnyDoor>false</canOpenAnyDoor>
+    <lifeStages>
+      <li>
+        <bodyGraphicData>
+          <texPath>HoloAI/Pawns/PRISM</texPath>
+          <shaderType>Transparent</shaderType>
+          <drawSize>1.25</drawSize>
+        </bodyGraphicData>
+      </li>
+    </lifeStages>
+  </PawnKindDef>
+
+</Defs>
