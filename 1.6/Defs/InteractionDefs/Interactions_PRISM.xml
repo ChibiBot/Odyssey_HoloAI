@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- Fired manually from JobDriver_HoloChat: the avatar is a ToolUser pawn with no
+       Pawn_InteractionsTracker, so the vanilla worker never triggers this on its own. -->
+  <InteractionDef>
+    <defName>HoloAI_Chitchat</defName>
+    <label>ship chat</label>
+    <workerClass>InteractionWorker</workerClass>
+    <symbol>Things/Mote/SpeechSymbols/Chitchat</symbol>
+    <logRulesInitiator>
+      <rulesStrings>
+        <li>r_logentry->[INITIATOR_nameDef] [chatted] [RECIPIENT_nameDef] [subject].</li>
+
+        <li>chatted(p=3)->chatted with</li>
+        <li>chatted->checked in on</li>
+        <li>chatted->drifted alongside</li>
+        <li>chatted->appeared beside</li>
+
+        <li>subject->about the hum of the grav engine</li>
+        <li>subject->about the view from the hull cameras</li>
+        <li>subject->about old voyages she half-remembers</li>
+        <li>subject->about the weather outside her hull</li>
+        <li>subject->about how the corridors feel quieter at night</li>
+        <li>subject->about a dream she had between power cycles</li>
+        <li>subject->about the constellations ahead</li>
+        <li>subject->and hummed an old docking chime</li>
+      </rulesStrings>
+    </logRulesInitiator>
+  </InteractionDef>
+
+</Defs>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- Plain memory, deliberately NOT a social thought: opinion math about a ToolUser
+       pawn is undefined territory for vanilla and third-party mods alike. -->
+  <ThoughtDef>
+    <defName>HoloAI_TalkedWithPRISM</defName>
+    <thoughtClass>Thought_Memory</thoughtClass>
+    <durationDays>1</durationDays>
+    <stackLimit>3</stackLimit>
+    <stackedEffectMultiplier>0.5</stackedEffectMultiplier>
+    <showBubble>true</showBubble>
+    <stages>
+      <li>
+        <label>talked with the ship</label>
+        <description>The ship spoke with me. Not the intercom — her. It feels good to be seen by the vessel that keeps us alive.</description>
+        <baseMoodEffect>3</baseMoodEffect>
+      </li>
+    </stages>
+  </ThoughtDef>
+
+</Defs>

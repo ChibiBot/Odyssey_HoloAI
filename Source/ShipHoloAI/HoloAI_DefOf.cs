@@ -8,6 +8,9 @@ namespace ShipHoloAI
     {
         public static ThingDef HoloAI_HoloCore;
         public static PawnKindDef HoloAI_PRISM;
+        public static InteractionDef HoloAI_Chitchat;
+        public static ThoughtDef HoloAI_TalkedWithPRISM;
+        public static JobDef HoloAI_Chat;
 
         static HoloAI_DefOf()
         {

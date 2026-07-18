@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using RimWorld;
 using Verse;
 
@@ -17,6 +18,9 @@ namespace ShipHoloAI
         private int ticks;
         private int failures;
         private Building_HoloCore core;
+        private Pawn testColonist;
+        private bool chatMemoryObserved;
+        private bool chatLogObserved;
         private bool done;
 
         public HoloAISelfTest(Game game)
@@ -73,8 +77,17 @@ namespace ShipHoloAI
                     break;
                 case 4200:
                     Check("avatar re-projected after core respawn", core.Avatar != null && core.Avatar.Spawned);
+                    break;
+                case 9000:
+                    Check("colonist gained chat memory", chatMemoryObserved);
+                    Check("interaction play-log entry recorded and resolvable", chatLogObserved);
                     Finish();
                     break;
+            }
+
+            if (ticks > 4200 && ticks % 250 == 0 && !done)
+            {
+                ObserveChat();
             }
 
             // Keep the unconnected power comp switched on between checkpoints.
@@ -104,6 +117,8 @@ namespace ShipHoloAI
             }
             core = (Building_HoloCore)GenSpawn.Spawn(
                 ThingMaker.MakeThing(HoloAI_DefOf.HoloAI_HoloCore), center, map);
+            testColonist = PawnGenerator.GeneratePawn(PawnKindDefOf.Colonist, Faction.OfPlayer);
+            GenSpawn.Spawn(testColonist, center + new IntVec3(3, 0, 0), map);
             Log.Message("[HoloAI SelfTest] setup complete at " + center);
         }
 
@@ -113,6 +128,54 @@ namespace ShipHoloAI
             if (comp != null && comp.PowerOn != on)
             {
                 comp.PowerOn = on;
+            }
+        }
+
+        private void ObserveChat()
+        {
+            // The colonist AI may walk them off the test patch; anchor them near the core
+            // so the avatar gets her chance to chat.
+            if (testColonist != null && testColonist.Spawned && !testColonist.Dead
+                && !testColonist.Position.InHorDistOf(core.Position, 8f))
+            {
+                testColonist.Position = core.Position + new IntVec3(3, 0, 0);
+                testColonist.pather?.StopDead();
+                testColonist.jobs?.StopAll();
+            }
+
+            if (!chatMemoryObserved)
+            {
+                foreach (Pawn colonist in core.Map.mapPawns.FreeColonistsSpawned)
+                {
+                    if (colonist.needs?.mood?.thoughts?.memories?
+                            .GetFirstMemoryOfDef(HoloAI_DefOf.HoloAI_TalkedWithPRISM) != null)
+                    {
+                        chatMemoryObserved = true;
+                        Log.Message("[HoloAI SelfTest] observed chat memory on "
+                            + colonist.LabelShort + " at tick " + ticks);
+                        break;
+                    }
+                }
+            }
+
+            if (!chatLogObserved)
+            {
+                foreach (LogEntry entry in Find.PlayLog.AllEntries)
+                {
+                    if (entry is PlayLogEntry_Interaction
+                        && entry.GetConcerns().Contains(core.Avatar))
+                    {
+                        Pawn recipient = entry.GetConcerns().OfType<Pawn>()
+                            .FirstOrDefault(p => p != core.Avatar);
+                        string text = entry.ToGameStringFromPOV(recipient ?? (Pawn)core.Avatar);
+                        if (!text.NullOrEmpty())
+                        {
+                            chatLogObserved = true;
+                            Log.Message("[HoloAI SelfTest] chat log line: " + text);
+                        }
+                        break;
+                    }
+                }
             }
         }
 

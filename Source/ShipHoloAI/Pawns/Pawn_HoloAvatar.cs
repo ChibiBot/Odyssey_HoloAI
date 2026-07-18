@@ -10,6 +10,14 @@ namespace ShipHoloAI
     public class Pawn_HoloAvatar : Pawn
     {
         public Building_HoloCore holoCore;
+        public int nextChatTick;
+
+        private static readonly IntRange ChatCooldownTicks = new IntRange(2500, 7500);
+
+        public void SetChatCooldown()
+        {
+            nextChatTick = Find.TickManager.TicksGame + ChatCooldownTicks.RandomInRange;
+        }
 
         public override void PreApplyDamage(ref DamageInfo dinfo, out bool absorbed)
         {
@@ -35,6 +43,7 @@ namespace ShipHoloAI
         {
             base.ExposeData();
             Scribe_References.Look(ref holoCore, "holoCore");
+            Scribe_Values.Look(ref nextChatTick, "nextChatTick");
         }
     }
 }
