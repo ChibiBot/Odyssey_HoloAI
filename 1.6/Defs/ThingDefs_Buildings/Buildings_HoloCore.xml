@@ -10,11 +10,12 @@
     <designationCategory>Odyssey</designationCategory>
     <uiOrder>2310</uiOrder>
     <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
+    <rotatable>true</rotatable>
     <graphicData>
-      <graphicClass>Graphic_Single</graphicClass>
+      <graphicClass>Graphic_Multi</graphicClass>
       <texPath>HoloAI/Buildings/HoloCore</texPath>
       <!-- Taller than the 2x2 footprint: cabinet base sits on the tiles, the
-           projector plate and prism rise above for depth. -->
+           projector plate and prism rise above for depth. West mirrors east. -->
       <drawSize>(2, 2.5)</drawSize>
       <drawOffset>(0, 0, 0.25)</drawOffset>
       <shadowData>
