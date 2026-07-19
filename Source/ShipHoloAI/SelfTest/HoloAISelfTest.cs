@@ -110,6 +110,7 @@ namespace ShipHoloAI
                     TestUnattackable();
                     TestStylingTrackers();
                     StartTeleportTest(map);
+                    SpawnMinifiedCore(map);
                     break;
                 case 9800:
                     Check("avatar teleported back to substructure near core",
@@ -254,6 +255,17 @@ namespace ShipHoloAI
                 Log.Message("[HoloAI SelfTest] styling dialog threw: " + e);
                 Check("styling dialog constructs and trackers detach", pass: false);
             }
+        }
+
+        /// <summary>Regression: a minified holocore must tick without exceptions
+        /// (MinifiedThing forwards ticks to the inner, unspawned building).</summary>
+        private void SpawnMinifiedCore(Map map)
+        {
+            Thing inner = ThingMaker.MakeThing(HoloAI_DefOf.HoloAI_HoloCore);
+            inner.SetFaction(Faction.OfPlayer);
+            MinifiedThing mini = inner.MakeMinified();
+            GenSpawn.Spawn(mini, siteCenter + new IntVec3(5, 0, -5), map);
+            Log.Message("[HoloAI SelfTest] minified holocore spawned (tick-safety regression)");
         }
 
         private void StartTeleportTest(Map map)

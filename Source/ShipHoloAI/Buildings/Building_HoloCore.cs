@@ -42,6 +42,12 @@ namespace ShipHoloAI
         protected override void Tick()
         {
             base.Tick();
+            // MinifiedThing forwards ticks to its inner building — while minified
+            // (or otherwise unspawned) there is no Map to project onto.
+            if (!Spawned || Map == null)
+            {
+                return;
+            }
             if (this.IsHashIntervalTick(StateCheckInterval))
             {
                 bool wantProjected = Powered && projectionEnabled;
@@ -62,7 +68,7 @@ namespace ShipHoloAI
 
         private void ProjectAvatar()
         {
-            if (!TryFindProjectionCell(out IntVec3 cell))
+            if (!Spawned || Map == null || !TryFindProjectionCell(out IntVec3 cell))
             {
                 return;
             }
