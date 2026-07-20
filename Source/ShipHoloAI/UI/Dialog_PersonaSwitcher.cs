@@ -108,11 +108,19 @@ namespace ShipHoloAI
 
             Rect viewRect = new Rect(0f, 0f, rowWidth, totalHeight);
             Widgets.BeginScrollView(listRect, ref scrollPosition, viewRect);
+            // Portraits draw via Graphics.DrawTexture, which ignores the scrollview's
+            // clip rect (only its offset) — cull/crop against the viewport ourselves
+            // or off-screen rows paint their holograms onto the map around the window.
+            Rect visibleRect = new Rect(0f, scrollPosition.y, rowWidth, listRect.height);
             float curY = 0f;
             foreach (var entry in entries)
             {
                 Rect rowRect = new Rect(0f, curY, rowWidth, entry.height);
-                DrawRow(rowRect, entry.persona, entry.matrix, entry.status, entry.statLines);
+                if (rowRect.Overlaps(visibleRect))
+                {
+                    DrawRow(rowRect, entry.persona, entry.matrix, entry.status, entry.statLines,
+                        visibleRect);
+                }
                 curY += entry.height + RowSpacing;
             }
             Widgets.EndScrollView();
@@ -132,7 +140,7 @@ namespace ShipHoloAI
         }
 
         private void DrawRow(Rect rowRect, HoloPersonaDef persona, Thing matrix, RowStatus status,
-            List<(string text, Color color)> statLines)
+            List<(string text, Color color)> statLines, Rect visibleRect)
         {
             bool selectable = status == RowStatus.MatrixAboard || status == RowStatus.CoreResident;
             if (selectable)
@@ -145,7 +153,7 @@ namespace ShipHoloAI
 
             Rect inner = rowRect.ContractedBy(RowInnerPadding);
             Rect portraitRect = new Rect(inner.x, inner.y, PortraitWidth, inner.height);
-            DrawPortrait(portraitRect, persona);
+            DrawPortrait(portraitRect, persona, visibleRect);
 
             float textX = portraitRect.xMax + RowInnerPadding;
             float textWidth = inner.xMax - textX;
@@ -215,7 +223,7 @@ namespace ShipHoloAI
         /// south-facing. Layer rects are squares the size of the in-game mesh, with
         /// the head/hair square lifted by the tree's head offset.
         /// </summary>
-        private static void DrawPortrait(Rect portraitRect, HoloPersonaDef persona)
+        private static void DrawPortrait(Rect portraitRect, HoloPersonaDef persona, Rect visibleRect)
         {
             Widgets.DrawBoxSolid(portraitRect, PortraitBackColor);
             GUI.color = RowBorderColor;
@@ -230,23 +238,39 @@ namespace ShipHoloAI
             Rect bodyRect = new Rect(portraitRect.x, portraitRect.y + topPad + headLift, size, size);
             Rect headRect = new Rect(bodyRect.x, bodyRect.y - headLift, size, size);
 
-            DrawLayer(bodyRect, BodyTexPath, BodyFilter);
-            DrawLayer(bodyRect, OutfitTexPath, OutfitFilter);
-            DrawLayer(headRect, HeadTexPath, HeadFilter);
+            DrawLayer(bodyRect, BodyTexPath, BodyFilter, visibleRect);
+            DrawLayer(bodyRect, OutfitTexPath, OutfitFilter, visibleRect);
+            DrawLayer(headRect, HeadTexPath, HeadFilter, visibleRect);
             HairDef hair = persona.DefaultHair;
             if (hair != null && !hair.noGraphic && !hair.texPath.NullOrEmpty())
             {
-                DrawLayer(headRect, hair.texPath, new HoloFilter(persona.hairColor, HairAlpha));
+                DrawLayer(headRect, hair.texPath,
+                    new HoloFilter(persona.hairColor, HairAlpha), visibleRect);
             }
         }
 
-        private static void DrawLayer(Rect rect, string texPath, HoloFilter filter)
+        private static void DrawLayer(Rect rect, string texPath, HoloFilter filter, Rect visibleRect)
         {
             Material mat = HoloGraphicPool.Get(texPath, filter).MatSouth;
-            if (mat != null && mat.mainTexture != null)
+            if (mat == null || mat.mainTexture == null)
             {
-                GenUI.DrawTextureWithMaterial(rect, mat.mainTexture, mat);
+                return;
             }
+            // Graphics.DrawTexture ignores the scrollview clip rect, so crop the layer
+            // to the viewport by hand, trimming the UVs to match (v runs bottom-up).
+            Rect clipped = Rect.MinMaxRect(
+                Mathf.Max(rect.xMin, visibleRect.xMin), Mathf.Max(rect.yMin, visibleRect.yMin),
+                Mathf.Min(rect.xMax, visibleRect.xMax), Mathf.Min(rect.yMax, visibleRect.yMax));
+            if (clipped.width <= 0f || clipped.height <= 0f)
+            {
+                return;
+            }
+            float cutLeft = (clipped.xMin - rect.xMin) / rect.width;
+            float cutTop = (clipped.yMin - rect.yMin) / rect.height;
+            float cutBottom = (rect.yMax - clipped.yMax) / rect.height;
+            Rect texCoords = new Rect(cutLeft, cutBottom,
+                clipped.width / rect.width, 1f - cutTop - cutBottom);
+            GenUI.DrawTextureWithMaterial(clipped, mat.mainTexture, mat, texCoords);
         }
 
         private static (string, Color) StatusChip(RowStatus status)

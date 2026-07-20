@@ -28,6 +28,7 @@ namespace ShipHoloAI
         private bool done;
         private Thing jobInstallMatrix;
         private Pawn wardenTestPrisoner;
+        private Pawn wardenTestSlave;
         private Filth testFilth;
 
         public HoloAISelfTest(Game game)
@@ -118,10 +119,12 @@ namespace ShipHoloAI
                     SpawnMinifiedCore(map);
                     break;
                 case 9800:
-                    Check("avatar teleported back to substructure near core",
+                    // On-substructure is the ship-bound invariant; no distance clause —
+                    // she lands within 3 cells of the core but has ~200 ticks to wander
+                    // anywhere on the patch before this fires.
+                    Check("avatar teleported back to substructure",
                         core.Avatar != null && core.Avatar.Spawned
-                        && map.terrainGrid.FoundationAt(core.Avatar.Position)?.IsSubstructure == true
-                        && core.Avatar.Position.InHorDistOf(core.Position, 6f));
+                        && map.terrainGrid.FoundationAt(core.Avatar.Position)?.IsSubstructure == true);
                     break;
                 case 9200:
                     Check("letter triggered a P.R.I.S.M. announcement",
@@ -470,8 +473,9 @@ namespace ShipHoloAI
 
         /// <summary>
         /// Confirms JobGiver_HoloWarden no-ops for the currently active (non-I.X.I.A.)
-        /// persona, then installs I.X.I.A. and plants a due prisoner (secure, awake,
-        /// AttemptRecruit) for the next checkpoint to find.
+        /// persona, then installs I.X.I.A., builds real holding rooms, and plants a
+        /// due prisoner (secure in her cell, awake, AttemptRecruit) plus a
+        /// not-yet-due slave for the next checkpoints to find.
         /// </summary>
         private void SetupWardenGiverTest(Map map)
         {
@@ -491,14 +495,95 @@ namespace ShipHoloAI
                 siteCenter + new IntVec3(4, 0, -4), map);
             core.InstallPersona(ixiaMatrix);
 
+            BuildHoldingRooms(map);
+
             // Must belong to a real hostile faction: capturing a same-faction pawn
             // leaves Pawn_GuestTracker.PrisonerIsSecure false (HostFaction never
-            // legitimately attaches when host == the pawn's own faction).
+            // legitimately attaches when host == the pawn's own faction). She also
+            // has to live in a genuine prison cell — captured on open deck she runs
+            // a vanilla exit-map escape job, which flips PrisonerIsSecure false.
             Faction hostileFaction = Find.FactionManager.RandomEnemyFaction(allowNonHumanlike: false);
             wardenTestPrisoner = PawnGenerator.GeneratePawn(PawnKindDefOf.Villager, hostileFaction);
-            GenSpawn.Spawn(wardenTestPrisoner, siteCenter + new IntVec3(4, 0, -3), map);
+            GenSpawn.Spawn(wardenTestPrisoner, siteCenter + new IntVec3(-9, 0, 1), map);
             wardenTestPrisoner.guest.CapturedBy(Faction.OfPlayer);
             wardenTestPrisoner.guest.SetExclusiveInteraction(PrisonerInteractionModeDefOf.AttemptRecruit);
+            wardenTestPrisoner.jobs?.StopAll();
+
+            if (ModsConfig.IdeologyActive)
+            {
+                wardenTestSlave = PawnGenerator.GeneratePawn(PawnKindDefOf.Villager, hostileFaction);
+                GenSpawn.Spawn(wardenTestSlave, siteCenter + new IntVec3(-9, 0, 6), map);
+                wardenTestSlave.guest.SetGuestStatus(Faction.OfPlayer, GuestStatus.Slave);
+                // Parked as not-due: the 11550 prisoner assertions need the prisoner
+                // to be the only candidate; TestWardenSlaveSuppression arms her later.
+                wardenTestSlave.guest.slaveInteractionMode = SlaveInteractionModeDefOf.NoInteraction;
+                wardenTestSlave.jobs?.StopAll();
+            }
+        }
+
+        /// <summary>
+        /// Two roofed 5x5 rooms — a prison cell and slave quarters, each with an
+        /// owner-typed bed — on a substructure spur north-west of the patch, joined
+        /// to it by a bare corridor column. Holding the warden-test pawns in real
+        /// rooms keeps them off vanilla escape jobs (exitMapOnArrival is what breaks
+        /// PrisonerIsSecure/SlaveIsSecure), so warden eligibility is deterministic
+        /// and nobody wanders off the map mid-test. The farthest cell sits ~16 cells
+        /// from the grav engine, inside its 18.9 substructure support radius.
+        /// </summary>
+        private void BuildHoldingRooms(Map map)
+        {
+            var prisonRect = new CellRect(siteCenter.x - 12, siteCenter.z, 5, 5);
+            var slaveRect = new CellRect(siteCenter.x - 12, siteCenter.z + 5, 5, 5);
+            TerrainDef substructure = DefDatabase<TerrainDef>.GetNamed("Substructure");
+            var corridor = Enumerable.Range(0, 10)
+                .Select(i => new IntVec3(siteCenter.x - 7, 0, siteCenter.z + i));
+            foreach (IntVec3 c in prisonRect.Cells.Concat(slaveRect.Cells).Concat(corridor))
+            {
+                if (!c.InBounds(map))
+                {
+                    continue;
+                }
+                map.terrainGrid.SetFoundation(c, substructure);
+                foreach (Thing t in c.GetThingList(map).ListFullCopy())
+                {
+                    if (t.def.destroyable && !(t is Pawn))
+                    {
+                        t.Destroy();
+                    }
+                }
+            }
+            BuildRoom(map, prisonRect, new IntVec3(siteCenter.x - 8, 0, siteCenter.z + 2),
+                BedOwnerType.Prisoner);
+            BuildRoom(map, slaveRect, new IntVec3(siteCenter.x - 8, 0, siteCenter.z + 7),
+                ModsConfig.IdeologyActive ? BedOwnerType.Slave : BedOwnerType.Colonist);
+        }
+
+        private static void BuildRoom(Map map, CellRect rect, IntVec3 doorCell, BedOwnerType bedFor)
+        {
+            foreach (IntVec3 c in rect.EdgeCells)
+            {
+                if (!c.InBounds(map) || c == doorCell)
+                {
+                    continue;
+                }
+                Thing wall = ThingMaker.MakeThing(ThingDefOf.Wall, ThingDefOf.Steel);
+                wall.SetFaction(Faction.OfPlayer);
+                GenSpawn.Spawn(wall, c, map);
+            }
+            Thing door = ThingMaker.MakeThing(ThingDefOf.Door, ThingDefOf.Steel);
+            door.SetFaction(Faction.OfPlayer);
+            GenSpawn.Spawn(door, doorCell, map);
+            foreach (IntVec3 c in rect)
+            {
+                if (c.InBounds(map))
+                {
+                    map.roofGrid.SetRoof(c, RoofDefOf.RoofConstructed);
+                }
+            }
+            var bed = (Building_Bed)ThingMaker.MakeThing(ThingDefOf.Bed, ThingDefOf.Steel);
+            bed.SetFaction(Faction.OfPlayer);
+            GenSpawn.Spawn(bed, rect.CenterCell, map, Rot4.South);
+            bed.ForOwnerType = bedFor;
         }
 
         /// <summary>
@@ -517,7 +602,16 @@ namespace ShipHoloAI
             {
                 Check("JobGiver_HoloWarden returns a job for a due prisoner", pass: false);
                 Check("JobGiver_HoloWarden returns null once the candidate is insecure", pass: false);
+                TestWardenSlaveSuppression();
                 return;
+            }
+
+            // A hungry prisoner in a real cell would divert the giver to its
+            // food-delivery branch (which deliberately outranks interaction), so
+            // keep her fed for a deterministic interaction assertion.
+            if (wardenTestPrisoner.needs?.food != null)
+            {
+                wardenTestPrisoner.needs.food.CurLevel = wardenTestPrisoner.needs.food.MaxLevel;
             }
 
             Log.Message("[HoloAI SelfTest] warden diag: IsPrisonerOfColony=" + wardenTestPrisoner.IsPrisonerOfColony
@@ -528,6 +622,7 @@ namespace ShipHoloAI
                 + " IsFormingCaravan=" + wardenTestPrisoner.IsFormingCaravan()
                 + " ExclusiveInteractionMode=" + wardenTestPrisoner.guest.ExclusiveInteractionMode?.defName
                 + " ScheduledForInteraction=" + wardenTestPrisoner.guest.ScheduledForInteraction
+                + " InPrisonCell=" + wardenTestPrisoner.Position.IsInPrisonCell(wardenTestPrisoner.Map)
                 + " Downed=" + wardenTestPrisoner.Downed
                 + " Awake=" + wardenTestPrisoner.Awake()
                 + " CanReach=" + core.Avatar.CanReach(wardenTestPrisoner, PathEndMode.Touch, Danger.None)
@@ -546,6 +641,58 @@ namespace ShipHoloAI
             ThinkResult afterInsecure = giver.TryIssueJobPackage(core.Avatar, default(JobIssueParams));
             Check("JobGiver_HoloWarden returns null once the candidate is insecure",
                 afterInsecure.Job == null);
+
+            TestWardenSlaveSuppression();
+        }
+
+        /// <summary>
+        /// With the prisoner released (insecure) the slave quarters hold the only
+        /// remaining candidate: arm her — Suppress mode, drained and overdue
+        /// suppression need — and the giver must target her; sate the need and it
+        /// must go quiet again. Mirrors WorkGiver_Warden_SuppressSlave's gates.
+        /// </summary>
+        private void TestWardenSlaveSuppression()
+        {
+            if (!ModsConfig.IdeologyActive)
+            {
+                Log.Message("[HoloAI SelfTest] slave suppression test skipped (no Ideology)");
+                return;
+            }
+            if (wardenTestSlave == null || !wardenTestSlave.Spawned
+                || core.Avatar == null || !core.Avatar.Spawned)
+            {
+                Check("JobGiver_HoloWarden suppresses a due slave", pass: false);
+                Check("JobGiver_HoloWarden returns null once the slave is sated", pass: false);
+                return;
+            }
+
+            wardenTestSlave.guest.slaveInteractionMode = SlaveInteractionModeDefOf.Suppress;
+            wardenTestSlave.mindState.lastSlaveSuppressedTick = -99999;
+            bool hasNeed = wardenTestSlave.needs.TryGetNeed(out Need_Suppression suppression);
+            if (hasNeed)
+            {
+                suppression.CurLevel = 0.2f; // CanBeSuppressedNow needs < 0.7
+            }
+            Log.Message("[HoloAI SelfTest] slave diag: IsSlaveOfColony=" + wardenTestSlave.IsSlaveOfColony
+                + " SlaveIsSecure=" + wardenTestSlave.guest.SlaveIsSecure
+                + " hasSuppressionNeed=" + hasNeed
+                + " ScheduledForSlaveSuppression=" + wardenTestSlave.guest.ScheduledForSlaveSuppression
+                + " Downed=" + wardenTestSlave.Downed
+                + " Awake=" + wardenTestSlave.Awake()
+                + " Position=" + wardenTestSlave.Position);
+
+            JobGiver_HoloWarden giver = new JobGiver_HoloWarden();
+            ThinkResult due = giver.TryIssueJobPackage(core.Avatar, default(JobIssueParams));
+            Check("JobGiver_HoloWarden suppresses a due slave",
+                due.Job != null && due.Job.def == HoloAI_DefOf.HoloAI_WardenInteract
+                && due.Job.GetTarget(TargetIndex.A).Thing == wardenTestSlave);
+
+            if (hasNeed)
+            {
+                suppression.CurLevel = 1f; // sated -> CanBeSuppressedNow false
+            }
+            Check("JobGiver_HoloWarden returns null once the slave is sated",
+                giver.TryIssueJobPackage(core.Avatar, default(JobIssueParams)).Job == null);
         }
 
         /// <summary>Direct persona swap used between ability tests (the job-driven
@@ -604,9 +751,34 @@ namespace ShipHoloAI
                 return;
             }
 
-            // Deterministic idleness: IsIdle reads mindState.lastJobTag.
+            // Deterministic idleness: IsIdle reads mindState.lastJobTag. Anchor the
+            // student back on the patch (free wandering can carry her off the
+            // substructure, which disqualifies her), and make every other colonist
+            // non-idle so she is the giver's only eligible student.
+            Map seminarMap = testColonist.Map;
+            testColonist.Position = core.Position + new IntVec3(-2, 0, 0);
+            testColonist.Notify_Teleported();
             testColonist.jobs?.StopAll();
             testColonist.mindState.lastJobTag = JobTag.Idle;
+            foreach (Pawn other in seminarMap.mapPawns.FreeColonistsSpawned)
+            {
+                if (other == testColonist)
+                {
+                    continue;
+                }
+                if (other.CurJob?.def.joyKind != null)
+                {
+                    other.jobs?.StopAll();
+                }
+                if (other.mindState != null)
+                {
+                    other.mindState.lastJobTag = JobTag.Misc;
+                }
+            }
+            Log.Message("[HoloAI SelfTest] seminar diag: onSubstructure="
+                + (seminarMap.terrainGrid.FoundationAt(testColonist.Position)?.IsSubstructure == true)
+                + " isDue=" + JobGiver_HoloSeminar.IsDueStudent(core.Avatar, testColonist)
+                + " Position=" + testColonist.Position);
 
             ThinkResult result = new JobGiver_HoloSeminar().TryIssueJobPackage(core.Avatar, default(JobIssueParams));
             Check("seminar giver targets idle colonist",
