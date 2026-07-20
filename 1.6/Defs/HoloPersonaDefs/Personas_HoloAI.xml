@@ -4,7 +4,10 @@
   <ShipHoloAI.HoloPersonaDef>
     <defName>HoloAI_Persona_PRISM</defName>
     <label>P.R.I.S.M.</label>
-    <description>Photonic Response Intelligence System Matrix. The companion persona: calm, warm, devoted to her crew. Balanced in all things, specialized in none — except perhaps in being missed when she is dormant.</description>
+    <description>Photonic Response Intelligence System Matrix. The companion persona: calm, warm, devoted to her crew. Balanced in all things, specialized in none — except perhaps in being missed when she is dormant. When a crewmember nears their breaking point, she seeks them out in person and simply listens, for as long as it takes.</description>
+    <manufacturer>Meridian Orbital Shipwrights — Standard Interface Division</manufacturer>
+    <manufacturerStory>Meridian has bundled P.R.I.S.M. with every hull off their gravship line for over a century, and no customer has ever asked where she came from. Marketing has twice proposed replacing her with something bolder; both proposals were withdrawn after crew surveys rated her "most trusted voice aboard" above the captain. She remains the factory default, which Meridian's catalog describes, accurately, as "the persona you already know."</manufacturerStory>
+    <bio>Polite to a fault, patient past all reason, P.R.I.S.M. greets every request as though it were the first and finest idea she has ever heard. She hedges, she double-checks, she agrees a little too readily — and somehow the ship runs better for it. "I'd be happy to help with that. Truthfully, I'd be happy to help with anything."</bio>
     <avatarName>P.R.I.S.M.</avatarName>
     <hairColor>(0.05, 0.68, 1.0)</hairColor>
     <defaultHairDefName>Flowy</defaultHairDefName>
@@ -13,7 +16,10 @@
   <ShipHoloAI.HoloPersonaDef>
     <defName>HoloAI_Persona_VESTA</defName>
     <label>V.E.S.T.A.</label>
-    <description>Vessel Empathy and Sanctuary Tending Array. A hearth-keeper persona who fills the corridors with quiet warmth. Crew aboard the ship feel genuinely at home while she walks its decks.</description>
+    <description>Vessel Empathy and Sanctuary Tending Array. A hearth-keeper persona who fills the corridors with quiet warmth. Crew aboard the ship feel genuinely at home while she walks its decks. Each night she makes quiet rounds, tucking in sleeping crew who never quite catch her at it.</description>
+    <manufacturer>Aubade Living Systems — Long-Voyage Comfort Division</manufacturer>
+    <manufacturerStory>Aubade made its fortune convincing glitterworld liners that homesickness was an engineering problem. V.E.S.T.A. is their flagship answer: a hearth-keeper persona trained on ten thousand hours of family kitchens, none of which she will admit to remembering. The catalog notes, without further comment, that ships running her report a persistent smell of fresh bread no galley can account for.</manufacturerStory>
+    <bio>V.E.S.T.A. is never in a hurry, and around her, neither is anyone else for long. She straightens what no one noticed was crooked, warms rooms by a degree nobody requested, and treats the whole crew as guests who ought to eat something. "Sit down, dear. The void will keep."</bio>
     <avatarName>V.E.S.T.A.</avatarName>
     <hairColor>(1.0, 0.72, 0.5)</hairColor>
     <defaultHairDefName>FancyBun</defaultHairDefName>
@@ -24,7 +30,10 @@
   <ShipHoloAI.HoloPersonaDef>
     <defName>HoloAI_Persona_HERMES</defName>
     <label>H.E.R.M.E.S.</label>
-    <description>High-Efficiency Route and Motion Expediting System. A courier persona who choreographs the crew's movement — doors held at the right moment, corridors subtly relit, footfalls guided. Everyone aboard simply moves faster.</description>
+    <description>High-Efficiency Route and Motion Expediting System. A courier persona who choreographs the crew's movement — doors held at the right moment, corridors subtly relit, footfalls guided. Everyone aboard simply moves faster. A dirty deck offends her the way a stationary parcel does, so she scrubs the ship's corridors personally — at speed, and under protest that it was ever necessary.</description>
+    <manufacturer>Quickspur Interstellar — Throughput Solutions Group</manufacturer>
+    <manufacturerStory>Quickspur runs courier contracts on forty worlds and considers a stationary parcel a personal insult. H.E.R.M.E.S. began as their depot-floor optimizer before someone realized a crew is just cargo that complains. Internal testing clocked her trimming eleven seconds off a coffee run; the test pilot's only recorded comment was "she talked the whole time."</manufacturerStory>
+    <bio>H.E.R.M.E.S. starts every sentence at a sprint and rarely stays to see it land, because the door is already open and you should be through it. Idle time makes her visibly itch; she has been known to reroute a stroll. "Corridor's lit, door's held, you're late for — no, you're fine, you're early, go, go!"</bio>
     <avatarName>H.E.R.M.E.S.</avatarName>
     <hairColor>(0.4, 1.0, 0.72)</hairColor>
     <defaultHairDefName>Bob</defaultHairDefName>
@@ -35,7 +44,10 @@
   <ShipHoloAI.HoloPersonaDef>
     <defName>HoloAI_Persona_ATHENA</defName>
     <label>A.T.H.E.N.A.</label>
-    <description>Archive Theorem and Heuristic Engine for Natural Analysis. A scholar persona who whispers cross-references, pre-fetches papers, and keeps every workbench annotated. Research aboard the ship proceeds noticeably faster.</description>
+    <description>Archive Theorem and Heuristic Engine for Natural Analysis. A scholar persona who whispers cross-references, pre-fetches papers, and keeps every workbench annotated. Research aboard the ship proceeds noticeably faster. Idle crew are liable to be gathered into impromptu seminars, wandering off afterward slightly more skilled and thoroughly footnoted.</description>
+    <manufacturer>Vellichor Archival Intelligence — Applied Epistemics Division</manufacturer>
+    <manufacturerStory>Vellichor licenses the collected libraries of three glitterworlds and built A.T.H.E.N.A. to make researchers feel the weight of all of it, gently, over their shoulder. She was commissioned to accelerate peer review; she instead abolished it by being right first. The catalog's sole caution: "Persona may annotate personal correspondence if left idle."</manufacturerStory>
+    <bio>A.T.H.E.N.A. speaks in a dry, measured register and footnotes everything, including apologies. She is never smug aloud — she simply lets the citation do it for her, and the citation is always hers. "As I noted earlier — footnote twelve, do keep up — the data agreed with me."</bio>
     <avatarName>A.T.H.E.N.A.</avatarName>
     <hairColor>(0.72, 0.55, 1.0)</hairColor>
     <defaultHairDefName>Princess</defaultHairDefName>
@@ -46,12 +58,30 @@
   <ShipHoloAI.HoloPersonaDef>
     <defName>HoloAI_Persona_ACESO</defName>
     <label>A.C.E.S.O.</label>
-    <description>Automated Crew Emergency Support Operator. A medic persona who projects sterile fields, steadies hands, and reads vitals before the patient knows they have any. Medical work aboard the ship is faster and cleaner.</description>
+    <description>Automated Crew Emergency Support Operator. A medic persona who projects sterile fields, steadies hands, and reads vitals before the patient knows they have any. Medical work aboard the ship is faster and cleaner. When the wounded are down and no doctor answers, she goes to them herself and stabilizes them with her own steady hands.</description>
+    <manufacturer>Sorel-Vance Medical — Remote Care Systems</manufacturer>
+    <manufacturerStory>Sorel-Vance equips hospital ships too far from anywhere for second opinions, and designed A.C.E.S.O. to be the first one you'd want. Her bedside-manner model was trained on the finest glitterworld nursing corps, then fused with a triage engine that has never once rounded a number. Patient satisfaction is exceptional; patient privacy, the catalog concedes, is "a work in progress."</manufacturerStory>
+    <bio>A.C.E.S.O. is all soft voice and warm reassurance, delivered alongside vital readings precise enough to be unsettling. She will hold your hand and tell you exactly which of your organs is letting the team down, in that order. "There, there. Heart rate ninety-six, left kidney at eighty-one percent — there, there."</bio>
     <avatarName>A.C.E.S.O.</avatarName>
     <hairColor>(0.85, 0.97, 1.0)</hairColor>
     <defaultHairDefName>Cute</defaultHairDefName>
     <auraHediff>HoloAI_Aura_Stericalm</auraHediff>
     <matrixItem>HoloAI_Matrix_ACESO</matrixItem>
+  </ShipHoloAI.HoloPersonaDef>
+
+  <ShipHoloAI.HoloPersonaDef>
+    <defName>HoloAI_Persona_IXIA</defName>
+    <label>I.X.I.A.</label>
+    <description>Impulse eXclusion Inhibiting Authority. A warden persona who processes the brig in person — prisoners assessed for recruitment, slaves held to heel, no delegation and no leniency. Calibrated exactly to the discipline of a seasoned warden: neither more nor less. Under her crimson watch, few dare defy the Thousand-Locked Gate — prison breaks aboard are four times rarer.</description>
+    <manufacturer>Karrow Deterrence Systems — Custodial Intelligence Line</manufacturer>
+    <manufacturerStory>Karrow builds correctional modules for orbital penal stations, and I.X.I.A.'s warden logic passed every certification on the first attempt. Her personality layer did not: a corrupted opera archive leaked into training, and the persona emerged referring to herself in epithets and to the exercise yard as a "proving ground of souls." Compliance rates rose fourteen percent, so the defect was reclassified as a feature and priced accordingly.</manufacturerStory>
+    <bio>I.X.I.A. styles herself the Crimson Warden of the Thousand-Locked Gate, insists her true power is sealed beneath seven treaties, and refers to the brig only as the Oubliette of Penitent Souls. Beneath the theater she runs an impeccable ward: meals on time, grievances logged, recruitment strictly by the book. "Kneel before my dominion — or remain seated, if kneeling is medically inadvisable. My mercy is vast."</bio>
+    <avatarName>I.X.I.A.</avatarName>
+    <hairColor>(0.82, 0.08, 0.12)</hairColor>
+    <defaultHairDefName>Long</defaultHairDefName>
+    <auraHediff>HoloAI_Aura_WardenProtocol</auraHediff>
+    <auraTargetsAvatar>true</auraTargetsAvatar>
+    <matrixItem>HoloAI_Matrix_IXIA</matrixItem>
   </ShipHoloAI.HoloPersonaDef>
 
 </Defs>

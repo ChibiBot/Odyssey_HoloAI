@@ -18,6 +18,21 @@ namespace ShipHoloAI
         public HediffDef auraHediff;
         public ThingDef matrixItem;
 
+        // Selection-screen lore (Dialog_PersonaSwitcher): who built her, the
+        // catalog blurb about them, and her own personality-forward bio.
+        public string manufacturer;
+        public string manufacturerStory;
+        public string bio;
+
+        /// <summary>
+        /// True for personas whose work is done by the avatar herself rather than
+        /// spread to nearby crew (e.g. a warden persona performing prisoner/slave
+        /// interactions in person). When set, HoloAuraMapComponent applies/refreshes
+        /// auraHediff on the avatar's own health.hediffSet instead of on colonists
+        /// standing on substructure.
+        /// </summary>
+        public bool auraTargetsAvatar;
+
         public HairDef DefaultHair =>
             DefDatabase<HairDef>.GetNamedSilentFail(defaultHairDefName);
     }

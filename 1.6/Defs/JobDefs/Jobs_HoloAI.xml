@@ -14,4 +14,45 @@
     <reportString>installing TargetA into TargetB.</reportString>
   </JobDef>
 
+  <JobDef>
+    <defName>HoloAI_WardenInteract</defName>
+    <driverClass>ShipHoloAI.JobDriver_HoloWarden</driverClass>
+    <reportString>wardening TargetA.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+  </JobDef>
+
+  <JobDef>
+    <defName>HoloAI_WardenDeliverFood</defName>
+    <driverClass>ShipHoloAI.JobDriver_HoloWardenFood</driverClass>
+    <reportString>rematerializing food for TargetA.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+  </JobDef>
+
+  <JobDef>
+    <defName>HoloAI_TuckIn</defName>
+    <driverClass>ShipHoloAI.JobDriver_HoloTuckIn</driverClass>
+    <reportString>tucking in TargetA.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+  </JobDef>
+
+  <JobDef>
+    <defName>HoloAI_Seminar</defName>
+    <driverClass>ShipHoloAI.JobDriver_HoloSeminar</driverClass>
+    <reportString>lecturing TargetA.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+  </JobDef>
+
+  <JobDef>
+    <defName>HoloAI_EmergencyTend</defName>
+    <driverClass>ShipHoloAI.JobDriver_HoloMedic</driverClass>
+    <reportString>stabilizing TargetA.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+  </JobDef>
+
+  <JobDef>
+    <defName>HoloAI_CleanFilth</defName>
+    <driverClass>ShipHoloAI.JobDriver_HoloClean</driverClass>
+    <reportString>scrubbing the deck.</reportString>
+  </JobDef>
+
 </Defs>

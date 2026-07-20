@@ -37,7 +37,8 @@ dotnet build Source/ShipHoloAI/ShipHoloAI.csproj -c Release   # → 1.6/Assembli
   -quicktest`, wait for `[HoloAI SelfTest] COMPLETE` in Player.log (~4 min), expect
   `0 failures`. The harness (`Source/ShipHoloAI/SelfTest/HoloAISelfTest.cs`, env-gated,
   inert for players) spawns a substructure patch + core and asserts the avatar
-  lifecycle, chat memory/log, and announcement patch — 12 assertions.
+  lifecycle, chat memory/log, announcement patch, persona installs/reverts, and every
+  persona's signature ability (~30 assertions; runs to game-tick ~13800).
 - Kill the game with explicit PIDs (`kill $(ps aux | grep -i "[R]imWorldLinux" | awk
   '{print $2}')`); `pkill -f RimWorldLinux` matches its own cmdline and returns 144,
   aborting `&&` chains, and stray instances corrupt Player.log for the next run.

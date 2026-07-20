@@ -19,6 +19,57 @@
     </stages>
   </ThoughtDef>
 
+  <!-- P.R.I.S.M.'s companion triage: the upgraded chat memory when she reaches
+       someone near their breaking point. stackLimit 1 — one comfort at a time. -->
+  <ThoughtDef>
+    <defName>HoloAI_ComfortedByPRISM</defName>
+    <thoughtClass>Thought_Memory</thoughtClass>
+    <durationDays>1</durationDays>
+    <stackLimit>1</stackLimit>
+    <showBubble>true</showBubble>
+    <stages>
+      <li>
+        <label>comforted by the ship</label>
+        <description>When everything felt like too much, she appeared and just... stayed. The ship herself sat with me until it passed.</description>
+        <baseMoodEffect>5</baseMoodEffect>
+      </li>
+    </stages>
+  </ThoughtDef>
+
+  <!-- V.E.S.T.A.'s tuck-in. The memory's presence doubles as the per-colonist
+       cooldown: JobGiver_HoloTuckIn skips anyone still carrying it. -->
+  <ThoughtDef>
+    <defName>HoloAI_TuckedInByVESTA</defName>
+    <thoughtClass>Thought_Memory</thoughtClass>
+    <durationDays>1</durationDays>
+    <stackLimit>1</stackLimit>
+    <showBubble>false</showBubble>
+    <stages>
+      <li>
+        <label>tucked in</label>
+        <description>I half-woke in the night and someone was drawing the blanket up over my shoulder. The room smelled faintly of bread. There is no bread on this ship.</description>
+        <baseMoodEffect>3</baseMoodEffect>
+      </li>
+    </stages>
+  </ThoughtDef>
+
+  <!-- A.T.H.E.N.A.'s seminar. durationDays 0.125 = 3 in-game hours, and the
+       memory's presence IS the per-colonist cooldown between lectures. -->
+  <ThoughtDef>
+    <defName>HoloAI_AttendedSeminar</defName>
+    <thoughtClass>Thought_Memory</thoughtClass>
+    <durationDays>0.125</durationDays>
+    <stackLimit>1</stackLimit>
+    <showBubble>true</showBubble>
+    <stages>
+      <li>
+        <label>attended a seminar</label>
+        <description>The ship gave me a private lecture. I did not ask for it. It was, annoyingly, excellent.</description>
+        <baseMoodEffect>2</baseMoodEffect>
+      </li>
+    </stages>
+  </ThoughtDef>
+
   <!-- Mood side of V.E.S.T.A.'s hearthlight aura: active while the hediff is present. -->
   <ThoughtDef>
     <defName>HoloAI_HearthlightMood</defName>

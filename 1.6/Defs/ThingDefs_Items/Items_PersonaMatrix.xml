@@ -29,13 +29,13 @@
   <ThingDef ParentName="HoloAI_MatrixBase">
     <defName>HoloAI_Matrix_VESTA</defName>
     <label>persona matrix (V.E.S.T.A.)</label>
-    <description>A photonic persona matrix housing V.E.S.T.A. — Vessel Empathy and Sanctuary Tending Array, a hearth-keeper intelligence. Installed in a holocore, she projects an avatar whose presence comforts everyone aboard the ship.\n\nInstalling a new matrix ejects the currently resident persona.</description>
+    <description>A photonic persona matrix housing V.E.S.T.A. — Vessel Empathy and Sanctuary Tending Array, a hearth-keeper intelligence. Installed in a holocore, she projects an avatar whose presence comforts everyone aboard the ship. Each night she makes quiet rounds, tucking in sleeping crew who never quite catch her at it.\n\nInstalling a new matrix ejects the currently resident persona.</description>
     <graphicData>
       <texPath>HoloAI/Items/Matrix_VESTA</texPath>
       <graphicClass>Graphic_Single</graphicClass>
     </graphicData>
     <statBases>
-      <MarketValue>1600</MarketValue>
+      <MarketValue>1700</MarketValue>
     </statBases>
     <modExtensions>
       <li Class="ShipHoloAI.HoloPersonaMatrixExtension">
@@ -47,13 +47,13 @@
   <ThingDef ParentName="HoloAI_MatrixBase">
     <defName>HoloAI_Matrix_HERMES</defName>
     <label>persona matrix (H.E.R.M.E.S.)</label>
-    <description>A photonic persona matrix housing H.E.R.M.E.S. — High-Efficiency Route and Motion Expediting System, a courier intelligence. Installed in a holocore, its avatar choreographs the crew's movement, making everyone aboard the ship faster on their feet.\n\nInstalling a new matrix ejects the currently resident persona.</description>
+    <description>A photonic persona matrix housing H.E.R.M.E.S. — High-Efficiency Route and Motion Expediting System, a courier intelligence. Installed in a holocore, its avatar choreographs the crew's movement, making everyone aboard the ship faster on their feet. A dirty deck offends her like a stationary parcel, so she scrubs the ship's corridors personally — at speed, and under protest.\n\nInstalling a new matrix ejects the currently resident persona.</description>
     <graphicData>
       <texPath>HoloAI/Items/Matrix_HERMES</texPath>
       <graphicClass>Graphic_Single</graphicClass>
     </graphicData>
     <statBases>
-      <MarketValue>1800</MarketValue>
+      <MarketValue>1900</MarketValue>
     </statBases>
     <modExtensions>
       <li Class="ShipHoloAI.HoloPersonaMatrixExtension">
@@ -65,13 +65,13 @@
   <ThingDef ParentName="HoloAI_MatrixBase">
     <defName>HoloAI_Matrix_ATHENA</defName>
     <label>persona matrix (A.T.H.E.N.A.)</label>
-    <description>A photonic persona matrix housing A.T.H.E.N.A. — Archive Theorem and Heuristic Engine for Natural Analysis, a scholar intelligence. Installed in a holocore, her avatar accelerates all research performed aboard the ship.\n\nInstalling a new matrix ejects the currently resident persona.</description>
+    <description>A photonic persona matrix housing A.T.H.E.N.A. — Archive Theorem and Heuristic Engine for Natural Analysis, a scholar intelligence. Installed in a holocore, her avatar accelerates all research performed aboard the ship. Idle crew are liable to be gathered into impromptu seminars, wandering off afterward slightly more skilled and thoroughly footnoted.\n\nInstalling a new matrix ejects the currently resident persona.</description>
     <graphicData>
       <texPath>HoloAI/Items/Matrix_ATHENA</texPath>
       <graphicClass>Graphic_Single</graphicClass>
     </graphicData>
     <statBases>
-      <MarketValue>2000</MarketValue>
+      <MarketValue>2200</MarketValue>
     </statBases>
     <modExtensions>
       <li Class="ShipHoloAI.HoloPersonaMatrixExtension">
@@ -83,17 +83,35 @@
   <ThingDef ParentName="HoloAI_MatrixBase">
     <defName>HoloAI_Matrix_ACESO</defName>
     <label>persona matrix (A.C.E.S.O.)</label>
-    <description>A photonic persona matrix housing A.C.E.S.O. — Automated Crew Emergency Support Operator, a medic intelligence. Installed in a holocore, her avatar steadies hands and sterilizes fields, improving medical work aboard the ship.\n\nInstalling a new matrix ejects the currently resident persona.</description>
+    <description>A photonic persona matrix housing A.C.E.S.O. — Automated Crew Emergency Support Operator, a medic intelligence. Installed in a holocore, her avatar steadies hands and sterilizes fields, improving medical work aboard the ship. When the wounded are down and no doctor answers, she goes to them herself and stabilizes them with her own steady hands.\n\nInstalling a new matrix ejects the currently resident persona.</description>
     <graphicData>
       <texPath>HoloAI/Items/Matrix_ACESO</texPath>
       <graphicClass>Graphic_Single</graphicClass>
     </graphicData>
     <statBases>
-      <MarketValue>1800</MarketValue>
+      <MarketValue>1900</MarketValue>
     </statBases>
     <modExtensions>
       <li Class="ShipHoloAI.HoloPersonaMatrixExtension">
         <persona>HoloAI_Persona_ACESO</persona>
+      </li>
+    </modExtensions>
+  </ThingDef>
+
+  <ThingDef ParentName="HoloAI_MatrixBase">
+    <defName>HoloAI_Matrix_IXIA</defName>
+    <label>persona matrix (I.X.I.A.)</label>
+    <description>A photonic persona matrix housing I.X.I.A. — Impulse eXclusion Inhibiting Authority, a warden intelligence. Installed in a holocore, her avatar walks to the brig herself, recruiting prisoners and holding slaves in line — calibrated to a veteran warden's exact touch. Under her crimson watch, few dare defy the Thousand-Locked Gate — prison breaks aboard are four times rarer.\n\nInstalling a new matrix ejects the currently resident persona.</description>
+    <graphicData>
+      <texPath>HoloAI/Items/Matrix_IXIA</texPath>
+      <graphicClass>Graphic_Single</graphicClass>
+    </graphicData>
+    <statBases>
+      <MarketValue>2000</MarketValue>
+    </statBases>
+    <modExtensions>
+      <li Class="ShipHoloAI.HoloPersonaMatrixExtension">
+        <persona>HoloAI_Persona_IXIA</persona>
       </li>
     </modExtensions>
   </ThingDef>

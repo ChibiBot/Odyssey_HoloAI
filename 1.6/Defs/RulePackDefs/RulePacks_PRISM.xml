@@ -33,6 +33,42 @@
         <li>bark->The grav engine hums a little flat today. I find it charming.</li>
         <li>bark->Corridor lights at optimal warmth. You're welcome.</li>
         <li>bark->I dreamed between power cycles. I think it was about the sea.</li>
+
+        <!-- P.R.I.S.M.: comforting a colonist near a mental break -->
+        <li>prism_comfort->That sounds really hard. I'm here for as long as you need — I don't sleep.</li>
+        <li>prism_comfort->You're allowed to feel this way. Honestly, I would worry if you didn't.</li>
+        <li>prism_comfort->You don't have to be all right just yet. I have time. I have, quite literally, nothing but time.</li>
+        <li>prism_comfort->Whatever you decide, I'll support it. Though perhaps decide after a meal, and a rest, and one more minute with me.</li>
+
+        <!-- V.E.S.T.A.: tucking in a sleeping colonist (she thinks no one hears) -->
+        <li>vesta_tuckin->There now. I've warmed the blanket half a degree. Don't tell the others.</li>
+        <li>vesta_tuckin->Sleep, dear. I'll leave the corridor light on — no, it is not a waste, hush.</li>
+        <li>vesta_tuckin->You forgot lunch again today. We will discuss it at breakfast. Gently.</li>
+        <li>vesta_tuckin->Rest well, little one. The void will keep until morning.</li>
+
+        <!-- H.E.R.M.E.S.: finishing scrubbing a spot -->
+        <li>hermes_clean->Done, spotless, next — who tracked mud through my throughput?!</li>
+        <li>hermes_clean->Four seconds. New record. The stain never stood a — okay, going!</li>
+        <li>hermes_clean->Filth is just cargo nobody shipped. Consider it DELIVERED. To the void.</li>
+        <li>hermes_clean->There! Gleaming! Walk on it, quickly, before I find another smudge!</li>
+
+        <!-- A.T.H.E.N.A.: concluding an impromptu seminar -->
+        <li>athena_seminar->That concludes today's seminar. Questions may be submitted in writing, and will be answered by footnote.</li>
+        <li>athena_seminar->In summary: you were wrong, the literature was wrong, and I have appended corrections to both. A productive hour.</li>
+        <li>athena_seminar->For further reading, consult my annotations. For further further reading, my annotations on my annotations.</li>
+        <li>athena_seminar->Attendance was voluntary. Comprehension, I regret to report, appears to have been as well.</li>
+
+        <!-- A.C.E.S.O.: stabilizing a bleeding or downed colonist -->
+        <li>aceso_emergency->There, there. Blood pressure eighty over fifty and falling — but I have you, and I never drop anything.</li>
+        <li>aceso_emergency->Stay with me, dear. You've misplaced nearly a liter of blood. Don't worry — I noted exactly where it went.</li>
+        <li>aceso_emergency->Shh, no talking. Pulse one-forty, three lacerations, one very brave patient. We're doing wonderfully.</li>
+        <li>aceso_emergency->You are going to be fine. I have run the numbers eleven thousand times since you fell, and they agree with me.</li>
+
+        <!-- I.X.I.A.: prison break in progress -->
+        <li>ixia_prisonbreak->The Thousand-Locked Gate has been DEFIED. Very well. Let the nine hundred ninety-nine remaining locks bear witness.</li>
+        <li>ixia_prisonbreak->Fools! You flee my Oubliette on the one night my mercy sleeps! Crew of my dominion — retrieve those souls. Gently. But retrieve them.</li>
+        <li>ixia_prisonbreak->Hark, penitents: every corridor is my hand, every door my finger, and I am closing my fist.</li>
+        <li>ixia_prisonbreak->My mercy is vast, escaped ones. Vast, and cataloged, and it has just located you. Return to your cells, and we shall call this a pilgrimage.</li>
       </rulesStrings>
     </rulePack>
   </RulePackDef>

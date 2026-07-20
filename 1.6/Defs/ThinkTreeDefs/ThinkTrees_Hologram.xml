@@ -9,6 +9,17 @@
           <treeDef>Despawned</treeDef>
         </li>
 
+        <!-- I.X.I.A. runs the brig herself the instant a prisoner/slave is due;
+             no-op for every other persona -->
+        <li Class="ShipHoloAI.JobGiver_HoloWarden"/>
+
+        <!-- Signature persona abilities — each giver self-gates on ActivePersona
+             and is a no-op otherwise. Medic first: emergencies outrank comfort. -->
+        <li Class="ShipHoloAI.JobGiver_HoloMedic"/>
+        <li Class="ShipHoloAI.JobGiver_HoloTuckIn"/>
+        <li Class="ShipHoloAI.JobGiver_HoloSeminar"/>
+        <li Class="ShipHoloAI.JobGiver_HoloClean"/>
+
         <!-- Drift over to a crew member for a word, on an internal cooldown -->
         <li Class="ShipHoloAI.JobGiver_HoloChat"/>
 

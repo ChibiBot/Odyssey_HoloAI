@@ -15,6 +15,9 @@ namespace ShipHoloAI
     {
         public Building_HoloCore holoCore;
         public int nextChatTick;
+        // A.C.E.S.O.: global cooldown between emergency tends (set when a tend fires,
+        // not when the job starts, so interruptions don't burn the cooldown).
+        public int nextEmergencyTendTick;
 
         private HairDef hairDef;
         private Color? hairColorInt;
@@ -258,6 +261,10 @@ namespace ShipHoloAI
                     action = CycleHairstyle,
                 };
             }
+            // Warden-specialist personas (I.X.I.A.) personally handle prisoner
+            // recruitment and slave suppression instead of buffing crew via aura —
+            // JobGiver_HoloWarden fires this automatically the instant a target is
+            // due, no manual click-target step.
         }
 
         public override void ExposeData()
@@ -265,6 +272,7 @@ namespace ShipHoloAI
             base.ExposeData();
             Scribe_References.Look(ref holoCore, "holoCore");
             Scribe_Values.Look(ref nextChatTick, "nextChatTick");
+            Scribe_Values.Look(ref nextEmergencyTendTick, "nextEmergencyTendTick");
             Scribe_Defs.Look(ref hairDef, "hairDef");
             Scribe_Values.Look(ref hairColorInt, "hairColor");
         }

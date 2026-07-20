@@ -119,7 +119,26 @@ namespace ShipHoloAI
             {
                 return;
             }
+            matrixItem.Destroy();
+            SwapPersona(newPersona);
+        }
 
+        /// <summary>
+        /// Revert to the built-in P.R.I.S.M. persona. No matrix item exists for her —
+        /// she ships with the core — so this is a pure software reset, done instantly
+        /// from the selection screen rather than via a hauling job.
+        /// </summary>
+        public void RestoreDefaultPersona()
+        {
+            if (ActivePersona == HoloAI_DefOf.HoloAI_Persona_PRISM)
+            {
+                return;
+            }
+            SwapPersona(HoloAI_DefOf.HoloAI_Persona_PRISM);
+        }
+
+        private void SwapPersona(HoloPersonaDef newPersona)
+        {
             ThingDef ejectedDef = ActivePersona.matrixItem;
 
             StoreAvatar();
@@ -127,7 +146,6 @@ namespace ShipHoloAI
             avatar = null;
 
             activePersona = newPersona;
-            matrixItem.Destroy();
             if (ejectedDef != null)
             {
                 GenPlace.TryPlaceThing(ThingMaker.MakeThing(ejectedDef), Position, Map, ThingPlaceMode.Near);
@@ -209,25 +227,28 @@ namespace ShipHoloAI
 
         private void OpenInstallMenu()
         {
-            List<FloatMenuOption> options = new List<FloatMenuOption>();
+            Find.WindowStack.Add(new Dialog_PersonaSwitcher(this));
+        }
+
+        /// <summary>Every matrix item on the map that could be installed here right now.</summary>
+        public IEnumerable<Thing> GetInstallableMatrices()
+        {
+            if (Map == null)
+            {
+                yield break;
+            }
             foreach (Thing thing in Map.listerThings.ThingsInGroup(ThingRequestGroup.HaulableEver))
             {
-                Thing matrix = thing;
-                if (matrix.def.GetModExtension<HoloPersonaMatrixExtension>() == null
-                    || matrix.IsForbidden(Faction.OfPlayer))
+                if (thing.def.GetModExtension<HoloPersonaMatrixExtension>() == null
+                    || thing.IsForbidden(Faction.OfPlayer))
                 {
                     continue;
                 }
-                options.Add(new FloatMenuOption(matrix.LabelCap, () => OrderInstall(matrix)));
+                yield return thing;
             }
-            if (options.Count == 0)
-            {
-                options.Add(new FloatMenuOption((string)"HoloAI_NoMatrices".Translate(), null));
-            }
-            Find.WindowStack.Add(new FloatMenu(options));
         }
 
-        private void OrderInstall(Thing matrix)
+        public void OrderInstall(Thing matrix)
         {
             Pawn worker = null;
             float bestDist = float.MaxValue;

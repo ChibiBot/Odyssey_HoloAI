@@ -12,8 +12,16 @@
   <HoloAI_RestyleDesc>Open the styling interface to reshape the avatar's holographic hair and color. Light is easily restyled.</HoloAI_RestyleDesc>
   <HoloAI_InstallPersonaGizmo>install persona</HoloAI_InstallPersonaGizmo>
   <HoloAI_InstallPersonaGizmoDesc>Install a persona matrix into this holocore, replacing the resident persona ({0}). The replaced persona's matrix is ejected — except the built-in P.R.I.S.M., who simply rests within the core until reinstalled.</HoloAI_InstallPersonaGizmoDesc>
-  <HoloAI_NoMatrices>No persona matrices available on this map</HoloAI_NoMatrices>
+  <HoloAI_PersonaSwitcherTitle>Persona selection</HoloAI_PersonaSwitcherTitle>
+  <HoloAI_PersonaStatusActive>ACTIVE</HoloAI_PersonaStatusActive>
+  <HoloAI_PersonaStatusReady>MATRIX ABOARD</HoloAI_PersonaStatusReady>
+  <HoloAI_PersonaStatusBuiltIn>CORE-RESIDENT</HoloAI_PersonaStatusBuiltIn>
+  <HoloAI_PersonaStatusMissing>MATRIX NOT DETECTED</HoloAI_PersonaStatusMissing>
+  <HoloAI_PersonaInstallTip>Install {0} into the holocore. A colonist will carry her matrix to the core; the current persona's matrix is ejected.</HoloAI_PersonaInstallTip>
+  <HoloAI_PersonaRestoreTip>Restore {0}, the core's built-in persona. She needs no matrix — the current persona's matrix is ejected.</HoloAI_PersonaRestoreTip>
+  <HoloAI_PersonaMissingTip>No matrix for {0} is aboard. Exotic goods traders sometimes carry persona matrices.</HoloAI_PersonaMissingTip>
   <HoloAI_NoInstaller>No colonist is available to install the persona matrix.</HoloAI_NoInstaller>
   <HoloAI_PersonaInstalled>{0} has taken residence in the holocore.</HoloAI_PersonaInstalled>
   <HoloAI_ActivePersona>Persona: {0}</HoloAI_ActivePersona>
+  <HoloAI_IxiaBreakFactor>I.X.I.A. warden protocol</HoloAI_IxiaBreakFactor>
 </LanguageData>

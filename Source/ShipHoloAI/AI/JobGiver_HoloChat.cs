@@ -33,8 +33,14 @@ namespace ShipHoloAI
 
         private static Pawn FindRecipient(Pawn_HoloAvatar avatar)
         {
+            // Companion triage is P.R.I.S.M.'s signature: she seeks out whoever is
+            // hurting. Paid personas keep the plain random-jitter social call.
+            bool triage = avatar.holoCore?.ActivePersona == HoloAI_DefOf.HoloAI_Persona_PRISM;
+
             List<Pawn> colonists = avatar.Map.mapPawns.FreeColonistsSpawned;
             Pawn best = null;
+            Pawn saddest = null;
+            float saddestMood = float.MaxValue;
             int bestScore = int.MinValue;
             foreach (Pawn colonist in colonists)
             {
@@ -47,13 +53,40 @@ namespace ShipHoloAI
                 }
                 // Prefer whoever the avatar hasn't visited recently; approximate with random jitter.
                 int score = Rand.Range(0, 100);
+                float mood = colonist.needs?.mood?.CurLevel ?? float.MaxValue;
+                if (triage)
+                {
+                    if (NearBreak(colonist))
+                    {
+                        score += 200;
+                    }
+                    if (mood < saddestMood)
+                    {
+                        saddestMood = mood;
+                        saddest = colonist;
+                    }
+                }
                 if (score > bestScore)
                 {
                     bestScore = score;
                     best = colonist;
                 }
             }
+            // The ship-wide lowest mood beats jitter (but not a near-break bonus
+            // already applied above, since the saddest pawn carries both).
+            if (triage && saddest != null && saddest != best && bestScore < 200)
+            {
+                best = saddest;
+            }
             return best;
+        }
+
+        /// <summary>Below (or within a hair of) the minor mental break threshold.</summary>
+        public static bool NearBreak(Pawn colonist)
+        {
+            float? mood = colonist.needs?.mood?.CurLevel;
+            float? threshold = colonist.mindState?.mentalBreaker?.BreakThresholdMinor;
+            return mood != null && threshold != null && mood.Value < threshold.Value + 0.05f;
         }
     }
 }

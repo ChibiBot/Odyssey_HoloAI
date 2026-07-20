@@ -14,6 +14,21 @@ namespace ShipHoloAI
         private const int PassIntervalTicks = 250;
         private const int AuraRefreshTicks = 600;
 
+        /// <summary>
+        /// The persona currently walking this map's ship: non-null only while a
+        /// powered core's avatar is spawned, refreshed each 250-tick pass. Persona
+        /// abilities that hook the wider game (stat parts, Harmony patches) read
+        /// this instead of scanning buildings, and inherit power-gating and the
+        /// one-persona opportunity cost for free. Up to 250 ticks stale after power
+        /// loss — same tolerance as the auras themselves.
+        /// </summary>
+        public HoloPersonaDef ProjectedPersona { get; private set; }
+
+        public static HoloPersonaDef ProjectedOn(Map map)
+        {
+            return map?.GetComponent<HoloAuraMapComponent>()?.ProjectedPersona;
+        }
+
         public HoloAuraMapComponent(Map map) : base(map)
         {
         }
@@ -25,27 +40,45 @@ namespace ShipHoloAI
                 return;
             }
             Building_HoloCore core = PrismSpeech.FindActiveCore(map);
-            HediffDef auraDef = core?.ActivePersona.auraHediff;
-            if (auraDef == null || core.Avatar == null || !core.Avatar.Spawned)
+            HoloPersonaDef persona = core?.ActivePersona;
+            bool projected = core?.Avatar != null && core.Avatar.Spawned;
+            ProjectedPersona = projected ? persona : null;
+
+            HediffDef auraDef = persona?.auraHediff;
+            if (auraDef == null || !projected)
             {
                 return;
             }
+
+            // Warden-style personas do the work themselves rather than buffing crew —
+            // the hediff lives on the avatar's own body instead of spreading outward.
+            if (persona.auraTargetsAvatar)
+            {
+                RefreshAura(core.Avatar, auraDef);
+                return;
+            }
+
             foreach (Pawn colonist in map.mapPawns.FreeColonistsSpawned)
             {
                 if (map.terrainGrid.FoundationAt(colonist.Position)?.IsSubstructure != true)
                 {
                     continue;
                 }
-                Hediff aura = colonist.health.hediffSet.GetFirstHediffOfDef(auraDef);
-                if (aura == null)
-                {
-                    aura = colonist.health.AddHediff(auraDef);
-                }
-                HediffComp_Disappears expiry = aura.TryGetComp<HediffComp_Disappears>();
-                if (expiry != null)
-                {
-                    expiry.ticksToDisappear = AuraRefreshTicks;
-                }
+                RefreshAura(colonist, auraDef);
+            }
+        }
+
+        private static void RefreshAura(Pawn pawn, HediffDef auraDef)
+        {
+            Hediff aura = pawn.health.hediffSet.GetFirstHediffOfDef(auraDef);
+            if (aura == null)
+            {
+                aura = pawn.health.AddHediff(auraDef);
+            }
+            HediffComp_Disappears expiry = aura.TryGetComp<HediffComp_Disappears>();
+            if (expiry != null)
+            {
+                expiry.ticksToDisappear = AuraRefreshTicks;
             }
         }
     }

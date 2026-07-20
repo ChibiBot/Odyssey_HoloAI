@@ -21,7 +21,7 @@ namespace ShipHoloAI
 
         protected override IEnumerable<Toil> MakeNewToils()
         {
-            this.FailOnDespawnedOrNull(TargetIndex.A);
+            this.FailOnDestroyedOrNull(TargetIndex.A);
             this.FailOnDestroyedOrNull(TargetIndex.B);
             this.FailOnForbidden(TargetIndex.A);
 

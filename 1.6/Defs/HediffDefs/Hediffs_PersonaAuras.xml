@@ -72,4 +72,27 @@
     </stages>
   </HediffDef>
 
+  <!-- Personal, not shipboard: I.X.I.A. handles the brig herself, so this lives on
+       the avatar's own body (HoloPersonaDef.auraTargetsAvatar) rather than spreading
+       to crew. She has no skill tracker (ToolUser), so both stats resolve as
+       (defaultBaseValue + offset) * noSkillFactor(1) — purely additive, no per-pawn
+       variance. Calibrated to a vanilla Social-10 warden's stat values:
+       NegotiationAbility 0.4+0.075*10=1.15 (her unboosted baseline is 1.0, so +0.15);
+       SuppressionPower 0.05+0.0225*10=0.275 (her unboosted baseline is already the
+       stat's ceiling of 1.0 — lacking a skill tracker exempts her from the skill
+       curve entirely — so parity here means reeling her back down, -0.725). -->
+  <HediffDef ParentName="HoloAI_AuraBase">
+    <defName>HoloAI_Aura_WardenProtocol</defName>
+    <label>warden protocol</label>
+    <description>I.X.I.A. runs the brig by protocol — negotiation dialed to recruiting spec, suppression dialed to control, nothing added and nothing spared.</description>
+    <stages>
+      <li>
+        <statOffsets>
+          <NegotiationAbility>0.15</NegotiationAbility>
+          <SuppressionPower>-0.725</SuppressionPower>
+        </statOffsets>
+      </li>
+    </stages>
+  </HediffDef>
+
 </Defs>

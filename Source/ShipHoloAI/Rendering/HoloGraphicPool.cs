@@ -413,5 +413,14 @@ namespace ShipHoloAI
         {
             return mats[rot.AsInt] ?? MatSingle;
         }
+
+        // Used by SilhouetteUtility to draw a recolored silhouette for roofed/hidden
+        // pawns. The baked hologram materials aren't meaningfully recolorable, and the
+        // base implementation would otherwise log an error and hand back BadGraphic
+        // (a magenta placeholder) — the pre-baked look already reads fine as-is.
+        public override Graphic GetColoredVersion(Shader newShader, Color newColor, Color newColorTwo)
+        {
+            return this;
+        }
     }
 }

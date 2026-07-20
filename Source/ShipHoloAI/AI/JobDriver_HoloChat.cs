@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using RimWorld;
+using UnityEngine;
 using Verse;
 using Verse.AI;
 
@@ -53,12 +54,26 @@ namespace ShipHoloAI
             MoteMaker.MakeInteractionBubble(pawn, Recipient, intDef.interactionMote,
                 intDef.GetSymbol(pawn.Faction, pawn.Ideo), intDef.GetSymbolColor(pawn.Faction));
             Find.PlayLog.Add(new PlayLogEntry_Interaction(intDef, pawn, Recipient, null));
-            Recipient.needs?.mood?.thoughts?.memories?.TryGainMemory(HoloAI_DefOf.HoloAI_TalkedWithPRISM);
 
-            if (pawn is Pawn_HoloAvatar avatar)
+            // Companion triage: when P.R.I.S.M. reaches someone near their breaking
+            // point, the chat lands as a stronger comfort memory and she says one of
+            // her comfort lines out loud.
+            Pawn_HoloAvatar avatar = pawn as Pawn_HoloAvatar;
+            bool comfort = avatar?.holoCore?.ActivePersona == HoloAI_DefOf.HoloAI_Persona_PRISM
+                && JobGiver_HoloChat.NearBreak(Recipient);
+            Recipient.needs?.mood?.thoughts?.memories?.TryGainMemory(
+                comfort ? HoloAI_DefOf.HoloAI_ComfortedByPRISM : HoloAI_DefOf.HoloAI_TalkedWithPRISM);
+            if (comfort)
             {
-                avatar.SetChatCooldown();
+                string line = PrismSpeech.ResolveLine("prism_comfort");
+                if (!line.NullOrEmpty())
+                {
+                    MoteMaker.ThrowText(pawn.DrawPos + new Vector3(0f, 0f, 0.65f),
+                        pawn.Map, line, new Color(0f, 0.855f, 1f), 5f);
+                }
             }
+
+            avatar?.SetChatCooldown();
         }
     }
 }

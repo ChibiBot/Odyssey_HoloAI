@@ -34,4 +34,33 @@
     </logRulesInitiator>
   </InteractionDef>
 
+  <!-- A.T.H.E.N.A.'s seminar — fired manually from JobDriver_HoloSeminar (same
+       ToolUser caveat as above). -->
+  <InteractionDef>
+    <defName>HoloAI_Lecture</defName>
+    <label>seminar</label>
+    <workerClass>InteractionWorker</workerClass>
+    <symbol>Things/Mote/SpeechSymbols/Speech</symbol>
+    <logRulesInitiator>
+      <rulesStrings>
+        <li>r_logentry(p=3)->[INITIATOR_nameDef] [lectured] [RECIPIENT_nameDef] [subject].</li>
+        <li>r_logentry->[INITIATOR_nameDef] cornered [RECIPIENT_nameDef] with [material].</li>
+
+        <li>lectured(p=2)->delivered an impromptu seminar to</li>
+        <li>lectured->lectured</li>
+        <li>lectured->tutored</li>
+        <li>lectured->cross-examined</li>
+
+        <li>subject->on a topic they did not choose</li>
+        <li>subject->citing four sources from memory</li>
+        <li>subject->with footnotes, verbally indicated</li>
+        <li>subject->until the point was conceded</li>
+
+        <li>material->a prepared syllabus</li>
+        <li>material->an annotated reading list</li>
+        <li>material->three corrections and a compliment</li>
+      </rulesStrings>
+    </logRulesInitiator>
+  </InteractionDef>
+
 </Defs>
