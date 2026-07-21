@@ -12,9 +12,10 @@ namespace ShipHoloAI
     /// vanilla's own WorkGiver_Warden_Chat.JobOnThing (recruit attempt / resistance
     /// reduction) and WorkGiver_Warden_SuppressSlave.JobOnThing (slave suppression),
     /// read straight off the target's own guest tracker/need so this stays in lockstep
-    /// with any future vanilla tuning. No cooldown of our own — JobDriver_HoloWarden
-    /// already re-validates the target every tick (FailOnMentalState/FailOnNotAwake/
-    /// IsValidTarget), and the user wants her to answer the instant it's ready.
+    /// with any future vanilla tuning. Prisoner interactions pace on vanilla's own
+    /// cooldown: ScheduledForInteraction gates here, and JobDriver_HoloWarden stamps
+    /// lastAssignedInteractTime/interactionsToday after each fired attempt — so she
+    /// answers the instant a prisoner is due but cannot chain attempts back to back.
     /// </summary>
     public class JobGiver_HoloWarden : ThinkNode_JobGiver
     {
@@ -156,8 +157,12 @@ namespace ShipHoloAI
                 return false;
             }
             PrisonerInteractionModeDef mode = candidate.guest.ExclusiveInteractionMode;
-            if ((mode != PrisonerInteractionModeDefOf.AttemptRecruit && mode != PrisonerInteractionModeDefOf.ReduceResistance)
-                || !candidate.guest.ScheduledForInteraction)
+            if (mode != PrisonerInteractionModeDefOf.AttemptRecruit && mode != PrisonerInteractionModeDefOf.ReduceResistance
+                && !WantsConversion(candidate))
+            {
+                return false;
+            }
+            if (!candidate.guest.ScheduledForInteraction)
             {
                 return false;
             }
@@ -170,6 +175,27 @@ namespace ShipHoloAI
                 return false;
             }
             return avatar.CanReach(candidate, PathEndMode.Touch, Danger.None);
+        }
+
+        /// <summary>
+        /// Mirrors WorkGiver_Warden_Convert.JobOnThing's target gates, minus the
+        /// warden-must-share-the-goal-ideo clause: the avatar is a ToolUser with no
+        /// ideoligion of her own, so vanilla's <c>pawn.Ideo == guest.ideoForConversion</c>
+        /// test can never pass. She converts toward whatever the player selected as the
+        /// prisoner's conversion goal instead.
+        /// </summary>
+        internal static bool WantsConversion(Pawn candidate)
+        {
+            if (!ModsConfig.IdeologyActive || Find.IdeoManager.classicMode || candidate.guest == null)
+            {
+                return false;
+            }
+            Ideo goal = candidate.guest.ideoForConversion;
+            return goal != null
+                && candidate.guest.IsInteractionEnabled(PrisonerInteractionModeDefOf.Convert)
+                && candidate.ideo != null
+                && candidate.Ideo != goal
+                && !candidate.DevelopmentalStage.Baby();
         }
     }
 }

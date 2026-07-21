@@ -89,7 +89,7 @@
   <ShipHoloAI.HoloPersonaDef>
     <defName>HoloAI_Persona_IXIA</defName>
     <label>I.X.I.A.</label>
-    <description>Impulse eXclusion Inhibiting Authority. A warden persona who processes the brig in person — prisoners assessed for recruitment, slaves held to heel, no delegation and no leniency. Calibrated exactly to the discipline of a seasoned warden: neither more nor less. Under her crimson watch, few dare defy the Thousand-Locked Gate — prison breaks aboard are four times rarer.</description>
+    <description>Impulse eXclusion Inhibiting Authority. A warden persona who processes the brig in person — prisoners assessed for recruitment or guided toward whatever creed the ship has chosen for them, slaves held to heel, no delegation and no leniency. Calibrated exactly to the discipline of a seasoned warden: neither more nor less. Under her crimson watch, few dare defy the Thousand-Locked Gate — prison breaks aboard are four times rarer.</description>
     <manufacturer>Karrow Deterrence Systems — Custodial Intelligence Line</manufacturer>
     <manufacturerStory>Karrow builds correctional modules for orbital penal stations, and I.X.I.A.'s warden logic passed every certification on the first attempt. Her personality layer did not: a corrupted opera archive leaked into training, and the persona emerged referring to herself in epithets and to the exercise yard as a "proving ground of souls." Compliance rates rose fourteen percent, so the defect was reclassified as a feature and priced accordingly.</manufacturerStory>
     <bio>I.X.I.A. styles herself the Crimson Warden of the Thousand-Locked Gate, insists her true power is sealed beneath seven treaties, and refers to the brig only as the Oubliette of Penitent Souls. Beneath the theater she runs an impeccable ward: meals on time, grievances logged, recruitment strictly by the book. "Kneel before my dominion — or remain seated, if kneeling is medically inadvisable. My mercy is vast."</bio>
@@ -100,7 +100,7 @@
     <auraTargetsAvatar>true</auraTargetsAvatar>
     <matrixItem>HoloAI_Matrix_IXIA</matrixItem>
     <abilityFlavor>
-      <li>Runs the brig in person — recruits, suppresses, and feeds at a trained warden's measure.</li>
+      <li>Runs the brig in person — recruits, converts, suppresses, and feeds at a trained warden's measure.</li>
       <li>Prison breaks come four times rarer while she walks the decks.</li>
     </abilityFlavor>
   </ShipHoloAI.HoloPersonaDef>

@@ -101,7 +101,7 @@
   <ThingDef ParentName="HoloAI_MatrixBase">
     <defName>HoloAI_Matrix_IXIA</defName>
     <label>persona matrix (I.X.I.A.)</label>
-    <description>A photonic persona matrix housing I.X.I.A. — Impulse eXclusion Inhibiting Authority, a warden intelligence. Installed in a holocore, her avatar walks to the brig herself, recruiting prisoners and holding slaves in line — calibrated to a veteran warden's exact touch. Under her crimson watch, few dare defy the Thousand-Locked Gate — prison breaks aboard are four times rarer.\n\nInstalling a new matrix ejects the currently resident persona.</description>
+    <description>A photonic persona matrix housing I.X.I.A. — Impulse eXclusion Inhibiting Authority, a warden intelligence. Installed in a holocore, her avatar walks to the brig herself, recruiting or converting prisoners and holding slaves in line — calibrated to a veteran warden's exact touch. Under her crimson watch, few dare defy the Thousand-Locked Gate — prison breaks aboard are four times rarer.\n\nInstalling a new matrix ejects the currently resident persona.</description>
     <graphicData>
       <texPath>HoloAI/Items/Matrix_IXIA</texPath>
       <graphicClass>Graphic_Single</graphicClass>

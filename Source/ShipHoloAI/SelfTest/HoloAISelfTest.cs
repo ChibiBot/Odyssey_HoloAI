@@ -674,12 +674,67 @@ namespace ShipHoloAI
                 due.Job != null && due.Job.def == HoloAI_DefOf.HoloAI_WardenInteract
                 && due.Job.GetTarget(TargetIndex.A).Thing == wardenTestPrisoner);
 
+            TestWardenConversion(giver);
+
             wardenTestPrisoner.guest.Released = true; // PrisonerIsSecure -> false
             ThinkResult afterInsecure = giver.TryIssueJobPackage(core.Avatar, default(JobIssueParams));
             Check("JobGiver_HoloWarden returns null once the candidate is insecure",
                 afterInsecure.Job == null);
 
             TestWardenSlaveSuppression();
+        }
+
+        /// <summary>
+        /// Flip the same prisoner to Convert mode with the player ideo as the goal:
+        /// the giver must still fire even though I.X.I.A. has no ideoligion of her
+        /// own (the goal is read off the guest tracker, not the warden), and a fired
+        /// attempt must actually drain certainty toward it. Mode is left on Convert
+        /// afterwards — the release assertion that follows blocks on PrisonerIsSecure
+        /// long before the interaction mode matters.
+        /// </summary>
+        private void TestWardenConversion(JobGiver_HoloWarden giver)
+        {
+            if (!ModsConfig.IdeologyActive || Find.IdeoManager.classicMode)
+            {
+                Log.Message("[HoloAI SelfTest] conversion test skipped (no Ideology / classic mode)");
+                return;
+            }
+            Ideo goal = Faction.OfPlayer.ideos?.PrimaryIdeo;
+            if (goal == null || wardenTestPrisoner.ideo == null)
+            {
+                Check("JobGiver_HoloWarden targets a convert-mode prisoner", pass: false);
+                Check("conversion attempt drains certainty toward the goal ideo", pass: false);
+                return;
+            }
+            if (wardenTestPrisoner.Ideo == goal)
+            {
+                Ideo other = Find.IdeoManager.IdeosListForReading.FirstOrDefault(i => i != goal);
+                if (other == null)
+                {
+                    Log.Message("[HoloAI SelfTest] conversion test skipped (only one ideoligion in game)");
+                    return;
+                }
+                wardenTestPrisoner.ideo.SetIdeo(other);
+            }
+            wardenTestPrisoner.guest.SetExclusiveInteraction(PrisonerInteractionModeDefOf.Convert);
+            wardenTestPrisoner.guest.ideoForConversion = goal;
+
+            ThinkResult convertDue = giver.TryIssueJobPackage(core.Avatar, default(JobIssueParams));
+            Check("JobGiver_HoloWarden targets a convert-mode prisoner",
+                convertDue.Job != null && convertDue.Job.def == HoloAI_DefOf.HoloAI_WardenInteract
+                && convertDue.Job.GetTarget(TargetIndex.A).Thing == wardenTestPrisoner);
+
+            float certaintyBefore = wardenTestPrisoner.ideo.Certainty;
+            bool converted = JobDriver_HoloWarden.TryConvertPrisoner(core.Avatar, wardenTestPrisoner);
+            Check("conversion attempt drains certainty toward the goal ideo",
+                wardenTestPrisoner.ideo.Certainty < certaintyBefore
+                || (converted && wardenTestPrisoner.Ideo == goal));
+
+            // The attempt must stamp vanilla's interaction cooldown — a giver that
+            // still fires here would let her chain attempts and trivialize conversion.
+            Check("conversion attempt stamps the prisoner interaction cooldown",
+                !wardenTestPrisoner.guest.ScheduledForInteraction
+                && giver.TryIssueJobPackage(core.Avatar, default(JobIssueParams)).Job == null);
         }
 
         /// <summary>
