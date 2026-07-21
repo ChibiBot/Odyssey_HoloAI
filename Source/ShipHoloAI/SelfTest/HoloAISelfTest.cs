@@ -914,9 +914,16 @@ namespace ShipHoloAI
         /// </summary>
         private void TestWardenFeedDowned(JobGiver_HoloWarden giver)
         {
-            HealthUtility.DamageUntilDowned(wardenTestSlave, allowBleedingWounds: false);
+            // Anesthetic, not DamageUntilDowned: random damage occasionally fails
+            // to down (or kills) the slave, flaking both checks — full sedation
+            // downs her deterministically with zero kill risk.
+            Hediff sedation = HediffMaker.MakeHediff(HediffDefOf.Anesthetic, wardenTestSlave);
+            sedation.Severity = 1f;
+            wardenTestSlave.health.AddHediff(sedation);
             if (!wardenTestSlave.Downed || wardenTestSlave.Dead || wardenTestSlave.needs?.food == null)
             {
+                Log.Message("[HoloAI SelfTest] feed diag: Downed=" + wardenTestSlave.Downed
+                    + " Dead=" + wardenTestSlave.Dead + " hasFood=" + (wardenTestSlave.needs?.food != null));
                 Check("JobGiver_HoloWarden hand-feeds a downed slave", pass: false);
                 Check("materialize-and-feed raises the patient's food need", pass: false);
                 return;
