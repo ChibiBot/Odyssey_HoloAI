@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using RimWorld;
@@ -196,9 +197,11 @@ namespace ShipHoloAI
                     break;
                 case 11800:
                     TestIxiaBreakFactor(map);
+                    TestNeedWardenAlertSuppressed(map);
                     InstallMatrixDirect(map, "HoloAI_Matrix_ATHENA");
                     break;
                 case 12200:
+                    TestNeedWardenAlertControl();
                     TestAthenaSeminar();
                     InstallMatrixDirect(map, "HoloAI_Matrix_ACESO");
                     break;
@@ -215,6 +218,61 @@ namespace ShipHoloAI
                 case 13800:
                     TestPrismRestoreAndTriage(map);
                     break;
+            }
+        }
+
+        private Dictionary<Pawn, int> savedWardenPriorities;
+
+        /// <summary>
+        /// With I.X.I.A. projected, a shipboard prisoner, and every colonist's
+        /// Warden work zeroed, the "Need warden" alert must stay quiet — she is the
+        /// warden (Patch_AlertNeedWarden). The prisoner is re-secured (she was
+        /// released for the insecure-giver test) so she stays put for the control
+        /// half at 12200; priorities are restored there.
+        /// </summary>
+        private void TestNeedWardenAlertSuppressed(Map map)
+        {
+            if (wardenTestPrisoner == null || !wardenTestPrisoner.Spawned
+                || !wardenTestPrisoner.IsPrisonerOfColony)
+            {
+                Check("need-warden alert suppressed while I.X.I.A. runs the brig", pass: false);
+                return;
+            }
+            wardenTestPrisoner.guest.Released = false;
+            savedWardenPriorities = new Dictionary<Pawn, int>();
+            foreach (Pawn colonist in map.mapPawns.FreeColonistsSpawned)
+            {
+                if (colonist.workSettings != null && colonist.workSettings.EverWork)
+                {
+                    savedWardenPriorities[colonist] = colonist.workSettings.GetPriority(WorkTypeDefOf.Warden);
+                    colonist.workSettings.SetPriority(WorkTypeDefOf.Warden, 0);
+                }
+            }
+            Check("need-warden alert suppressed while I.X.I.A. runs the brig",
+                !new Alert_NeedWarden().GetReport().active);
+        }
+
+        /// <summary>
+        /// Same board state after the swap to A.T.H.E.N.A.: no colonist wardens and
+        /// a shipboard prisoner must alert again — proving the suppression is
+        /// I.X.I.A.-specific, not a blanket mute. Warden priorities restored after.
+        /// </summary>
+        private void TestNeedWardenAlertControl()
+        {
+            if (savedWardenPriorities == null)
+            {
+                return; // suppressed half never armed; its Check already failed
+            }
+            bool prisonerPresent = wardenTestPrisoner != null && wardenTestPrisoner.Spawned
+                && wardenTestPrisoner.IsPrisonerOfColony;
+            Check("need-warden alert returns without I.X.I.A.",
+                prisonerPresent && new Alert_NeedWarden().GetReport().active);
+            foreach (KeyValuePair<Pawn, int> saved in savedWardenPriorities)
+            {
+                if (!saved.Key.Dead && saved.Key.workSettings != null)
+                {
+                    saved.Key.workSettings.SetPriority(WorkTypeDefOf.Warden, saved.Value);
+                }
             }
         }
 
