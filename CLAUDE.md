@@ -42,6 +42,11 @@ dotnet build Source/ShipHoloAI/ShipHoloAI.csproj -c Release   # → 1.6/Assembli
 - Kill the game with explicit PIDs (`kill $(ps aux | grep -i "[R]imWorldLinux" | awk
   '{print $2}')`); `pkill -f RimWorldLinux` matches its own cmdline and returns 144,
   aborting `&&` chains, and stray instances corrupt Player.log for the next run.
+- **Package for release**: `Source/Build/package.sh` → `dist/ShipHoloAI` (gitignored).
+  Whitelist-copies only the game-loaded dirs (About/1.6/Textures/Languages) plus a
+  fresh Release dll, strips pdbs, and shrinks the shipped Preview.png under Steam's
+  1 MB cap (repo keeps the full-res art). Upload that folder to the Workshop; the
+  Mods/ symlink stays pointed at the repo root for dev.
 - Gravship testing needs a dev-mode Odyssey start (god-mode place `GravEngine`; it
   generates its own substructure footprint).
 - Decompile vanilla for API signatures with `ilspycmd` into `Decompiled/` (gitignored).

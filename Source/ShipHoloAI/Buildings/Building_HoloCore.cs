@@ -17,6 +17,10 @@ namespace ShipHoloAI
         private Pawn_HoloAvatar avatar;
         private bool projectionEnabled = true;
         private HoloPersonaDef activePersona;
+        // The persona archive: installing a matrix consumes it (research-disc
+        // style) and permanently unlocks its persona here; switching among
+        // archived personas afterward is instant and free.
+        private List<HoloPersonaDef> archivedPersonas = new List<HoloPersonaDef>();
 
         private CompPowerTrader powerComp;
 
@@ -105,51 +109,66 @@ namespace ShipHoloAI
             avatar.ApplyPersonaStyle(ActivePersona);
         }
 
+        /// <summary>True when this core can project the persona without a matrix:
+        /// built-in (P.R.I.S.M. has no matrix item), currently resident, or already
+        /// installed into the archive.</summary>
+        public bool IsUnlocked(HoloPersonaDef persona)
+        {
+            return persona != null
+                && (persona.matrixItem == null
+                    || persona == ActivePersona
+                    || archivedPersonas.Contains(persona));
+        }
+
         /// <summary>
-        /// Swap the resident persona for the one held in a matrix item. The current
-        /// persona's matrix (if it has one — P.R.I.S.M. does not) is ejected beside
-        /// the core, the old avatar dissolves, and the newcomer projects on the next
-        /// state check.
+        /// Install a persona matrix, research-disc style: the matrix is consumed and
+        /// its persona joins this core's permanent archive, then takes over the
+        /// projection. Installing a matrix whose persona is already archived wastes
+        /// nothing — the matrix is left alone and the persona simply activates.
         /// </summary>
         public void InstallPersona(Thing matrixItem)
         {
             HoloPersonaDef newPersona = matrixItem?.def
                 .GetModExtension<HoloPersonaMatrixExtension>()?.persona;
-            if (newPersona == null || newPersona == ActivePersona)
+            if (newPersona == null)
             {
+                return;
+            }
+            if (IsUnlocked(newPersona))
+            {
+                ActivatePersona(newPersona);
                 return;
             }
             matrixItem.Destroy();
+            archivedPersonas.Add(newPersona);
             SwapPersona(newPersona);
         }
 
-        /// <summary>
-        /// Revert to the built-in P.R.I.S.M. persona. No matrix item exists for her —
-        /// she ships with the core — so this is a pure software reset, done instantly
-        /// from the selection screen rather than via a hauling job.
-        /// </summary>
-        public void RestoreDefaultPersona()
+        /// <summary>Switch the projection to an archived (or built-in) persona — no
+        /// matrix, no hauling job; the archive's whole point. No-op if the persona
+        /// is locked or already resident.</summary>
+        public void ActivatePersona(HoloPersonaDef persona)
         {
-            if (ActivePersona == HoloAI_DefOf.HoloAI_Persona_PRISM)
+            if (persona == null || persona == ActivePersona || !IsUnlocked(persona))
             {
                 return;
             }
-            SwapPersona(HoloAI_DefOf.HoloAI_Persona_PRISM);
+            SwapPersona(persona);
+        }
+
+        /// <summary>Revert to the built-in P.R.I.S.M. persona.</summary>
+        public void RestoreDefaultPersona()
+        {
+            ActivatePersona(HoloAI_DefOf.HoloAI_Persona_PRISM);
         }
 
         private void SwapPersona(HoloPersonaDef newPersona)
         {
-            ThingDef ejectedDef = ActivePersona.matrixItem;
-
             StoreAvatar();
             innerContainer.ClearAndDestroyContents();
             avatar = null;
 
             activePersona = newPersona;
-            if (ejectedDef != null)
-            {
-                GenPlace.TryPlaceThing(ThingMaker.MakeThing(ejectedDef), Position, Map, ThingPlaceMode.Near);
-            }
             FleckMaker.ThrowLightningGlow(DrawPos, Map, 1.4f);
             Messages.Message("HoloAI_PersonaInstalled".Translate(newPersona.label), this,
                 MessageTypeDefOf.PositiveEvent);
@@ -190,7 +209,7 @@ namespace ShipHoloAI
             {
                 defaultLabel = "HoloAI_ToggleProjection".Translate(),
                 defaultDesc = "HoloAI_ToggleProjectionDesc".Translate(),
-                icon = def.uiIcon,
+                icon = HoloAIIcons.ToggleProjection,
                 isActive = () => projectionEnabled,
                 toggleAction = () => projectionEnabled = !projectionEnabled,
             };
@@ -199,7 +218,7 @@ namespace ShipHoloAI
             {
                 defaultLabel = "HoloAI_InstallPersonaGizmo".Translate(),
                 defaultDesc = "HoloAI_InstallPersonaGizmoDesc".Translate(ActivePersona.label),
-                icon = def.uiIcon,
+                icon = HoloAIIcons.SwitchPersona,
                 action = OpenInstallMenu,
             };
 
@@ -209,7 +228,7 @@ namespace ShipHoloAI
                 {
                     defaultLabel = "HoloAI_Summon".Translate(),
                     defaultDesc = "HoloAI_SummonDesc".Translate(),
-                    icon = def.uiIcon,
+                    icon = HoloAIIcons.Summon,
                     targetingParams = new TargetingParameters
                     {
                         canTargetLocations = true,
@@ -295,9 +314,23 @@ namespace ShipHoloAI
             Scribe_References.Look(ref avatar, "avatar");
             Scribe_Values.Look(ref projectionEnabled, "projectionEnabled", defaultValue: true);
             Scribe_Defs.Look(ref activePersona, "activePersona");
-            if (Scribe.mode == LoadSaveMode.PostLoadInit && innerContainer == null)
+            Scribe_Collections.Look(ref archivedPersonas, "archivedPersonas", LookMode.Def);
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
-                innerContainer = new ThingOwner<Pawn>(this);
+                if (innerContainer == null)
+                {
+                    innerContainer = new ThingOwner<Pawn>(this);
+                }
+                if (archivedPersonas == null)
+                {
+                    archivedPersonas = new List<HoloPersonaDef>();
+                }
+                // Pre-archive saves: whoever is resident was installed from a matrix
+                // that no longer exists — grandfather her into the archive.
+                if (activePersona?.matrixItem != null && !archivedPersonas.Contains(activePersona))
+                {
+                    archivedPersonas.Add(activePersona);
+                }
             }
         }
 

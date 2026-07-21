@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+
+  <!-- Vanilla Mote_Text with our outlined, larger-font renderer; the explicit
+       fadeOutTime gives a graceful fade instead of vanilla's instant cutoff. -->
+  <ThingDef ParentName="MoteBase">
+    <defName>HoloAI_Mote_SpeechText</defName>
+    <graphicData>
+      <texPath>Things/Mote/Transparent</texPath>
+    </graphicData>
+    <thingClass>ShipHoloAI.MoteSpeechText</thingClass>
+    <drawGUIOverlay>true</drawGUIOverlay>
+    <altitudeLayer>MetaOverlays</altitudeLayer>
+    <mote>
+      <realTime>true</realTime>
+      <solidTime>2.2</solidTime>
+      <fadeOutTime>0.8</fadeOutTime>
+    </mote>
+  </ThingDef>
+
+</Defs>

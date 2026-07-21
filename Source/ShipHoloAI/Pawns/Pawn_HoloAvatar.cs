@@ -15,9 +15,6 @@ namespace ShipHoloAI
     {
         public Building_HoloCore holoCore;
         public int nextChatTick;
-        // A.C.E.S.O.: global cooldown between emergency tends (set when a tend fires,
-        // not when the job starts, so interruptions don't burn the cooldown).
-        public int nextEmergencyTendTick;
 
         private HairDef hairDef;
         private Color? hairColorInt;
@@ -114,6 +111,12 @@ namespace ShipHoloAI
 
         public void AttachStyleTrackers()
         {
+            // Read the color BEFORE the story tracker exists: HoloHairColor routes
+            // through the tracker once one is attached, so reading it afterward
+            // returns the fresh tracker's default — silently stripping the persona
+            // color, and the stripped value then survives DetachStyleTrackers even
+            // when the styling dialog is cancelled.
+            Color hairColor = HoloHairColor;
             story = new Pawn_StoryTracker(this)
             {
                 hairDef = CurrentHairDef,
@@ -121,7 +124,7 @@ namespace ShipHoloAI
                 bodyType = BodyTypeDefOf.Female,
                 headType = DefDatabase<HeadTypeDef>.GetNamedSilentFail("Female_AverageNormal"),
             };
-            story.HairColor = HoloHairColor;
+            story.HairColor = hairColor;
             style = new Pawn_StyleTracker(this)
             {
                 beardDef = BeardDefOf.NoBeard,
@@ -242,7 +245,7 @@ namespace ShipHoloAI
                 {
                     defaultLabel = "HoloAI_Restyle".Translate(),
                     defaultDesc = "HoloAI_RestyleDesc".Translate(),
-                    icon = holoCore?.def.uiIcon,
+                    icon = HoloAIIcons.Restyle,
                     action = OpenStylingUI,
                 };
             }
@@ -252,7 +255,7 @@ namespace ShipHoloAI
                 {
                     defaultLabel = "HoloAI_Hairstyle".Translate() + ": " + (CurrentHairDef?.LabelCap ?? "-"),
                     defaultDesc = "HoloAI_HairstyleDesc".Translate(),
-                    icon = holoCore?.def.uiIcon,
+                    icon = HoloAIIcons.Hairstyle,
                     action = CycleHairstyle,
                 };
             }
@@ -267,7 +270,6 @@ namespace ShipHoloAI
             base.ExposeData();
             Scribe_References.Look(ref holoCore, "holoCore");
             Scribe_Values.Look(ref nextChatTick, "nextChatTick");
-            Scribe_Values.Look(ref nextEmergencyTendTick, "nextEmergencyTendTick");
             Scribe_Defs.Look(ref hairDef, "hairDef");
             Scribe_Values.Look(ref hairColorInt, "hairColor");
         }
