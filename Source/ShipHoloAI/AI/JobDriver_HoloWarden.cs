@@ -80,12 +80,14 @@ namespace ShipHoloAI
                 }
                 intDef = InteractionDefOf.RecruitAttempt;
                 MarkPrisonerInteracted(recipient);
+                PrismSpeech.Bark(pawn, "ixia_recruit");
             }
             else
             {
                 // IsValidTarget already confirmed Ideology + a secure slave.
                 intDef = InteractionDefOf.Suppress;
                 recipient.mindState.lastSlaveSuppressedTick = Find.TickManager.TicksGame;
+                PrismSpeech.Bark(pawn, "ixia_suppress");
             }
 
             List<RulePackDef> extraSentencePacks = new List<RulePackDef>();
@@ -133,6 +135,7 @@ namespace ShipHoloAI
                 reduction *= role.def.certaintyLossFactor;
             }
             bool converted = recipient.ideo.IdeoConversionAttempt(reduction, goal);
+            PrismSpeech.Bark(initiator, "ixia_convert");
 
             InteractionDef intDef = InteractionDefOf.ConvertIdeoAttempt;
             List<RulePackDef> extraSentencePacks = new List<RulePackDef>

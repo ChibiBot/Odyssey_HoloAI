@@ -53,12 +53,7 @@ namespace ShipHoloAI
         {
             sleeper.needs?.mood?.thoughts?.memories?.TryGainMemory(HoloAI_DefOf.HoloAI_TuckedInByVESTA);
             FleckMaker.ThrowLightningGlow(sleeper.DrawPos, sleeper.Map, 0.4f);
-            string line = PrismSpeech.ResolveLine("vesta_tuckin");
-            if (!line.NullOrEmpty())
-            {
-                MoteMaker.ThrowText(avatar.DrawPos + new Vector3(0f, 0f, 0.65f),
-                    avatar.Map, line, new Color(0f, 0.855f, 1f), 5f);
-            }
+            PrismSpeech.Bark(avatar, "vesta_tuckin");
         }
     }
 }

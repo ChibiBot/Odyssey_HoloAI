@@ -170,12 +170,7 @@ namespace ShipHoloAI
             }
             if (this.IsHashIntervalTick(2500) && Rand.Chance(0.3f) && !Position.Fogged(Map))
             {
-                string line = PrismSpeech.ResolveLine("bark");
-                if (!line.NullOrEmpty())
-                {
-                    MoteMaker.ThrowText(DrawPos + new Vector3(0f, 0f, 0.65f),
-                        Map, line, new Color(0f, 0.855f, 1f), 5f);
-                }
+                PrismSpeech.Bark(this, "bark");
             }
         }
 

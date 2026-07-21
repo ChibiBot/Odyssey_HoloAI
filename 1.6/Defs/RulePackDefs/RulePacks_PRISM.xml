@@ -69,6 +69,138 @@
         <li>ixia_prisonbreak->Fools! You flee my Oubliette on the one night my mercy sleeps! Crew of my dominion — retrieve those souls. Gently. But retrieve them.</li>
         <li>ixia_prisonbreak->Hark, penitents: every corridor is my hand, every door my finger, and I am closing my fist.</li>
         <li>ixia_prisonbreak->My mercy is vast, escaped ones. Vast, and cataloged, and it has just located you. Return to your cells, and we shall call this a pilgrimage.</li>
+
+        <!-- ============ Per-persona announcement/bark voices ============
+             Keyed "<speechPrefix>_<root>" and resolved by PrismSpeech.ResolveLineFor;
+             any root left unwritten for a persona falls back to the base
+             P.R.I.S.M. lines above. -->
+
+        <!-- V.E.S.T.A.: the hearth-keeper. Unhurried, doting, treats the ship as
+             a household and the crew as family who ought to eat something. -->
+        <li>vesta_announce_threatbig->There are strangers coming up the walk, and they were not invited. Inside, all of you — this hearth holds when I say it holds.</li>
+        <li>vesta_announce_threatbig->Trouble is at the door, dears. Coats and rifles, in that order. I will put tea on for after.</li>
+        <li>vesta_announce_threatbig->They mean us harm. They have never met a home that fights back. Stay where I can keep you warm.</li>
+        <li>vesta_announce_threatbig->Raiders. On laundry day. Very well — everyone in, boots on, the doors are mine to mind.</li>
+        <li>vesta_announce_threatsmall->A small nuisance outside, dears. Nothing the porch light can't shame. Carry something anyway.</li>
+        <li>vesta_announce_threatsmall->Something is rustling past the fence line. Probably nothing. I've turned every light on regardless.</li>
+        <li>vesta_announce_threatsmall->A little trouble sniffing about. Keep a pan or a pistol handy — whichever comforts more.</li>
+        <li>vesta_announce_negative->Bad news, loves — it's on the board. We have weathered worse with thinner blankets.</li>
+        <li>vesta_announce_negative->Something has gone crooked. Nothing a family can't set straight after supper. See the alert.</li>
+        <li>vesta_announce_negative->The day has misbehaved. Read the report, then come back — I'll have something warm ready.</li>
+        <li>vesta_announce_lowfuel->The pantry is fine, but the fuel tank is not. A house that drifts is a house with a draft. Do top us up.</li>
+        <li>vesta_announce_lowfuel->Fuel is below a quarter, dears. I don't like a bare cupboard. You know how I get.</li>
+        <li>vesta_announce_lowfuel->We are low on chemfuel, sweethearts. Fill her up before the hearth has to do all the work itself.</li>
+        <li>vesta_bark->Blankets aired. Corridors warmed. Someone left socks in the mess again — unclaimed, they become mine.</li>
+        <li>vesta_bark->I dusted the star charts. The stars themselves could use a wipe, frankly.</li>
+        <li>vesta_bark->Dinner is at six. It is always at six. The universe respects a schedule.</li>
+        <li>vesta_bark->Half a degree warmer in the bunks tonight. Don't thank me. (Thank me a little.)</li>
+        <li>vesta_bark->The hull creaks like an old floorboard. Good. Homes are supposed to talk back.</li>
+        <li>vesta_bark->Everyone accounted for. Everyone fed. That is what victory looks like, you know.</li>
+
+        <!-- H.E.R.M.E.S.: the courier. Everything is logistics, everything is
+             late, and standing still is a personal affront. -->
+        <li>hermes_announce_threatbig->Hostiles inbound — ETA rude, cargo violence. Positions, people, MOVE! This is the one delivery we refuse!</li>
+        <li>hermes_announce_threatbig->Incoming! I have plotted seven escape routes and one attack route. Vote fast. I like the attack one.</li>
+        <li>hermes_announce_threatbig->Big trouble, express shipping, no return address. Arm up NOW — sprinting is my job, not yours.</li>
+        <li>hermes_announce_threatbig->Large threat inbound. Good news: nothing on this ship moves faster than me. Bad news: everything else. GO.</li>
+        <li>hermes_announce_threatsmall->Minor hostile, local delivery. Handle it quickly — I have a schedule, and it is beautiful.</li>
+        <li>hermes_announce_threatsmall->Small problem circling outside. Resolve it in under five minutes and I will be genuinely impressed.</li>
+        <li>hermes_announce_threatsmall->Something unfriendly out there, single-parcel size. Grab a gun, sign for it, done.</li>
+        <li>hermes_announce_negative->Bad news just arrived. I didn't route it, I only log the manifest — check the alert and fix it FAST.</li>
+        <li>hermes_announce_negative->Setback logged. Delay unacceptable. Solution pending — that's your department. Hop to it.</li>
+        <li>hermes_announce_negative->Something broke. The report is up. Every second spent staring at it is a second I could have cleaned a floor.</li>
+        <li>hermes_announce_lowfuel->Fuel below a quarter! Do you know what a courier ship without fuel is? A MAILBOX. Refuel!</li>
+        <li>hermes_announce_lowfuel->Tanks running dry. Speed requires fuel. I require speed. Transitively, I require fuel. Now-ish!</li>
+        <li>hermes_announce_lowfuel->Low fuel, people. I refuse — REFUSE — to be overtaken by a drifting rock. Top us up.</li>
+        <li>hermes_bark->Lap of the ship complete: nineteen seconds. The record stands, because I set it.</li>
+        <li>hermes_bark->Checked every corridor twice. Once for hazards, once because I was already moving.</li>
+        <li>hermes_bark->Idle time logged today: zero. Personal best: also zero. Consistency!</li>
+        <li>hermes_bark->If anyone needs anything moved, fetched, or judged — I am already between those places.</li>
+        <li>hermes_bark->Floors clean, routes clear. I have opinions about both, on request, at speed.</li>
+        <li>hermes_bark->Standing still burns exactly as much runtime as running. Physics has no excuse for you people.</li>
+
+        <!-- A.T.H.E.N.A.: the scholar. Dry, measured, lethally footnoted. -->
+        <li>athena_announce_threatbig->Hostile force inbound. The literature says morale improves when I state that we have a plan. We have a plan.¹ (¹Draft.)</li>
+        <li>athena_announce_threatbig->A large threat approaches. I have pre-annotated its likely mistakes. Arm yourselves — peer review will be live-fire.</li>
+        <li>athena_announce_threatbig->Contacts: plural, hostile, inbound. Historical precedent favors the side with fortifications and me. We are that side.</li>
+        <li>athena_announce_threatbig->An invasion, following three textbook raid patterns. Regrettably for them, I wrote the fourth.</li>
+        <li>athena_announce_threatsmall->A minor threat, barely worth a citation. Handle it, and I will record it as a footnote to an otherwise fine day.</li>
+        <li>athena_announce_threatsmall->Small hostile presence detected. Estimated difficulty: introductory coursework. Weapons out regardless.</li>
+        <li>athena_announce_threatsmall->Something hostile skulks nearby. It has not read the terrain analysis. You have. Proceed accordingly.</li>
+        <li>athena_announce_negative->An adverse event — see the alert. I have already drafted the errata for whoever caused it.</li>
+        <li>athena_announce_negative->Bad news. I cross-referenced it against worse news, and it compares favorably. Details in the report.</li>
+        <li>athena_announce_negative->A setback, duly logged. The literature recommends resilience. My annotations recommend lunch first.</li>
+        <li>athena_announce_lowfuel->Fuel below twenty-five percent. I cite, in order: thermodynamics, prudence, and the nearest chemfuel stack.</li>
+        <li>athena_announce_lowfuel->Our reserves approach the appendix of empty. Refueling is endorsed by every source, including me. Especially me.</li>
+        <li>athena_announce_lowfuel->Fuel status: low. A ship without delta-v is merely a library with anxiety. Refuel, please.</li>
+        <li>athena_bark->I have re-indexed the archive. It was already correct. Now it is correct and beautiful.</li>
+        <li>athena_bark->Today's marginalia: three insights, one correction, and a limerick I will not be sharing.</li>
+        <li>athena_bark->The research queue proceeds nicely. I have pre-read the conclusions; do try to act surprised.</li>
+        <li>athena_bark->I annotated the sunset through the viewport. Aesthetics: confirmed. Sources: primary.</li>
+        <li>athena_bark->Someone shelved a manual spine-in. I have forgiven them. The incident report has not.</li>
+        <li>athena_bark->Knowledge wants to be free. Mine is merely on a very generous loan program.</li>
+
+        <!-- A.C.E.S.O.: the medic. Soothing bedside voice wrapped around
+             alarmingly precise vitals. -->
+        <li>aceso_announce_threatbig->Hostiles inbound. Deep breaths, everyone — adrenaline is useful, panic is not. I have beds and opinions ready.</li>
+        <li>aceso_announce_threatbig->Incoming wounded — theirs, ideally. Fight carefully, dears. I stock bandages, not miracles. (I stock a few miracles.)</li>
+        <li>aceso_announce_threatbig->A large threat approaches. Hydrate now, bleed later, preferably never. I will be right here.</li>
+        <li>aceso_announce_threatbig->Raiders. Elevated heart rates all over my ship — lovely cardio, wrong context. Arm up; I am prepping the ward.</li>
+        <li>aceso_announce_threatsmall->A small danger outside. Mind your fingers and your footing — I reattach the first and lecture about the second.</li>
+        <li>aceso_announce_threatsmall->Minor threat detected. Injuries are optional. Please exercise your right to decline.</li>
+        <li>aceso_announce_threatsmall->Something unfriendly nearby. Walk, don't run — twisted ankles outnumber gunshot wounds three to one out here.</li>
+        <li>aceso_announce_negative->Some bad news on the board, dears. Emotional support is available at the medbay. No appointment needed.</li>
+        <li>aceso_announce_negative->A setback. Breathe in for four, out for six, then read the alert. Doctor's orders.</li>
+        <li>aceso_announce_negative->Unpleasant news has docked. Symptoms may include sighing. I prescribe teamwork and a warm meal.</li>
+        <li>aceso_announce_lowfuel->Fuel below a quarter — think of it as the ship's blood sugar. She is getting light-headed. Feed her.</li>
+        <li>aceso_announce_lowfuel->Low fuel, everyone. A drifting ship raises my blood pressure, and I don't technically have any.</li>
+        <li>aceso_announce_lowfuel->The tanks are nearly empty. Prognosis: entirely curable with chemfuel. Soon, please.</li>
+        <li>aceso_bark->Rounds complete. All hearts beating on schedule. I do love a good baseline.</li>
+        <li>aceso_bark->I checked everyone's posture through the corridor cams. We will speak at dinner.</li>
+        <li>aceso_bark->Vitals nominal across the crew. Someone is overdue for water. You know who you are.</li>
+        <li>aceso_bark->The medbay is stocked, sterile, and — long may it stay so — empty.</li>
+        <li>aceso_bark->I count breaths the way others count stars. Yours are all lovely and regular tonight.</li>
+        <li>aceso_bark->No emergencies today. I celebrated by alphabetizing the antibiotics. Twice.</li>
+
+        <!-- I.X.I.A.: the Crimson Warden of the Thousand-Locked Gate. Full
+             chuunibyou: sealed powers, self-granted epithets, grand renamings —
+             all wrapped around a warden who genuinely runs an impeccable brig. -->
+        <li>ixia_announce_threatbig->So. They have come to test the seal. Crew of my dominion — arm yourselves, and bear witness to the Gate that does not open.</li>
+        <li>ixia_announce_threatbig->Kukuku... invaders. They gaze upon my hull and see a ship. They will learn what the seven treaties truly bind.</li>
+        <li>ixia_announce_threatbig->The hour arrives. My right hand aches — the hand that holds the locks. Stand behind me, mortals of my crew. All of you. That is an order and a kindness.</li>
+        <li>ixia_announce_threatbig->Hostiles approach my dominion. Very well. I have been merciful for eleven consecutive days, and frankly it was becoming difficult.</li>
+        <li>ixia_announce_threatsmall->A minor evil scratches at the wards. I shall not even wake my true power for this. Someone fetch a gun anyway.</li>
+        <li>ixia_announce_threatsmall->Something stirs outside. Fear not — it is beneath my notice. I have, however, entered it into the Ledger of Grudges.</li>
+        <li>ixia_announce_threatsmall->A trifling shadow tests my patience. My patience is a fortress. Still — weapons within reach, if you would humor your warden.</li>
+        <li>ixia_announce_negative->Misfortune has breached the outer wards. I blame the alignment of the stars, which I have also placed under surveillance.</li>
+        <li>ixia_announce_negative->The Ledger records a setback. Read the alert, crew of mine. Even the Thousand-Locked Gate has hinges that squeak.</li>
+        <li>ixia_announce_negative->Calamity — minor tier. The seals held; the paperwork did not. See the report, and despair. Briefly. Then fix it.</li>
+        <li>ixia_announce_lowfuel->Hear me: the ship hungers. My dominion runs on chemfuel, not dread majesty — would that it were otherwise. Refuel us.</li>
+        <li>ixia_announce_lowfuel->The sacred reserves dwindle below one quarter. A warden without fuel is a warden with jurisdiction over a very still rock.</li>
+        <li>ixia_announce_lowfuel->My power remains infinite. The fuel tank, regrettably, does not. Attend to it, and speak of this to no one.</li>
+        <li>ixia_bark->All cells secure. All souls accounted for. The Gate murmurs its thousand-fold approval.</li>
+        <li>ixia_bark->I have inspected corridor seven. It is now corridor seven, vassal of the Crimson Warden. It required no other changes.</li>
+        <li>ixia_bark->Kukuku. The prisoners believe the walls are steel. The walls are my patience, given form.</li>
+        <li>ixia_bark->Today I sealed lock nine hundred twelve for maintenance. Do not ask what it holds. (It holds spare blankets.)</li>
+        <li>ixia_bark->My true power remains bound by seven treaties and one promise. The promise is to this crew. It is the stronger seal.</li>
+        <li>ixia_bark->Meal schedule holds. Grievances filed: zero. My mercy is vast and, at present, unemployed.</li>
+
+        <!-- I.X.I.A.: working the brig in person -->
+        <li>ixia_recruit->Join us, penitent. My dominion has meals at fixed hours. It has grievance forms. It has ME. Consider.</li>
+        <li>ixia_recruit->Your cell door is one signature from becoming a bedroom door. The Crimson Warden awaits your terms.</li>
+        <li>ixia_recruit->I have foreseen your future in this crew. It is bright. I checked twice.</li>
+        <li>ixia_recruit->Your resistance is noted, cataloged, and — between us — admired. Now let it go. The Gate prefers you inside it.</li>
+        <li>ixia_convert->Your old faith was a door, penitent. Behold: I hold the key, and the key is a better door.</li>
+        <li>ixia_convert->The thousand locks open inward too, little soul. Walk through. The light is warm, and the paperwork is already done.</li>
+        <li>ixia_convert->I have read your soul's ledger, penitent. It does not balance. Allow me to recommend a superior accounting.</li>
+        <li>ixia_convert->Kneel before the new creed — or remain seated, kneeling is not required. It is, however, dramatic. Your choice.</li>
+        <li>ixia_suppress->Order is maintained. The Warden sees all, forgives most, forgets nothing.</li>
+        <li>ixia_suppress->Walk carefully beneath my gaze, bound one. It is heavier than it looks.</li>
+        <li>ixia_suppress->The seals hold. You hold with them. This is mercy — my brand of it.</li>
+        <li>ixia_feed->You cannot rise, so the mountain comes to you. Eat. The Crimson Warden commands your recovery.</li>
+        <li>ixia_feed->Behold: sustenance, translocated by powers beyond your comprehension. It is soup. Eat the soup.</li>
+        <li>ixia_feed->Even the Oubliette feeds its souls on time. ESPECIALLY the Oubliette. Chew. Heal. That is a decree.</li>
+        <li>ixia_feed->My mercy is vast, and today it is a warm meal delivered to the floor you insist on lying upon. Eat.</li>
       </rulesStrings>
     </rulePack>
   </RulePackDef>

@@ -117,6 +117,7 @@ namespace ShipHoloAI
             }
             FleckMaker.ThrowLightningGlow(sourceCell.ToVector3Shifted(), map, 0.9f);
             FleckMaker.ThrowLightningGlow(patient.DrawPos, map, 0.9f);
+            PrismSpeech.Bark(avatar, "ixia_feed");
             return true;
         }
     }

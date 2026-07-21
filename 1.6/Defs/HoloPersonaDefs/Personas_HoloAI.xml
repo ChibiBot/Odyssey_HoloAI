@@ -28,6 +28,7 @@
     <defaultHairDefName>FancyBun</defaultHairDefName>
     <auraHediff>HoloAI_Aura_Hearthlight</auraHediff>
     <matrixItem>HoloAI_Matrix_VESTA</matrixItem>
+    <speechPrefix>vesta</speechPrefix>
     <abilityFlavor>
       <li>Her presence settles the ship; crew aboard feel at home.</li>
       <li>Tucks sleeping crew in on her night rounds. They rest easier for it.</li>
@@ -46,6 +47,7 @@
     <defaultHairDefName>Bob</defaultHairDefName>
     <auraHediff>HoloAI_Aura_Slipstream</auraHediff>
     <matrixItem>HoloAI_Matrix_HERMES</matrixItem>
+    <speechPrefix>hermes</speechPrefix>
     <abilityFlavor>
       <li>Scrubs the decks herself between errands, under audible protest.</li>
     </abilityFlavor>
@@ -63,6 +65,7 @@
     <defaultHairDefName>Princess</defaultHairDefName>
     <auraHediff>HoloAI_Aura_Archivelight</auraHediff>
     <matrixItem>HoloAI_Matrix_ATHENA</matrixItem>
+    <speechPrefix>athena</speechPrefix>
     <abilityFlavor>
       <li>Holds impromptu seminars for crew at leisure, teaching their best skill.</li>
       <li>Attendance counts as recreation; meditators leave sharper, not slower.</li>
@@ -81,6 +84,7 @@
     <defaultHairDefName>Cute</defaultHairDefName>
     <auraHediff>HoloAI_Aura_Stericalm</auraHediff>
     <matrixItem>HoloAI_Matrix_ACESO</matrixItem>
+    <speechPrefix>aceso</speechPrefix>
     <abilityFlavor>
       <li>Answers medical emergencies herself when no doctor is coming.</li>
     </abilityFlavor>
@@ -99,6 +103,7 @@
     <auraHediff>HoloAI_Aura_WardenProtocol</auraHediff>
     <auraTargetsAvatar>true</auraTargetsAvatar>
     <matrixItem>HoloAI_Matrix_IXIA</matrixItem>
+    <speechPrefix>ixia</speechPrefix>
     <abilityFlavor>
       <li>Runs the brig in person — recruits, converts, suppresses, and feeds at a trained warden's measure.</li>
       <li>Prison breaks come four times rarer while she walks the decks.</li>

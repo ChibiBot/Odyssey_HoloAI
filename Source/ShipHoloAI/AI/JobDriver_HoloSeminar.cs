@@ -107,12 +107,7 @@ namespace ShipHoloAI
                 intDef.GetSymbol(avatar.Faction, avatar.Ideo), intDef.GetSymbolColor(avatar.Faction));
             Find.PlayLog.Add(new PlayLogEntry_Interaction(intDef, avatar, student, null));
 
-            string line = PrismSpeech.ResolveLine("athena_seminar");
-            if (!line.NullOrEmpty())
-            {
-                MoteMaker.ThrowText(avatar.DrawPos + new Vector3(0f, 0f, 0.65f),
-                    avatar.Map, line, new Color(0f, 0.855f, 1f), 5f);
-            }
+            PrismSpeech.Bark(avatar, "athena_seminar");
         }
     }
 }

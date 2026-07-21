@@ -31,6 +31,13 @@ namespace ShipHoloAI
         // Dialog_PersonaSwitcher.BuildStatLines).
         public List<string> abilityFlavor;
 
+        // Keyword prefix for persona-voiced speech: rulepack lines named
+        // "<prefix>_<root>" (e.g. "ixia_announce_lowfuel") override the base
+        // P.R.I.S.M. lines when this persona is active, and each root falls back
+        // to the base voice individually when unwritten — see
+        // PrismSpeech.ResolveLineFor. Null/empty = base voice only.
+        public string speechPrefix;
+
         /// <summary>
         /// True for personas whose work is done by the avatar herself rather than
         /// spread to nearby crew (e.g. a warden persona performing prisoner/slave

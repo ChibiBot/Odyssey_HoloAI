@@ -140,6 +140,7 @@ namespace ShipHoloAI
                 case 9100:
                     Check("low-fuel line resolves from grammar",
                         !PrismSpeech.ResolveLine("announce_lowfuel").NullOrEmpty());
+                    Check("persona speech keyword coverage", PersonaSpeechCoverage());
                     Find.LetterStack.ReceiveLetter("self-test threat", "letter sent by the HoloAI self-test",
                         LetterDefOf.ThreatSmall, new LookTargets(core));
                     break;
@@ -215,6 +216,48 @@ namespace ShipHoloAI
                     TestPrismRestoreAndTriage(map);
                     break;
             }
+        }
+
+        /// <summary>
+        /// Every persona that declares a speechPrefix must cover the full
+        /// announcement/bark keyword set, and I.X.I.A. her signature warden acts.
+        /// A missing keyword silently falls back to P.R.I.S.M.'s voice in play, so
+        /// only a def-level audit like this ever catches one.
+        /// </summary>
+        private static bool PersonaSpeechCoverage()
+        {
+            bool ok = true;
+            string[] roots =
+            {
+                "announce_threatbig", "announce_threatsmall", "announce_negative",
+                "announce_lowfuel", "bark",
+            };
+            foreach (HoloPersonaDef persona in DefDatabase<HoloPersonaDef>.AllDefsListForReading)
+            {
+                if (persona.speechPrefix.NullOrEmpty())
+                {
+                    continue;
+                }
+                foreach (string root in roots)
+                {
+                    string keyword = persona.speechPrefix + "_" + root;
+                    if (PrismSpeech.ResolveLine(keyword).NullOrEmpty())
+                    {
+                        Log.Message("[HoloAI SelfTest] missing/unresolvable speech keyword: " + keyword);
+                        ok = false;
+                    }
+                }
+            }
+            foreach (string keyword in new[]
+                { "ixia_recruit", "ixia_convert", "ixia_suppress", "ixia_feed", "ixia_prisonbreak" })
+            {
+                if (PrismSpeech.ResolveLine(keyword).NullOrEmpty())
+                {
+                    Log.Message("[HoloAI SelfTest] missing/unresolvable speech keyword: " + keyword);
+                    ok = false;
+                }
+            }
+            return ok;
         }
 
         /// <summary>
