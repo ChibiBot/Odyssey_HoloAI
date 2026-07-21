@@ -6,18 +6,19 @@
   <supportedVersions>
     <li>1.6</li>
   </supportedVersions>
-  <description>Your gravship comes alive. Adds the HoloCore, a gravship facility housing a shipboard AI personified as a holographic avatar who roams your ship, chats with the crew, and keeps watch over your voyage.
+  <description>Your gravship comes alive. Adds the HoloCore, a gravship facility housing a shipboard AI personified as a holographic avatar who roams your decks, chats with the crew, and keeps watch over your voyage — announcing threats and ship status in her own voice, and surviving launch and landing safe inside her core.
 
-Default persona: P.R.I.S.M. (Photonic Response Intelligence System Matrix).
+Default persona: P.R.I.S.M. (Photonic Response Intelligence System Matrix) — calm, warm, quietly devoted. When a crewmember nears their breaking point, she finds them and simply listens.
 
-Features:
-- HoloCore gravship facility, linked to your grav engine
-- A roaming, intangible holographic avatar bound to your ship
-- Crew interactions and mood boosts
-- Personality-flavored alerts and announcements
-- Ambient holographic charm
+Persona matrices, sold by exotic goods traders, install like research discs: a colonist carries one to the core, the matrix is consumed, and that persona joins the core's permanent archive — switch between archived personas any time, instantly. Each has her own voice, look, and signature ability:
 
-Requires the Odyssey expansion and Harmony.</description>
+- V.E.S.T.A., hearth-keeper: the ship feels like home; tucks sleeping crew in on her night rounds.
+- H.E.R.M.E.S., courier: everyone aboard moves faster; scrubs the decks herself, under audible protest.
+- A.T.H.E.N.A., scholar: research accelerates; idle crew get gathered into skill-teaching seminars that count as recreation.
+- A.C.E.S.O., medic: cleaner, faster medical work; answers emergencies in person when no doctor is coming.
+- I.X.I.A., the Crimson Warden of the Thousand-Locked Gate: runs the brig herself — recruiting, converting, suppressing, and hand-feeding prisoners — while prison breaks grow four times rarer. Maximally chuuni.
+
+Requires the Odyssey expansion and Harmony. Ideology additionally enables slave handling, prisoner conversion, and the full avatar styling dialog; everything else works without it.</description>
   <modDependencies>
     <li>
       <packageId>brrainz.harmony</packageId>

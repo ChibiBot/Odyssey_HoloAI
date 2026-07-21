@@ -7,6 +7,9 @@ Source/**/obj/
 # Decompile scratch (dev aid, never shipped)
 Decompiled/
 
+# Packaged mod output (Source/Build/package.sh)
+dist/
+
 # Editor/OS noise
 *.swp
 .DS_Store
