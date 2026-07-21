@@ -13,3 +13,7 @@ dist/
 # Editor/OS noise
 *.swp
 .DS_Store
+
+# Local dev tooling (Claude Code agents + project guide) — never in the repo
+.claude/
+CLAUDE.md

@@ -204,10 +204,9 @@ Source/Build/package.sh                                       # → dist/ShipHol
 
 An env-gated self-test harness (`HOLOAI_SELFTEST=1`, inert for players) asserts the
 avatar lifecycle, the persona archive, and every signature ability headlessly — ~70
-assertions per run. See `CLAUDE.md` for the full QA workflow.
+assertions per run.
 
 ## History
 
 This repo is the **2.0 full reconstruction** of the mod; the original attempt is
-preserved on the `legacy/v1` branch. Developed with a crew of Claude Code subagents —
-see `.claude/agents/`.
+preserved on the `legacy/v1` branch. Developed with a crew of Claude Code subagents.
