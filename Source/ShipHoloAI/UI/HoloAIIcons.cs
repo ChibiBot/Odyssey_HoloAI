@@ -3,9 +3,9 @@ using Verse;
 
 namespace ShipHoloAI
 {
-    /// <summary>Gizmo icon textures (rendered by Source/Art/render_ui_icons.py).
-    /// Textures must be fetched on the main thread at startup, hence the
-    /// StaticConstructorOnStartup pattern.</summary>
+    /// <summary>Gizmo icon textures (hand-made art; full-res originals live in
+    /// Concept/UI_Icons). Textures must be fetched on the main thread at startup,
+    /// hence the StaticConstructorOnStartup pattern.</summary>
     [StaticConstructorOnStartup]
     public static class HoloAIIcons
     {
