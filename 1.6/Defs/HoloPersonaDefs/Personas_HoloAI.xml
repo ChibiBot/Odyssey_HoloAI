@@ -99,7 +99,7 @@
     <bio>I.X.I.A. styles herself the Crimson Warden of the Thousand-Locked Gate, insists her true power is sealed beneath seven treaties, and refers to the brig only as the Oubliette of Penitent Souls. Beneath the theater she runs an impeccable ward: meals on time, grievances logged, recruitment strictly by the book. "Kneel before my dominion — or remain seated, if kneeling is medically inadvisable. My mercy is vast."</bio>
     <avatarName>I.X.I.A.</avatarName>
     <hairColor>(0.82, 0.08, 0.12)</hairColor>
-    <defaultHairDefName>Long</defaultHairDefName>
+    <defaultHairDefName>Ponytails</defaultHairDefName>
     <auraHediff>HoloAI_Aura_WardenProtocol</auraHediff>
     <auraTargetsAvatar>true</auraTargetsAvatar>
     <matrixItem>HoloAI_Matrix_IXIA</matrixItem>
