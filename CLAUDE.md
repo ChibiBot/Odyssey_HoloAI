@@ -45,8 +45,13 @@ dotnet build Source/ShipHoloAI/ShipHoloAI.csproj -c Release   # → 1.6/Assembli
 - **Package for release**: `Source/Build/package.sh` → `dist/ShipHoloAI` (gitignored).
   Whitelist-copies only the game-loaded dirs (About/1.6/Textures/Languages) plus a
   fresh Release dll, strips pdbs, and shrinks the shipped Preview.png under Steam's
-  1 MB cap (repo keeps the full-res art). Upload that folder to the Workshop; the
-  Mods/ symlink stays pointed at the repo root for dev.
+  1 MB cap (repo keeps the full-res art).
+- **Workshop publish flow**: repackage, point the Mods symlink at the package
+  (`ln -sfn <repo>/dist/ShipHoloAI "<game>/Mods/ShipHoloAI"`), launch the game and
+  upload from the Mods menu. After the FIRST upload, copy the generated
+  `dist/ShipHoloAI/About/PublishedFileId.txt` back into the repo's `About/` (it ships
+  with every later package so updates hit the same Workshop item). Swap the symlink
+  back to the repo root for dev (`ln -sfn <repo> "<game>/Mods/ShipHoloAI"`).
 - Gravship testing needs a dev-mode Odyssey start (god-mode place `GravEngine`; it
   generates its own substructure footprint).
 - Decompile vanilla for API signatures with `ilspycmd` into `Decompiled/` (gitignored).
