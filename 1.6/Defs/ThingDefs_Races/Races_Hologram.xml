@@ -13,9 +13,11 @@
       <MoveSpeed>4.6</MoveSpeed>
       <!-- A.C.E.S.O. emergency tending: without this she'd resolve MedicalTendQuality
            at 1.0 (SkillNeed_BaseBonus returns 1 for a skill-less pawn) = a Medicine-8
-           doctor. 0.75 x NoMedicinePotency 0.3 = 0.225 tend quality — a bare-handed
-           Medicine-5 medic, strictly worse than any real doctor with medicine. Same
-           parity trick as I.X.I.A.'s WardenProtocol suppression calibration. -->
+           doctor. Her tends consume a conjured herbal-grade dose (see
+           JobDriver_HoloMedic.FireEmergencyTend): 0.75 x herbal potency 0.60 = 0.45
+           tend quality — a competent field medic, still strictly worse than a real
+           doctor with industrial medicine. Same parity trick as I.X.I.A.'s
+           WardenProtocol suppression calibration. -->
       <MedicalTendQuality>0.75</MedicalTendQuality>
       <MedicalTendSpeed>1.0</MedicalTendSpeed>
       <MarketValue>0</MarketValue>

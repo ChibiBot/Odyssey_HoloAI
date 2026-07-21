@@ -7,21 +7,20 @@ namespace ShipHoloAI
     /// <summary>
     /// A.C.E.S.O.'s signature: emergency stabilization. When a colonist on the ship
     /// is downed or bleeding, needs tending, and no doctor has claimed them, she
-    /// responds herself — bare-handed, at calibrated Medicine-5 quality (see the
-    /// MedicalTendQuality statBase on the race def), strictly worse than any real
-    /// doctor with medicine. Global cooldown lives on the avatar (scribed) and is
-    /// only consumed when a tend actually fires.
+    /// responds herself — at herbal-medicine-grade quality (a conjured photonic dose,
+    /// see JobDriver_HoloMedic.FireEmergencyTend) and with no cooldown: an emergency
+    /// is an emergency, and she answers every one. Still strictly worse than a real
+    /// doctor with industrial medicine, and she yields the instant one claims the
+    /// patient.
     /// </summary>
     public class JobGiver_HoloMedic : ThinkNode_JobGiver
     {
-        internal const int EmergencyCooldownTicks = 1250;
         private const float MinBleedRate = 0.1f;
 
         protected override Job TryGiveJob(Pawn pawn)
         {
             if (!(pawn is Pawn_HoloAvatar avatar)
-                || avatar.holoCore?.ActivePersona != HoloAI_DefOf.HoloAI_Persona_ACESO
-                || Find.TickManager.TicksGame < avatar.nextEmergencyTendTick)
+                || avatar.holoCore?.ActivePersona != HoloAI_DefOf.HoloAI_Persona_ACESO)
             {
                 return null;
             }

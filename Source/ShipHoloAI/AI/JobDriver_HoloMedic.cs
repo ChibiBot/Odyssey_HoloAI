@@ -58,17 +58,21 @@ namespace ShipHoloAI
             yield return fire;
         }
 
-        /// <summary>Static so the self-test can assert the effect directly.</summary>
+        /// <summary>Static so the self-test can assert the effect directly.
+        /// She conjures a photonic dose of herbal-grade medicine and DoTend consumes
+        /// it like the real thing — tend quality lands at herbal level (0.75 race
+        /// statBase x 0.60 herbal potency = 0.45 base) instead of the bare-handed
+        /// 0.3-potency floor that let patients bleed out under her care.</summary>
         internal static void FireEmergencyTend(Pawn avatar, Pawn patient)
         {
-            TendUtility.DoTend(avatar, patient, null);
+            Medicine photonicDose = (Medicine)ThingMaker.MakeThing(ThingDefOf.MedicineHerbal);
+            TendUtility.DoTend(avatar, patient, photonicDose);
+            if (!photonicDose.Destroyed)
+            {
+                photonicDose.Destroy();
+            }
             FleckMaker.ThrowLightningGlow(patient.DrawPos, patient.Map, 0.6f);
             PrismSpeech.Say(patient.Map, "aceso_emergency");
-            if (avatar is Pawn_HoloAvatar holo)
-            {
-                holo.nextEmergencyTendTick =
-                    Find.TickManager.TicksGame + JobGiver_HoloMedic.EmergencyCooldownTicks;
-            }
         }
     }
 }

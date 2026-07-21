@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
+using UnityEngine;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
@@ -428,16 +429,22 @@ namespace ShipHoloAI
             }
             try
             {
+                Color colorBefore = avatar.HoloHairColor;
                 avatar.AttachStyleTrackers();
                 _ = new Dialog_HoloStyling(avatar);
                 avatar.DetachStyleTrackers();
                 Check("styling dialog constructs and trackers detach",
                     avatar.story == null && avatar.style == null);
+                // Regression: attach/detach with no user picks (= opening the dialog
+                // and hitting cancel) must not strip the persona hair color.
+                Check("styling round-trip preserves hair color",
+                    avatar.HoloHairColor == colorBefore);
             }
             catch (System.Exception e)
             {
                 Log.Message("[HoloAI SelfTest] styling dialog threw: " + e);
                 Check("styling dialog constructs and trackers detach", pass: false);
+                Check("styling round-trip preserves hair color", pass: false);
             }
         }
 
@@ -1071,12 +1078,16 @@ namespace ShipHoloAI
                     break;
                 }
             }
-            // 0.75 statBase x 0.3 no-medicine potency = 0.225 base (+-0.25 random
-            // swing, clamped >= 0) — anything above 0.5 means the calibration broke.
+            // 0.75 statBase x 0.60 herbal potency = 0.45 base (+-0.25 random swing)
+            // — below 0.2 means the conjured dose regressed to bare hands, above
+            // 0.75 means the calibration broke upward.
             Check("emergency tend applied at calibrated quality",
-                tended && quality >= 0f && quality <= 0.5f);
-            Check("emergency tend set avatar cooldown",
-                core.Avatar.nextEmergencyTendTick > Find.TickManager.TicksGame);
+                tended && quality >= 0.2f && quality <= 0.75f);
+            // No cooldown: wound her again and the giver must answer immediately.
+            testColonist.TakeDamage(new DamageInfo(DamageDefOf.Cut, 8f));
+            ThinkResult again = new JobGiver_HoloMedic().TryIssueJobPackage(core.Avatar, default(JobIssueParams));
+            Check("emergency tend has no cooldown (giver re-fires immediately)",
+                again.Job != null && again.Job.def == HoloAI_DefOf.HoloAI_EmergencyTend);
             Log.Message("[HoloAI SelfTest] emergency tend quality: " + quality);
         }
 
