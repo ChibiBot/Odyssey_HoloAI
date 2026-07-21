@@ -785,6 +785,42 @@ namespace ShipHoloAI
             }
             Check("JobGiver_HoloWarden returns null once the slave is sated",
                 giver.TryIssueJobPackage(core.Avatar, default(JobIssueParams)).Job == null);
+
+            TestWardenFeedDowned(giver);
+        }
+
+        /// <summary>
+        /// Down the (sated) slave on the floor of her quarters and starve her, with a
+        /// meal stack planted on the ship's substructure: the giver must return the
+        /// hand-feed job (downed-out-of-bed is exactly the case vanilla's in-a-bed
+        /// feed gates exclude and ours must cover), and the driver's
+        /// materialize-and-feed must actually raise her food need.
+        /// </summary>
+        private void TestWardenFeedDowned(JobGiver_HoloWarden giver)
+        {
+            HealthUtility.DamageUntilDowned(wardenTestSlave, allowBleedingWounds: false);
+            if (!wardenTestSlave.Downed || wardenTestSlave.Dead || wardenTestSlave.needs?.food == null)
+            {
+                Check("JobGiver_HoloWarden hand-feeds a downed slave", pass: false);
+                Check("materialize-and-feed raises the patient's food need", pass: false);
+                return;
+            }
+            wardenTestSlave.needs.food.CurLevel = 0f;
+            Thing meal = ThingMaker.MakeThing(ThingDefOf.MealSimple);
+            meal.stackCount = 5;
+            GenPlace.TryPlaceThing(meal, siteCenter + new IntVec3(-3, 0, -3),
+                wardenTestSlave.Map, ThingPlaceMode.Near, out Thing placedMeal);
+
+            ThinkResult due = giver.TryIssueJobPackage(core.Avatar, default(JobIssueParams));
+            Check("JobGiver_HoloWarden hand-feeds a downed slave",
+                due.Job != null && due.Job.def == HoloAI_DefOf.HoloAI_WardenFeed
+                && due.Job.GetTarget(TargetIndex.A).Thing == wardenTestSlave);
+
+            float foodBefore = wardenTestSlave.needs.food.CurLevel;
+            bool fed = placedMeal != null
+                && JobDriver_HoloWardenFeed.MaterializeAndFeed(core.Avatar, wardenTestSlave, placedMeal);
+            Check("materialize-and-feed raises the patient's food need",
+                fed && wardenTestSlave.needs.food.CurLevel > foodBefore);
         }
 
         /// <summary>Direct persona swap used between ability tests (the job-driven

@@ -27,7 +27,13 @@ namespace ShipHoloAI
                 return null;
             }
 
-            // A hungry prisoner outranks recruitment/suppression — feed first.
+            // A charge who cannot feed themself outranks everything, then a hungry
+            // prisoner who can — interactions wait until the brig is fed.
+            Job feedJob = TryGiveFeedPatientJob(avatar);
+            if (feedJob != null)
+            {
+                return feedJob;
+            }
             Job foodJob = TryGiveFoodDeliveryJob(avatar);
             if (foodJob != null)
             {
@@ -36,6 +42,53 @@ namespace ShipHoloAI
 
             Pawn target = FindDueTarget(avatar);
             return target == null ? null : JobMaker.MakeJob(HoloAI_DefOf.HoloAI_WardenInteract, target);
+        }
+
+        /// <summary>
+        /// Hand-feeding for prisoners and slaves who cannot feed themselves: vanilla's
+        /// warden-feed/feed-patient targets (in a bed, needing medical rest), plus
+        /// downed charges lying out of bed — a human warden would rescue them to one
+        /// first, which a hologram cannot, so she feeds them where they lie. The
+        /// pawn-state gates live in JobDriver_HoloWardenFeed.StillNeedsFeeding so the
+        /// driver re-validates the same conditions every tick. Same ship-stores rule
+        /// as delivery: the food source must sit on the ship's own substructure.
+        /// </summary>
+        private static Job TryGiveFeedPatientJob(Pawn_HoloAvatar avatar)
+        {
+            foreach (Pawn patient in avatar.Map.mapPawns.SlavesAndPrisonersOfColonySpawned)
+            {
+                if (patient.InAggroMentalState || patient.IsForbidden(avatar)
+                    || patient.IsFormingCaravan()
+                    || !JobDriver_HoloWardenFeed.StillNeedsFeeding(patient)
+                    || !avatar.CanReach(patient, PathEndMode.Touch, Danger.None))
+                {
+                    continue;
+                }
+                FoodPolicy restriction = patient.foodRestriction?.GetCurrentRespectedRestriction(avatar);
+                if (restriction != null && restriction.filter.AllowedDefCount == 0)
+                {
+                    continue;
+                }
+                if (!FoodUtility.TryFindBestFoodSourceFor(avatar, patient,
+                        patient.needs.food.CurCategory == HungerCategory.Starving,
+                        out Thing foodSource, out ThingDef foodDef,
+                        canRefillDispenser: false, canUseInventory: false, canUsePackAnimalInventory: false,
+                        allowForbidden: false, allowCorpse: false, allowSociallyImproper: false,
+                        allowHarvest: false, forceScanWholeMap: false, ignoreReservations: true,
+                        calculateWantedStackCount: true))
+                {
+                    continue;
+                }
+                if (avatar.Map.terrainGrid.FoundationAt(foodSource.PositionHeld)?.IsSubstructure != true)
+                {
+                    continue;
+                }
+                float nutrition = FoodUtility.GetNutrition(patient, foodSource, foodDef);
+                Job job = JobMaker.MakeJob(HoloAI_DefOf.HoloAI_WardenFeed, patient, foodSource);
+                job.count = FoodUtility.WillIngestStackCountOf(patient, foodDef, nutrition);
+                return job;
+            }
+            return null;
         }
 
         /// <summary>
