@@ -209,7 +209,7 @@ namespace ShipHoloAI
             {
                 defaultLabel = "HoloAI_ToggleProjection".Translate(),
                 defaultDesc = "HoloAI_ToggleProjectionDesc".Translate(),
-                icon = def.uiIcon,
+                icon = HoloAIIcons.ToggleProjection,
                 isActive = () => projectionEnabled,
                 toggleAction = () => projectionEnabled = !projectionEnabled,
             };
@@ -218,7 +218,7 @@ namespace ShipHoloAI
             {
                 defaultLabel = "HoloAI_InstallPersonaGizmo".Translate(),
                 defaultDesc = "HoloAI_InstallPersonaGizmoDesc".Translate(ActivePersona.label),
-                icon = def.uiIcon,
+                icon = HoloAIIcons.SwitchPersona,
                 action = OpenInstallMenu,
             };
 
@@ -228,7 +228,7 @@ namespace ShipHoloAI
                 {
                     defaultLabel = "HoloAI_Summon".Translate(),
                     defaultDesc = "HoloAI_SummonDesc".Translate(),
-                    icon = def.uiIcon,
+                    icon = HoloAIIcons.Summon,
                     targetingParams = new TargetingParameters
                     {
                         canTargetLocations = true,

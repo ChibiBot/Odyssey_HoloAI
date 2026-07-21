@@ -245,7 +245,7 @@ namespace ShipHoloAI
                 {
                     defaultLabel = "HoloAI_Restyle".Translate(),
                     defaultDesc = "HoloAI_RestyleDesc".Translate(),
-                    icon = holoCore?.def.uiIcon,
+                    icon = HoloAIIcons.Restyle,
                     action = OpenStylingUI,
                 };
             }
@@ -255,7 +255,7 @@ namespace ShipHoloAI
                 {
                     defaultLabel = "HoloAI_Hairstyle".Translate() + ": " + (CurrentHairDef?.LabelCap ?? "-"),
                     defaultDesc = "HoloAI_HairstyleDesc".Translate(),
-                    icon = holoCore?.def.uiIcon,
+                    icon = HoloAIIcons.Hairstyle,
                     action = CycleHairstyle,
                 };
             }
