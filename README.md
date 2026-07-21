@@ -42,6 +42,10 @@ color-tinted overhead), her own look, her own lore, and a signature ability she 
 
 ### P.R.I.S.M. — the companion <em>(factory default)</em>
 
+<table><tr>
+<td width="200"><img src="Concept/prism_concept_small.png" width="190" alt="P.R.I.S.M. projected"/></td>
+<td>
+
 > *"I'd be happy to help with that. Truthfully, I'd be happy to help with anything."*
 
 **Photonic Response Intelligence System Matrix** · Meridian Orbital Shipwrights, Standard
@@ -55,6 +59,8 @@ the captain, twice.
   in person and simply listens. The chat lands as a strong comfort memory.
 - Chats with idle crew, tells them the hull integrity report like a lullaby, and counts
   the stars between power cycles. (Still infinite.)
+
+</td></tr></table>
 
 ---
 
