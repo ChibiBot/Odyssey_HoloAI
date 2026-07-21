@@ -13,9 +13,11 @@ namespace ShipHoloAI
     /// blurb, the persona's own bio, and the stat buffs read generically off her
     /// <see cref="HoloPersonaDef.auraHediff"/> stages — new personas need no UI work.
     ///
-    /// Row states: ACTIVE (resident now), MATRIX ABOARD (click to install via the
-    /// usual hauling job), CORE-RESIDENT (P.R.I.S.M.: matrix-free, click reverts
-    /// instantly), MATRIX NOT DETECTED (dimmed; doubles as a trader shopping list).
+    /// Row states: ACTIVE (resident now), IN ARCHIVE / CORE-RESIDENT (installed or
+    /// built-in — click switches instantly, no matrix needed), MATRIX ABOARD (a
+    /// matrix is on the map; click sends a colonist to install it, consuming the
+    /// matrix and archiving the persona forever), MATRIX NOT DETECTED (dimmed;
+    /// doubles as a trader shopping list).
     /// </summary>
     public class Dialog_PersonaSwitcher : Window
     {
@@ -55,7 +57,7 @@ namespace ShipHoloAI
         private static readonly Color AbilityFlavorColor = new Color(0.85f, 0.76f, 0.55f);
         private static readonly Color DevStatColor = new Color(0.55f, 0.55f, 0.58f);
 
-        private enum RowStatus { Active, MatrixAboard, CoreResident, Missing }
+        private enum RowStatus { Active, Archived, MatrixAboard, Missing }
 
         private readonly Building_HoloCore core;
         private Vector2 scrollPosition;
@@ -134,9 +136,9 @@ namespace ShipHoloAI
             {
                 return RowStatus.Active;
             }
-            if (persona.matrixItem == null)
+            if (core.IsUnlocked(persona))
             {
-                return RowStatus.CoreResident;
+                return RowStatus.Archived;
             }
             return matrix != null ? RowStatus.MatrixAboard : RowStatus.Missing;
         }
@@ -144,7 +146,7 @@ namespace ShipHoloAI
         private void DrawRow(Rect rowRect, HoloPersonaDef persona, Thing matrix, RowStatus status,
             List<(string text, Color color)> statLines, Rect visibleRect)
         {
-            bool selectable = status == RowStatus.MatrixAboard || status == RowStatus.CoreResident;
+            bool selectable = status == RowStatus.MatrixAboard || status == RowStatus.Archived;
             if (selectable)
             {
                 Widgets.DrawHighlightIfMouseover(rowRect);
@@ -167,7 +169,7 @@ namespace ShipHoloAI
             float nameHeight = Text.CalcHeight(name, textWidth);
             Widgets.Label(new Rect(textX, y, textWidth, nameHeight), name);
             Text.Font = GameFont.Tiny;
-            (string statusText, Color statusColor) = StatusChip(status);
+            (string statusText, Color statusColor) = StatusChip(status, persona);
             Text.Anchor = TextAnchor.MiddleRight;
             GUI.color = statusColor;
             Widgets.Label(new Rect(textX, y, textWidth, nameHeight), statusText);
@@ -201,14 +203,14 @@ namespace ShipHoloAI
             }
             else if (selectable)
             {
-                TooltipHandler.TipRegion(rowRect, status == RowStatus.CoreResident
-                    ? "HoloAI_PersonaRestoreTip".Translate(persona.label)
+                TooltipHandler.TipRegion(rowRect, status == RowStatus.Archived
+                    ? "HoloAI_PersonaActivateTip".Translate(persona.label)
                     : "HoloAI_PersonaInstallTip".Translate(persona.label));
                 if (Widgets.ButtonInvisible(rowRect))
                 {
-                    if (status == RowStatus.CoreResident)
+                    if (status == RowStatus.Archived)
                     {
-                        core.RestoreDefaultPersona();
+                        core.ActivatePersona(persona);
                     }
                     else
                     {
@@ -275,7 +277,7 @@ namespace ShipHoloAI
             GenUI.DrawTextureWithMaterial(clipped, mat.mainTexture, mat, texCoords);
         }
 
-        private static (string, Color) StatusChip(RowStatus status)
+        private static (string, Color) StatusChip(RowStatus status, HoloPersonaDef persona)
         {
             switch (status)
             {
@@ -283,8 +285,10 @@ namespace ShipHoloAI
                     return ("HoloAI_PersonaStatusActive".Translate(), StatusActiveColor);
                 case RowStatus.MatrixAboard:
                     return ("HoloAI_PersonaStatusReady".Translate(), StatusReadyColor);
-                case RowStatus.CoreResident:
-                    return ("HoloAI_PersonaStatusBuiltIn".Translate(), StatusReadyColor);
+                case RowStatus.Archived:
+                    return (persona.matrixItem == null
+                        ? "HoloAI_PersonaStatusBuiltIn".Translate()
+                        : "HoloAI_PersonaStatusArchived".Translate(), StatusReadyColor);
                 default:
                     return ("HoloAI_PersonaStatusMissing".Translate(), StatusMissingColor);
             }

@@ -525,7 +525,8 @@ namespace ShipHoloAI
             Check("aura hediff applied to crew on ship", auraSeen);
             Check("aura grants move speed", auraSeen && speedAfter > speedBefore);
 
-            // Swap back to a second persona to verify ejection of the old matrix.
+            // Install a second persona: the archive model consumes the new matrix,
+            // ejects nothing, and keeps the outgoing persona unlocked.
             ThingDef vestaDef = DefDatabase<ThingDef>.GetNamedSilentFail("HoloAI_Matrix_VESTA");
             Thing vesta = GenSpawn.Spawn(ThingMaker.MakeThing(vestaDef),
                 siteCenter + new IntVec3(-3, 0, 2), map);
@@ -540,27 +541,34 @@ namespace ShipHoloAI
                     break;
                 }
             }
-            Check("previous persona matrix ejected on swap", ejected);
+            Check("no matrix ejected on swap (archive model)", vesta.Destroyed && !ejected);
+            Check("outgoing persona stays archived",
+                core.IsUnlocked(HoloAI_DefOf.HoloAI_Persona_HERMES));
+
+            // The archive's whole point: switch back to H.E.R.M.E.S. with no matrix
+            // anywhere on the map.
+            core.ActivatePersona(HoloAI_DefOf.HoloAI_Persona_HERMES);
+            Check("archived persona reactivates without a matrix",
+                core.ActivePersona == HoloAI_DefOf.HoloAI_Persona_HERMES);
         }
 
         /// <summary>
-        /// Opens the new persona-switcher dialog with real installable matrices on the
-        /// map (the H.E.R.M.E.S. matrix ejected by TestPersonaAura's swap-back is sitting
-        /// beside the core) and closes it a few ticks later. Any exception thrown while
-        /// the window is constructed, laid out, or drawn surfaces in Player.log as a
-        /// stack trace with a ShipHoloAI frame — a clean run with none is the render
-        /// smoke-test signal since this harness has no way to eyeball pixels.
+        /// Opens the persona-switcher dialog with a populated archive (H.E.R.M.E.S.
+        /// and V.E.S.T.A. were both installed by earlier checkpoints) and closes it a
+        /// few ticks later. Any exception thrown while the window is constructed,
+        /// laid out, or drawn surfaces in Player.log as a stack trace with a
+        /// ShipHoloAI frame — a clean run with none is the render smoke-test signal
+        /// since this harness has no way to eyeball pixels.
         /// </summary>
         private void TestPersonaSwitcherDialogSmoke(Map map)
         {
             try
             {
-                var matrices = new System.Collections.Generic.List<Thing>(core.GetInstallableMatrices());
-                Check("dialog smoke-test has a real matrix on the map to list", matrices.Count > 0);
+                Check("dialog smoke-test has archived personas to list",
+                    core.IsUnlocked(HoloAI_DefOf.HoloAI_Persona_VESTA)
+                    && core.IsUnlocked(HoloAI_DefOf.HoloAI_Persona_HERMES));
                 Dialog_PersonaSwitcher dialog = new Dialog_PersonaSwitcher(core);
                 Find.WindowStack.Add(dialog);
-                Log.Message("[HoloAI SelfTest] persona switcher dialog opened with "
-                    + matrices.Count + " installable matrix/matrices");
                 Find.WindowStack.TryRemove(dialog, doCloseSound: false);
                 Check("persona switcher dialog constructs and closes without throwing", pass: true);
             }
@@ -1135,7 +1143,7 @@ namespace ShipHoloAI
 
         /// <summary>
         /// The RestoreDefaultPersona path (fired at 13400): P.R.I.S.M. returns without
-        /// a matrix, the outgoing persona's matrix is ejected, and her companion-triage
+        /// a matrix, the outgoing persona stays in the archive, and her companion-triage
         /// chat prefers whoever is near breaking. Also the V.E.S.T.A. tuck-in effect
         /// (fired directly — real sleep timing is too fragile for the harness) and the
         /// break-factor negative control now that I.X.I.A. is long gone.
@@ -1146,16 +1154,8 @@ namespace ShipHoloAI
                 core.ActivePersona?.defName == "HoloAI_Persona_PRISM"
                 && core.Avatar != null && core.Avatar.Spawned
                 && core.Avatar.Name?.ToStringFull == "P.R.I.S.M.");
-            bool hermesEjected = false;
-            foreach (IntVec3 c in GenRadial.RadialCellsAround(core.Position, 6f, useCenter: true))
-            {
-                if (c.InBounds(map) && c.GetThingList(map).Any(t => t.def.defName == "HoloAI_Matrix_HERMES"))
-                {
-                    hermesEjected = true;
-                    break;
-                }
-            }
-            Check("restore ejected the outgoing persona's matrix", hermesEjected);
+            Check("restore keeps the outgoing persona archived",
+                core.IsUnlocked(HoloAI_DefOf.HoloAI_Persona_HERMES));
             Check("break MTB factor back to x1 without I.X.I.A.",
                 testColonist == null || !testColonist.Spawned
                 || Patch_PrisonBreakMtb.BreakMtbFactorFor(testColonist) == 1f);
