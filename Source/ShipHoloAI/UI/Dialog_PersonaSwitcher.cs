@@ -52,6 +52,8 @@ namespace ShipHoloAI
         private static readonly Color StatusReadyColor = new Color(0.05f, 0.82f, 1f);
         private static readonly Color StatusMissingColor = new Color(0.55f, 0.55f, 0.58f);
         private static readonly Color MissingOverlayColor = new Color(0.01f, 0.02f, 0.04f, 0.55f);
+        private static readonly Color AbilityFlavorColor = new Color(0.85f, 0.76f, 0.55f);
+        private static readonly Color DevStatColor = new Color(0.55f, 0.55f, 0.58f);
 
         private enum RowStatus { Active, MatrixAboard, CoreResident, Missing }
 
@@ -339,19 +341,42 @@ namespace ShipHoloAI
         }
 
         /// <summary>
-        /// Reads every stat offset/factor off the aura hediff's stages and formats
-        /// them as "Stat Label +value" / "Stat Label x1.15", colored by whether the
-        /// modifier helps (green) or hurts (red). Works for any persona's aura,
-        /// present or future, without per-persona code.
+        /// The row's ability block: the persona's signature-ability flavor lines
+        /// first (catalog gold), then every stat offset/factor read generically off
+        /// the aura hediff's stages as "Stat Label +value" / "Stat Label x1.15",
+        /// colored by whether the modifier helps (green) or hurts (red). Works for
+        /// any persona, present or future, without per-persona code.
+        ///
+        /// Avatar-targeted auras (auraTargetsAvatar, e.g. I.X.I.A.) carry internal
+        /// calibration constants, not crew effects — dumped raw they read as
+        /// shipwide penalties ("Suppression power -72%"), so the numbers stay
+        /// obfuscated behind the flavor lines unless dev mode is on, where they
+        /// show grayed with an "(avatar-only calibration)" tag.
         /// </summary>
         private static List<(string text, Color color)> BuildStatLines(HoloPersonaDef persona)
         {
             var lines = new List<(string, Color)>();
+            if (persona.abilityFlavor != null)
+            {
+                foreach (string flavor in persona.abilityFlavor)
+                {
+                    if (!flavor.NullOrEmpty())
+                    {
+                        lines.Add((flavor, AbilityFlavorColor));
+                    }
+                }
+            }
             HediffDef aura = persona.auraHediff;
             if (aura?.stages == null)
             {
                 return lines;
             }
+            bool avatarOnly = persona.auraTargetsAvatar;
+            if (avatarOnly && !Prefs.DevMode)
+            {
+                return lines;
+            }
+            string devSuffix = avatarOnly ? " (avatar-only calibration)" : string.Empty;
             foreach (HediffStage stage in aura.stages)
             {
                 if (stage.statOffsets != null)
@@ -362,8 +387,10 @@ namespace ShipHoloAI
                         {
                             continue;
                         }
-                        Color color = modifier.value >= 0f ? PositiveColor : NegativeColor;
-                        lines.Add((modifier.stat.LabelCap + " " + modifier.ValueToStringAsOffset, color));
+                        Color color = avatarOnly ? DevStatColor
+                            : modifier.value >= 0f ? PositiveColor : NegativeColor;
+                        lines.Add((modifier.stat.LabelCap + " "
+                            + modifier.ValueToStringAsOffset + devSuffix, color));
                     }
                 }
                 if (stage.statFactors != null)
@@ -374,8 +401,10 @@ namespace ShipHoloAI
                         {
                             continue;
                         }
-                        Color color = modifier.value >= 1f ? PositiveColor : NegativeColor;
-                        lines.Add((modifier.stat.LabelCap + " " + modifier.ToStringAsFactor, color));
+                        Color color = avatarOnly ? DevStatColor
+                            : modifier.value >= 1f ? PositiveColor : NegativeColor;
+                        lines.Add((modifier.stat.LabelCap + " "
+                            + modifier.ToStringAsFactor + devSuffix, color));
                     }
                 }
             }

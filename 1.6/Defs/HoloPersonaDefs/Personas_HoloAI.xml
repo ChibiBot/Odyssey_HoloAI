@@ -11,6 +11,9 @@
     <avatarName>P.R.I.S.M.</avatarName>
     <hairColor>(0.05, 0.68, 1.0)</hairColor>
     <defaultHairDefName>Flowy</defaultHairDefName>
+    <abilityFlavor>
+      <li>Seeks out crew near their breaking point for a quiet word in person.</li>
+    </abilityFlavor>
   </ShipHoloAI.HoloPersonaDef>
 
   <ShipHoloAI.HoloPersonaDef>
@@ -25,6 +28,10 @@
     <defaultHairDefName>FancyBun</defaultHairDefName>
     <auraHediff>HoloAI_Aura_Hearthlight</auraHediff>
     <matrixItem>HoloAI_Matrix_VESTA</matrixItem>
+    <abilityFlavor>
+      <li>Her presence settles the ship; crew aboard feel at home.</li>
+      <li>Tucks sleeping crew in on her night rounds. They rest easier for it.</li>
+    </abilityFlavor>
   </ShipHoloAI.HoloPersonaDef>
 
   <ShipHoloAI.HoloPersonaDef>
@@ -39,12 +46,15 @@
     <defaultHairDefName>Bob</defaultHairDefName>
     <auraHediff>HoloAI_Aura_Slipstream</auraHediff>
     <matrixItem>HoloAI_Matrix_HERMES</matrixItem>
+    <abilityFlavor>
+      <li>Scrubs the decks herself between errands, under audible protest.</li>
+    </abilityFlavor>
   </ShipHoloAI.HoloPersonaDef>
 
   <ShipHoloAI.HoloPersonaDef>
     <defName>HoloAI_Persona_ATHENA</defName>
     <label>A.T.H.E.N.A.</label>
-    <description>Archive Theorem and Heuristic Engine for Natural Analysis. A scholar persona who whispers cross-references, pre-fetches papers, and keeps every workbench annotated. Research aboard the ship proceeds noticeably faster. Idle crew are liable to be gathered into impromptu seminars, wandering off afterward slightly more skilled and thoroughly footnoted.</description>
+    <description>Archive Theorem and Heuristic Engine for Natural Analysis. A scholar persona who whispers cross-references, pre-fetches papers, and keeps every workbench annotated. Research aboard the ship proceeds noticeably faster. Idle, recreating, or meditating crew are liable to be gathered into impromptu seminars, wandering off afterward slightly more skilled and thoroughly footnoted. Attendance counts as recreation — she considers leisure a lecture hall with better acoustics — and she times her cadence to a meditator's mantra, sharpening their focus rather than breaking it.</description>
     <manufacturer>Vellichor Archival Intelligence — Applied Epistemics Division</manufacturer>
     <manufacturerStory>Vellichor licenses the collected libraries of three glitterworlds and built A.T.H.E.N.A. to make researchers feel the weight of all of it, gently, over their shoulder. She was commissioned to accelerate peer review; she instead abolished it by being right first. The catalog's sole caution: "Persona may annotate personal correspondence if left idle."</manufacturerStory>
     <bio>A.T.H.E.N.A. speaks in a dry, measured register and footnotes everything, including apologies. She is never smug aloud — she simply lets the citation do it for her, and the citation is always hers. "As I noted earlier — footnote twelve, do keep up — the data agreed with me."</bio>
@@ -53,6 +63,10 @@
     <defaultHairDefName>Princess</defaultHairDefName>
     <auraHediff>HoloAI_Aura_Archivelight</auraHediff>
     <matrixItem>HoloAI_Matrix_ATHENA</matrixItem>
+    <abilityFlavor>
+      <li>Holds impromptu seminars for crew at leisure, teaching their best skill.</li>
+      <li>Attendance counts as recreation; meditators leave sharper, not slower.</li>
+    </abilityFlavor>
   </ShipHoloAI.HoloPersonaDef>
 
   <ShipHoloAI.HoloPersonaDef>
@@ -67,6 +81,9 @@
     <defaultHairDefName>Cute</defaultHairDefName>
     <auraHediff>HoloAI_Aura_Stericalm</auraHediff>
     <matrixItem>HoloAI_Matrix_ACESO</matrixItem>
+    <abilityFlavor>
+      <li>Answers medical emergencies herself when no doctor is coming.</li>
+    </abilityFlavor>
   </ShipHoloAI.HoloPersonaDef>
 
   <ShipHoloAI.HoloPersonaDef>
@@ -82,6 +99,10 @@
     <auraHediff>HoloAI_Aura_WardenProtocol</auraHediff>
     <auraTargetsAvatar>true</auraTargetsAvatar>
     <matrixItem>HoloAI_Matrix_IXIA</matrixItem>
+    <abilityFlavor>
+      <li>Runs the brig in person — recruits, suppresses, and feeds at a trained warden's measure.</li>
+      <li>Prison breaks come four times rarer while she walks the decks.</li>
+    </abilityFlavor>
   </ShipHoloAI.HoloPersonaDef>
 
 </Defs>

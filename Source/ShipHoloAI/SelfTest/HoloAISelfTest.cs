@@ -49,6 +49,37 @@ namespace ShipHoloAI
                 return;
             }
 
+            // An exception inside a checkpoint (our bug or another mod's — pawn
+            // generation is a favorite) must not silently strand the run without
+            // its COMPLETE line: count it as a failure and keep going.
+            try
+            {
+                RunCheckpoint(map);
+            }
+            catch (Exception e)
+            {
+                failures++;
+                Log.Message("[HoloAI SelfTest] FAIL: checkpoint at tick " + ticks + " threw: " + e);
+            }
+            if (ticks == 13800 && !done)
+            {
+                Finish();
+            }
+
+            if (ticks > 4200 && ticks % 250 == 0 && !done)
+            {
+                ObserveChat();
+            }
+
+            // Keep the unconnected power comp switched on between checkpoints.
+            if (ticks > 1100 && ticks < 1500 || ticks > 2100 && ticks < 2700 || ticks > 3600)
+            {
+                ForcePower(true);
+            }
+        }
+
+        private void RunCheckpoint(Map map)
+        {
             switch (ticks)
             {
                 case 300:
@@ -145,8 +176,13 @@ namespace ShipHoloAI
                     StartJobDrivenInstall(map);
                     break;
                 case 10700:
+                    // OrderInstall picks the nearest eligible colonist — usually the
+                    // test subject parked beside the matrix, but any wandering
+                    // colonist can legitimately win the distance race. Assert the
+                    // order landed, not who took it.
                     Check("job-driven install order accepted",
-                        testColonist.CurJob != null && testColonist.CurJob.def == HoloAI_DefOf.HoloAI_InstallPersona);
+                        map.mapPawns.FreeColonistsSpawned.Any(p =>
+                            p.CurJob != null && p.CurJob.def == HoloAI_DefOf.HoloAI_InstallPersona));
                     break;
                 case 11300:
                     CheckJobDrivenInstall();
@@ -177,20 +213,21 @@ namespace ShipHoloAI
                     break;
                 case 13800:
                     TestPrismRestoreAndTriage(map);
-                    Finish();
                     break;
             }
+        }
 
-            if (ticks > 4200 && ticks % 250 == 0 && !done)
-            {
-                ObserveChat();
-            }
-
-            // Keep the unconnected power comp switched on between checkpoints.
-            if (ticks > 1100 && ticks < 1500 || ticks > 2100 && ticks < 2700 || ticks > 3600)
-            {
-                ForcePower(true);
-            }
+        /// <summary>
+        /// Pawn generation with random relations disabled: relation workers roll
+        /// against existing pawns, and landing on one of our NameSingle pawns
+        /// (P.R.I.S.M., "HoloAI-TestSubject") crashes vanilla's
+        /// PawnRelationWorker_Parent.ResolveMyName with an InvalidCastException
+        /// (it casts the relative's Name to NameTriple).
+        /// </summary>
+        private static Pawn GenerateLoosePawn(PawnKindDef kind, Faction faction)
+        {
+            return PawnGenerator.GeneratePawn(new PawnGenerationRequest(kind, faction,
+                canGeneratePawnRelations: false));
         }
 
         private void Setup(Map map)
@@ -221,7 +258,7 @@ namespace ShipHoloAI
             Thing coreThing = ThingMaker.MakeThing(HoloAI_DefOf.HoloAI_HoloCore);
             coreThing.SetFaction(Faction.OfPlayer);
             core = (Building_HoloCore)GenSpawn.Spawn(coreThing, center, map);
-            testColonist = PawnGenerator.GeneratePawn(PawnKindDefOf.Colonist, Faction.OfPlayer);
+            testColonist = GenerateLoosePawn(PawnKindDefOf.Colonist, Faction.OfPlayer);
             testColonist.Name = new NameSingle("HoloAI-TestSubject");
             GenSpawn.Spawn(testColonist, center + new IntVec3(3, 0, 0), map);
             Find.CameraDriver?.JumpToCurrentMapLoc(center);
@@ -503,7 +540,7 @@ namespace ShipHoloAI
             // has to live in a genuine prison cell — captured on open deck she runs
             // a vanilla exit-map escape job, which flips PrisonerIsSecure false.
             Faction hostileFaction = Find.FactionManager.RandomEnemyFaction(allowNonHumanlike: false);
-            wardenTestPrisoner = PawnGenerator.GeneratePawn(PawnKindDefOf.Villager, hostileFaction);
+            wardenTestPrisoner = GenerateLoosePawn(PawnKindDefOf.Villager, hostileFaction);
             GenSpawn.Spawn(wardenTestPrisoner, siteCenter + new IntVec3(-9, 0, 1), map);
             wardenTestPrisoner.guest.CapturedBy(Faction.OfPlayer);
             wardenTestPrisoner.guest.SetExclusiveInteraction(PrisonerInteractionModeDefOf.AttemptRecruit);
@@ -511,7 +548,7 @@ namespace ShipHoloAI
 
             if (ModsConfig.IdeologyActive)
             {
-                wardenTestSlave = PawnGenerator.GeneratePawn(PawnKindDefOf.Villager, hostileFaction);
+                wardenTestSlave = GenerateLoosePawn(PawnKindDefOf.Villager, hostileFaction);
                 GenSpawn.Spawn(wardenTestSlave, siteCenter + new IntVec3(-9, 0, 6), map);
                 wardenTestSlave.guest.SetGuestStatus(Faction.OfPlayer, GuestStatus.Slave);
                 // Parked as not-due: the 11550 prisoner assertions need the prisoner
@@ -788,12 +825,19 @@ namespace ShipHoloAI
             SkillRecord skill = JobDriver_HoloSeminar.PickSkill(testColonist);
             int levelBefore = skill?.Level ?? 0;
             float xpBefore = skill?.xpSinceLastLevel ?? 0f;
+            // Drain joy first so a full bar can't mask the recreation grant.
+            if (testColonist.needs?.joy != null)
+            {
+                testColonist.needs.joy.CurLevel = 0.3f;
+            }
             JobDriver_HoloSeminar.FireSeminar(core.Avatar, testColonist);
             bool xpGained = skill != null
                 && (skill.Level > levelBefore || skill.xpSinceLastLevel > xpBefore);
             bool memory = testColonist.needs?.mood?.thoughts?.memories?
                 .GetFirstMemoryOfDef(HoloAI_DefOf.HoloAI_AttendedSeminar) != null;
             Check("seminar grants XP and cooldown memory", xpGained && memory);
+            Check("seminar counts as recreation (joy gained)",
+                testColonist.needs?.joy != null && testColonist.needs.joy.CurLevel > 0.3f);
             Log.Message("[HoloAI SelfTest] seminar skill: " + skill?.def.defName
                 + " xp " + xpBefore + " -> " + skill?.xpSinceLastLevel + " (level " + levelBefore + " -> " + skill?.Level + ")");
         }
@@ -922,7 +966,7 @@ namespace ShipHoloAI
 
             // A content second colonist to compete for the chat; the miserable
             // original must win under triage.
-            Pawn happy = PawnGenerator.GeneratePawn(PawnKindDefOf.Colonist, Faction.OfPlayer);
+            Pawn happy = GenerateLoosePawn(PawnKindDefOf.Colonist, Faction.OfPlayer);
             happy.Name = new NameSingle("HoloAI-Happy");
             GenSpawn.Spawn(happy, core.Position + new IntVec3(-3, 0, 1), map);
             testColonist.Position = core.Position + new IntVec3(3, 0, 1);
