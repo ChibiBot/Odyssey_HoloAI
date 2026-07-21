@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -23,6 +24,19 @@ namespace ShipHoloAI
         public string manufacturer;
         public string manufacturerStory;
         public string bio;
+
+        // Signature-ability lines for the selection screen, listed above the aura
+        // stat readout. Catalog voice, one ability per line. These also stand in
+        // for the raw numbers entirely when auraTargetsAvatar is set (see
+        // Dialog_PersonaSwitcher.BuildStatLines).
+        public List<string> abilityFlavor;
+
+        // Keyword prefix for persona-voiced speech: rulepack lines named
+        // "<prefix>_<root>" (e.g. "ixia_announce_lowfuel") override the base
+        // P.R.I.S.M. lines when this persona is active, and each root falls back
+        // to the base voice individually when unwritten — see
+        // PrismSpeech.ResolveLineFor. Null/empty = base voice only.
+        public string speechPrefix;
 
         /// <summary>
         /// True for personas whose work is done by the avatar herself rather than

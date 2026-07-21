@@ -5,9 +5,13 @@ using Verse.AI;
 namespace ShipHoloAI
 {
     /// <summary>
-    /// A.T.H.E.N.A.'s signature: impromptu seminars for crew who are idling or
-    /// recreating on the ship — never anyone working. The seminar memory doubles as
-    /// the per-colonist cooldown (3 in-game hours). XP goes through the vanilla
+    /// A.T.H.E.N.A.'s signature: impromptu seminars for crew who are idling,
+    /// recreating, or meditating on the ship (Meditate is a core joy job, so it
+    /// passes the joyKind gate) — never anyone working. She complements downtime
+    /// rather than competing with it: the student's own job is never interrupted,
+    /// and the seminar itself grants recreation (plus psyfocus for meditators) —
+    /// see JobDriver_HoloSeminar.FireSeminar. The seminar memory doubles as the
+    /// per-colonist cooldown (3 in-game hours). XP goes through the vanilla
     /// learning pipeline, so passions and the daily saturation cap all apply.
     /// </summary>
     public class JobGiver_HoloSeminar : ThinkNode_JobGiver

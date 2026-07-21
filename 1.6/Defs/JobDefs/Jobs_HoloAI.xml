@@ -29,6 +29,13 @@
   </JobDef>
 
   <JobDef>
+    <defName>HoloAI_WardenFeed</defName>
+    <driverClass>ShipHoloAI.JobDriver_HoloWardenFeed</driverClass>
+    <reportString>hand-feeding TargetA.</reportString>
+    <casualInterruptible>false</casualInterruptible>
+  </JobDef>
+
+  <JobDef>
     <defName>HoloAI_TuckIn</defName>
     <driverClass>ShipHoloAI.JobDriver_HoloTuckIn</driverClass>
     <reportString>tucking in TargetA.</reportString>

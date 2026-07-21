@@ -65,12 +65,7 @@ namespace ShipHoloAI
                 comfort ? HoloAI_DefOf.HoloAI_ComfortedByPRISM : HoloAI_DefOf.HoloAI_TalkedWithPRISM);
             if (comfort)
             {
-                string line = PrismSpeech.ResolveLine("prism_comfort");
-                if (!line.NullOrEmpty())
-                {
-                    MoteMaker.ThrowText(pawn.DrawPos + new Vector3(0f, 0f, 0.65f),
-                        pawn.Map, line, new Color(0f, 0.855f, 1f), 5f);
-                }
+                PrismSpeech.Bark(pawn, "prism_comfort");
             }
 
             avatar?.SetChatCooldown();

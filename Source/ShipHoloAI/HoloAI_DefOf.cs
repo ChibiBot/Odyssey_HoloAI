@@ -18,6 +18,7 @@ namespace ShipHoloAI
         public static JobDef HoloAI_InstallPersona;
         public static JobDef HoloAI_WardenInteract;
         public static JobDef HoloAI_WardenDeliverFood;
+        public static JobDef HoloAI_WardenFeed;
         public static JobDef HoloAI_TuckIn;
         public static JobDef HoloAI_Seminar;
         public static JobDef HoloAI_EmergencyTend;

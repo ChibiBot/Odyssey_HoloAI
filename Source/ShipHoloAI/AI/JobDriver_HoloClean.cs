@@ -61,12 +61,7 @@ namespace ShipHoloAI
             filth.Destroy();
             if (Rand.Chance(RemarkChance))
             {
-                string line = PrismSpeech.ResolveLine("hermes_clean");
-                if (!line.NullOrEmpty())
-                {
-                    MoteMaker.ThrowText(avatar.DrawPos + new Vector3(0f, 0f, 0.65f),
-                        avatar.Map, line, new Color(0f, 0.855f, 1f), 5f);
-                }
+                PrismSpeech.Bark(avatar, "hermes_clean");
             }
         }
     }

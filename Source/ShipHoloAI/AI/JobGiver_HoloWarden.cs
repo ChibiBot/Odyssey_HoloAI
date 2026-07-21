@@ -12,9 +12,10 @@ namespace ShipHoloAI
     /// vanilla's own WorkGiver_Warden_Chat.JobOnThing (recruit attempt / resistance
     /// reduction) and WorkGiver_Warden_SuppressSlave.JobOnThing (slave suppression),
     /// read straight off the target's own guest tracker/need so this stays in lockstep
-    /// with any future vanilla tuning. No cooldown of our own — JobDriver_HoloWarden
-    /// already re-validates the target every tick (FailOnMentalState/FailOnNotAwake/
-    /// IsValidTarget), and the user wants her to answer the instant it's ready.
+    /// with any future vanilla tuning. Prisoner interactions pace on vanilla's own
+    /// cooldown: ScheduledForInteraction gates here, and JobDriver_HoloWarden stamps
+    /// lastAssignedInteractTime/interactionsToday after each fired attempt — so she
+    /// answers the instant a prisoner is due but cannot chain attempts back to back.
     /// </summary>
     public class JobGiver_HoloWarden : ThinkNode_JobGiver
     {
@@ -26,7 +27,13 @@ namespace ShipHoloAI
                 return null;
             }
 
-            // A hungry prisoner outranks recruitment/suppression — feed first.
+            // A charge who cannot feed themself outranks everything, then a hungry
+            // prisoner who can — interactions wait until the brig is fed.
+            Job feedJob = TryGiveFeedPatientJob(avatar);
+            if (feedJob != null)
+            {
+                return feedJob;
+            }
             Job foodJob = TryGiveFoodDeliveryJob(avatar);
             if (foodJob != null)
             {
@@ -35,6 +42,53 @@ namespace ShipHoloAI
 
             Pawn target = FindDueTarget(avatar);
             return target == null ? null : JobMaker.MakeJob(HoloAI_DefOf.HoloAI_WardenInteract, target);
+        }
+
+        /// <summary>
+        /// Hand-feeding for prisoners and slaves who cannot feed themselves: vanilla's
+        /// warden-feed/feed-patient targets (in a bed, needing medical rest), plus
+        /// downed charges lying out of bed — a human warden would rescue them to one
+        /// first, which a hologram cannot, so she feeds them where they lie. The
+        /// pawn-state gates live in JobDriver_HoloWardenFeed.StillNeedsFeeding so the
+        /// driver re-validates the same conditions every tick. Same ship-stores rule
+        /// as delivery: the food source must sit on the ship's own substructure.
+        /// </summary>
+        private static Job TryGiveFeedPatientJob(Pawn_HoloAvatar avatar)
+        {
+            foreach (Pawn patient in avatar.Map.mapPawns.SlavesAndPrisonersOfColonySpawned)
+            {
+                if (patient.InAggroMentalState || patient.IsForbidden(avatar)
+                    || patient.IsFormingCaravan()
+                    || !JobDriver_HoloWardenFeed.StillNeedsFeeding(patient)
+                    || !avatar.CanReach(patient, PathEndMode.Touch, Danger.None))
+                {
+                    continue;
+                }
+                FoodPolicy restriction = patient.foodRestriction?.GetCurrentRespectedRestriction(avatar);
+                if (restriction != null && restriction.filter.AllowedDefCount == 0)
+                {
+                    continue;
+                }
+                if (!FoodUtility.TryFindBestFoodSourceFor(avatar, patient,
+                        patient.needs.food.CurCategory == HungerCategory.Starving,
+                        out Thing foodSource, out ThingDef foodDef,
+                        canRefillDispenser: false, canUseInventory: false, canUsePackAnimalInventory: false,
+                        allowForbidden: false, allowCorpse: false, allowSociallyImproper: false,
+                        allowHarvest: false, forceScanWholeMap: false, ignoreReservations: true,
+                        calculateWantedStackCount: true))
+                {
+                    continue;
+                }
+                if (avatar.Map.terrainGrid.FoundationAt(foodSource.PositionHeld)?.IsSubstructure != true)
+                {
+                    continue;
+                }
+                float nutrition = FoodUtility.GetNutrition(patient, foodSource, foodDef);
+                Job job = JobMaker.MakeJob(HoloAI_DefOf.HoloAI_WardenFeed, patient, foodSource);
+                job.count = FoodUtility.WillIngestStackCountOf(patient, foodDef, nutrition);
+                return job;
+            }
+            return null;
         }
 
         /// <summary>
@@ -156,8 +210,12 @@ namespace ShipHoloAI
                 return false;
             }
             PrisonerInteractionModeDef mode = candidate.guest.ExclusiveInteractionMode;
-            if ((mode != PrisonerInteractionModeDefOf.AttemptRecruit && mode != PrisonerInteractionModeDefOf.ReduceResistance)
-                || !candidate.guest.ScheduledForInteraction)
+            if (mode != PrisonerInteractionModeDefOf.AttemptRecruit && mode != PrisonerInteractionModeDefOf.ReduceResistance
+                && !WantsConversion(candidate))
+            {
+                return false;
+            }
+            if (!candidate.guest.ScheduledForInteraction)
             {
                 return false;
             }
@@ -170,6 +228,27 @@ namespace ShipHoloAI
                 return false;
             }
             return avatar.CanReach(candidate, PathEndMode.Touch, Danger.None);
+        }
+
+        /// <summary>
+        /// Mirrors WorkGiver_Warden_Convert.JobOnThing's target gates, minus the
+        /// warden-must-share-the-goal-ideo clause: the avatar is a ToolUser with no
+        /// ideoligion of her own, so vanilla's <c>pawn.Ideo == guest.ideoForConversion</c>
+        /// test can never pass. She converts toward whatever the player selected as the
+        /// prisoner's conversion goal instead.
+        /// </summary>
+        internal static bool WantsConversion(Pawn candidate)
+        {
+            if (!ModsConfig.IdeologyActive || Find.IdeoManager.classicMode || candidate.guest == null)
+            {
+                return false;
+            }
+            Ideo goal = candidate.guest.ideoForConversion;
+            return goal != null
+                && candidate.guest.IsInteractionEnabled(PrisonerInteractionModeDefOf.Convert)
+                && candidate.ideo != null
+                && candidate.Ideo != goal
+                && !candidate.DevelopmentalStage.Baby();
         }
     }
 }

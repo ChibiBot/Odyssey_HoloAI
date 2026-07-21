@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using RimWorld;
@@ -49,6 +50,37 @@ namespace ShipHoloAI
                 return;
             }
 
+            // An exception inside a checkpoint (our bug or another mod's — pawn
+            // generation is a favorite) must not silently strand the run without
+            // its COMPLETE line: count it as a failure and keep going.
+            try
+            {
+                RunCheckpoint(map);
+            }
+            catch (Exception e)
+            {
+                failures++;
+                Log.Message("[HoloAI SelfTest] FAIL: checkpoint at tick " + ticks + " threw: " + e);
+            }
+            if (ticks == 13800 && !done)
+            {
+                Finish();
+            }
+
+            if (ticks > 4200 && ticks % 250 == 0 && !done)
+            {
+                ObserveChat();
+            }
+
+            // Keep the unconnected power comp switched on between checkpoints.
+            if (ticks > 1100 && ticks < 1500 || ticks > 2100 && ticks < 2700 || ticks > 3600)
+            {
+                ForcePower(true);
+            }
+        }
+
+        private void RunCheckpoint(Map map)
+        {
             switch (ticks)
             {
                 case 300:
@@ -109,6 +141,7 @@ namespace ShipHoloAI
                 case 9100:
                     Check("low-fuel line resolves from grammar",
                         !PrismSpeech.ResolveLine("announce_lowfuel").NullOrEmpty());
+                    Check("persona speech keyword coverage", PersonaSpeechCoverage());
                     Find.LetterStack.ReceiveLetter("self-test threat", "letter sent by the HoloAI self-test",
                         LetterDefOf.ThreatSmall, new LookTargets(core));
                     break;
@@ -145,8 +178,13 @@ namespace ShipHoloAI
                     StartJobDrivenInstall(map);
                     break;
                 case 10700:
+                    // OrderInstall picks the nearest eligible colonist — usually the
+                    // test subject parked beside the matrix, but any wandering
+                    // colonist can legitimately win the distance race. Assert the
+                    // order landed, not who took it.
                     Check("job-driven install order accepted",
-                        testColonist.CurJob != null && testColonist.CurJob.def == HoloAI_DefOf.HoloAI_InstallPersona);
+                        map.mapPawns.FreeColonistsSpawned.Any(p =>
+                            p.CurJob != null && p.CurJob.def == HoloAI_DefOf.HoloAI_InstallPersona));
                     break;
                 case 11300:
                     CheckJobDrivenInstall();
@@ -159,9 +197,11 @@ namespace ShipHoloAI
                     break;
                 case 11800:
                     TestIxiaBreakFactor(map);
+                    TestNeedWardenAlertSuppressed(map);
                     InstallMatrixDirect(map, "HoloAI_Matrix_ATHENA");
                     break;
                 case 12200:
+                    TestNeedWardenAlertControl();
                     TestAthenaSeminar();
                     InstallMatrixDirect(map, "HoloAI_Matrix_ACESO");
                     break;
@@ -177,20 +217,118 @@ namespace ShipHoloAI
                     break;
                 case 13800:
                     TestPrismRestoreAndTriage(map);
-                    Finish();
                     break;
             }
+        }
 
-            if (ticks > 4200 && ticks % 250 == 0 && !done)
-            {
-                ObserveChat();
-            }
+        private Dictionary<Pawn, int> savedWardenPriorities;
 
-            // Keep the unconnected power comp switched on between checkpoints.
-            if (ticks > 1100 && ticks < 1500 || ticks > 2100 && ticks < 2700 || ticks > 3600)
+        /// <summary>
+        /// With I.X.I.A. projected, a shipboard prisoner, and every colonist's
+        /// Warden work zeroed, the "Need warden" alert must stay quiet — she is the
+        /// warden (Patch_AlertNeedWarden). The prisoner is re-secured (she was
+        /// released for the insecure-giver test) so she stays put for the control
+        /// half at 12200; priorities are restored there.
+        /// </summary>
+        private void TestNeedWardenAlertSuppressed(Map map)
+        {
+            if (wardenTestPrisoner == null || !wardenTestPrisoner.Spawned
+                || !wardenTestPrisoner.IsPrisonerOfColony)
             {
-                ForcePower(true);
+                Check("need-warden alert suppressed while I.X.I.A. runs the brig", pass: false);
+                return;
             }
+            wardenTestPrisoner.guest.Released = false;
+            savedWardenPriorities = new Dictionary<Pawn, int>();
+            foreach (Pawn colonist in map.mapPawns.FreeColonistsSpawned)
+            {
+                if (colonist.workSettings != null && colonist.workSettings.EverWork)
+                {
+                    savedWardenPriorities[colonist] = colonist.workSettings.GetPriority(WorkTypeDefOf.Warden);
+                    colonist.workSettings.SetPriority(WorkTypeDefOf.Warden, 0);
+                }
+            }
+            Check("need-warden alert suppressed while I.X.I.A. runs the brig",
+                !new Alert_NeedWarden().GetReport().active);
+        }
+
+        /// <summary>
+        /// Same board state after the swap to A.T.H.E.N.A.: no colonist wardens and
+        /// a shipboard prisoner must alert again — proving the suppression is
+        /// I.X.I.A.-specific, not a blanket mute. Warden priorities restored after.
+        /// </summary>
+        private void TestNeedWardenAlertControl()
+        {
+            if (savedWardenPriorities == null)
+            {
+                return; // suppressed half never armed; its Check already failed
+            }
+            bool prisonerPresent = wardenTestPrisoner != null && wardenTestPrisoner.Spawned
+                && wardenTestPrisoner.IsPrisonerOfColony;
+            Check("need-warden alert returns without I.X.I.A.",
+                prisonerPresent && new Alert_NeedWarden().GetReport().active);
+            foreach (KeyValuePair<Pawn, int> saved in savedWardenPriorities)
+            {
+                if (!saved.Key.Dead && saved.Key.workSettings != null)
+                {
+                    saved.Key.workSettings.SetPriority(WorkTypeDefOf.Warden, saved.Value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Every persona that declares a speechPrefix must cover the full
+        /// announcement/bark keyword set, and I.X.I.A. her signature warden acts.
+        /// A missing keyword silently falls back to P.R.I.S.M.'s voice in play, so
+        /// only a def-level audit like this ever catches one.
+        /// </summary>
+        private static bool PersonaSpeechCoverage()
+        {
+            bool ok = true;
+            string[] roots =
+            {
+                "announce_threatbig", "announce_threatsmall", "announce_negative",
+                "announce_lowfuel", "bark",
+            };
+            foreach (HoloPersonaDef persona in DefDatabase<HoloPersonaDef>.AllDefsListForReading)
+            {
+                if (persona.speechPrefix.NullOrEmpty())
+                {
+                    continue;
+                }
+                foreach (string root in roots)
+                {
+                    string keyword = persona.speechPrefix + "_" + root;
+                    if (PrismSpeech.ResolveLine(keyword).NullOrEmpty())
+                    {
+                        Log.Message("[HoloAI SelfTest] missing/unresolvable speech keyword: " + keyword);
+                        ok = false;
+                    }
+                }
+            }
+            foreach (string keyword in new[]
+                { "ixia_recruit", "ixia_convert", "ixia_suppress", "ixia_feed", "ixia_prisonbreak" })
+            {
+                if (PrismSpeech.ResolveLine(keyword).NullOrEmpty())
+                {
+                    Log.Message("[HoloAI SelfTest] missing/unresolvable speech keyword: " + keyword);
+                    ok = false;
+                }
+            }
+            return ok;
+        }
+
+        /// <summary>
+        /// Pawn generation with random relations disabled: relation workers roll
+        /// against existing pawns, and landing on one of our NameSingle pawns
+        /// (P.R.I.S.M., "HoloAI-TestSubject") crashes vanilla's
+        /// PawnRelationWorker_Parent.ResolveMyName with an InvalidCastException
+        /// (it casts the relative's Name to NameTriple).
+        /// </summary>
+        private static Pawn GenerateLoosePawn(PawnKindDef kind, Faction faction)
+        {
+            return PawnGenerator.GeneratePawn(new PawnGenerationRequest(kind, faction,
+                canGeneratePawnRelations: false));
         }
 
         private void Setup(Map map)
@@ -221,7 +359,7 @@ namespace ShipHoloAI
             Thing coreThing = ThingMaker.MakeThing(HoloAI_DefOf.HoloAI_HoloCore);
             coreThing.SetFaction(Faction.OfPlayer);
             core = (Building_HoloCore)GenSpawn.Spawn(coreThing, center, map);
-            testColonist = PawnGenerator.GeneratePawn(PawnKindDefOf.Colonist, Faction.OfPlayer);
+            testColonist = GenerateLoosePawn(PawnKindDefOf.Colonist, Faction.OfPlayer);
             testColonist.Name = new NameSingle("HoloAI-TestSubject");
             GenSpawn.Spawn(testColonist, center + new IntVec3(3, 0, 0), map);
             Find.CameraDriver?.JumpToCurrentMapLoc(center);
@@ -503,7 +641,7 @@ namespace ShipHoloAI
             // has to live in a genuine prison cell — captured on open deck she runs
             // a vanilla exit-map escape job, which flips PrisonerIsSecure false.
             Faction hostileFaction = Find.FactionManager.RandomEnemyFaction(allowNonHumanlike: false);
-            wardenTestPrisoner = PawnGenerator.GeneratePawn(PawnKindDefOf.Villager, hostileFaction);
+            wardenTestPrisoner = GenerateLoosePawn(PawnKindDefOf.Villager, hostileFaction);
             GenSpawn.Spawn(wardenTestPrisoner, siteCenter + new IntVec3(-9, 0, 1), map);
             wardenTestPrisoner.guest.CapturedBy(Faction.OfPlayer);
             wardenTestPrisoner.guest.SetExclusiveInteraction(PrisonerInteractionModeDefOf.AttemptRecruit);
@@ -511,7 +649,7 @@ namespace ShipHoloAI
 
             if (ModsConfig.IdeologyActive)
             {
-                wardenTestSlave = PawnGenerator.GeneratePawn(PawnKindDefOf.Villager, hostileFaction);
+                wardenTestSlave = GenerateLoosePawn(PawnKindDefOf.Villager, hostileFaction);
                 GenSpawn.Spawn(wardenTestSlave, siteCenter + new IntVec3(-9, 0, 6), map);
                 wardenTestSlave.guest.SetGuestStatus(Faction.OfPlayer, GuestStatus.Slave);
                 // Parked as not-due: the 11550 prisoner assertions need the prisoner
@@ -637,12 +775,67 @@ namespace ShipHoloAI
                 due.Job != null && due.Job.def == HoloAI_DefOf.HoloAI_WardenInteract
                 && due.Job.GetTarget(TargetIndex.A).Thing == wardenTestPrisoner);
 
+            TestWardenConversion(giver);
+
             wardenTestPrisoner.guest.Released = true; // PrisonerIsSecure -> false
             ThinkResult afterInsecure = giver.TryIssueJobPackage(core.Avatar, default(JobIssueParams));
             Check("JobGiver_HoloWarden returns null once the candidate is insecure",
                 afterInsecure.Job == null);
 
             TestWardenSlaveSuppression();
+        }
+
+        /// <summary>
+        /// Flip the same prisoner to Convert mode with the player ideo as the goal:
+        /// the giver must still fire even though I.X.I.A. has no ideoligion of her
+        /// own (the goal is read off the guest tracker, not the warden), and a fired
+        /// attempt must actually drain certainty toward it. Mode is left on Convert
+        /// afterwards — the release assertion that follows blocks on PrisonerIsSecure
+        /// long before the interaction mode matters.
+        /// </summary>
+        private void TestWardenConversion(JobGiver_HoloWarden giver)
+        {
+            if (!ModsConfig.IdeologyActive || Find.IdeoManager.classicMode)
+            {
+                Log.Message("[HoloAI SelfTest] conversion test skipped (no Ideology / classic mode)");
+                return;
+            }
+            Ideo goal = Faction.OfPlayer.ideos?.PrimaryIdeo;
+            if (goal == null || wardenTestPrisoner.ideo == null)
+            {
+                Check("JobGiver_HoloWarden targets a convert-mode prisoner", pass: false);
+                Check("conversion attempt drains certainty toward the goal ideo", pass: false);
+                return;
+            }
+            if (wardenTestPrisoner.Ideo == goal)
+            {
+                Ideo other = Find.IdeoManager.IdeosListForReading.FirstOrDefault(i => i != goal);
+                if (other == null)
+                {
+                    Log.Message("[HoloAI SelfTest] conversion test skipped (only one ideoligion in game)");
+                    return;
+                }
+                wardenTestPrisoner.ideo.SetIdeo(other);
+            }
+            wardenTestPrisoner.guest.SetExclusiveInteraction(PrisonerInteractionModeDefOf.Convert);
+            wardenTestPrisoner.guest.ideoForConversion = goal;
+
+            ThinkResult convertDue = giver.TryIssueJobPackage(core.Avatar, default(JobIssueParams));
+            Check("JobGiver_HoloWarden targets a convert-mode prisoner",
+                convertDue.Job != null && convertDue.Job.def == HoloAI_DefOf.HoloAI_WardenInteract
+                && convertDue.Job.GetTarget(TargetIndex.A).Thing == wardenTestPrisoner);
+
+            float certaintyBefore = wardenTestPrisoner.ideo.Certainty;
+            bool converted = JobDriver_HoloWarden.TryConvertPrisoner(core.Avatar, wardenTestPrisoner);
+            Check("conversion attempt drains certainty toward the goal ideo",
+                wardenTestPrisoner.ideo.Certainty < certaintyBefore
+                || (converted && wardenTestPrisoner.Ideo == goal));
+
+            // The attempt must stamp vanilla's interaction cooldown — a giver that
+            // still fires here would let her chain attempts and trivialize conversion.
+            Check("conversion attempt stamps the prisoner interaction cooldown",
+                !wardenTestPrisoner.guest.ScheduledForInteraction
+                && giver.TryIssueJobPackage(core.Avatar, default(JobIssueParams)).Job == null);
         }
 
         /// <summary>
@@ -693,6 +886,42 @@ namespace ShipHoloAI
             }
             Check("JobGiver_HoloWarden returns null once the slave is sated",
                 giver.TryIssueJobPackage(core.Avatar, default(JobIssueParams)).Job == null);
+
+            TestWardenFeedDowned(giver);
+        }
+
+        /// <summary>
+        /// Down the (sated) slave on the floor of her quarters and starve her, with a
+        /// meal stack planted on the ship's substructure: the giver must return the
+        /// hand-feed job (downed-out-of-bed is exactly the case vanilla's in-a-bed
+        /// feed gates exclude and ours must cover), and the driver's
+        /// materialize-and-feed must actually raise her food need.
+        /// </summary>
+        private void TestWardenFeedDowned(JobGiver_HoloWarden giver)
+        {
+            HealthUtility.DamageUntilDowned(wardenTestSlave, allowBleedingWounds: false);
+            if (!wardenTestSlave.Downed || wardenTestSlave.Dead || wardenTestSlave.needs?.food == null)
+            {
+                Check("JobGiver_HoloWarden hand-feeds a downed slave", pass: false);
+                Check("materialize-and-feed raises the patient's food need", pass: false);
+                return;
+            }
+            wardenTestSlave.needs.food.CurLevel = 0f;
+            Thing meal = ThingMaker.MakeThing(ThingDefOf.MealSimple);
+            meal.stackCount = 5;
+            GenPlace.TryPlaceThing(meal, siteCenter + new IntVec3(-3, 0, -3),
+                wardenTestSlave.Map, ThingPlaceMode.Near, out Thing placedMeal);
+
+            ThinkResult due = giver.TryIssueJobPackage(core.Avatar, default(JobIssueParams));
+            Check("JobGiver_HoloWarden hand-feeds a downed slave",
+                due.Job != null && due.Job.def == HoloAI_DefOf.HoloAI_WardenFeed
+                && due.Job.GetTarget(TargetIndex.A).Thing == wardenTestSlave);
+
+            float foodBefore = wardenTestSlave.needs.food.CurLevel;
+            bool fed = placedMeal != null
+                && JobDriver_HoloWardenFeed.MaterializeAndFeed(core.Avatar, wardenTestSlave, placedMeal);
+            Check("materialize-and-feed raises the patient's food need",
+                fed && wardenTestSlave.needs.food.CurLevel > foodBefore);
         }
 
         /// <summary>Direct persona swap used between ability tests (the job-driven
@@ -788,12 +1017,19 @@ namespace ShipHoloAI
             SkillRecord skill = JobDriver_HoloSeminar.PickSkill(testColonist);
             int levelBefore = skill?.Level ?? 0;
             float xpBefore = skill?.xpSinceLastLevel ?? 0f;
+            // Drain joy first so a full bar can't mask the recreation grant.
+            if (testColonist.needs?.joy != null)
+            {
+                testColonist.needs.joy.CurLevel = 0.3f;
+            }
             JobDriver_HoloSeminar.FireSeminar(core.Avatar, testColonist);
             bool xpGained = skill != null
                 && (skill.Level > levelBefore || skill.xpSinceLastLevel > xpBefore);
             bool memory = testColonist.needs?.mood?.thoughts?.memories?
                 .GetFirstMemoryOfDef(HoloAI_DefOf.HoloAI_AttendedSeminar) != null;
             Check("seminar grants XP and cooldown memory", xpGained && memory);
+            Check("seminar counts as recreation (joy gained)",
+                testColonist.needs?.joy != null && testColonist.needs.joy.CurLevel > 0.3f);
             Log.Message("[HoloAI SelfTest] seminar skill: " + skill?.def.defName
                 + " xp " + xpBefore + " -> " + skill?.xpSinceLastLevel + " (level " + levelBefore + " -> " + skill?.Level + ")");
         }
@@ -922,7 +1158,7 @@ namespace ShipHoloAI
 
             // A content second colonist to compete for the chat; the miserable
             // original must win under triage.
-            Pawn happy = PawnGenerator.GeneratePawn(PawnKindDefOf.Colonist, Faction.OfPlayer);
+            Pawn happy = GenerateLoosePawn(PawnKindDefOf.Colonist, Faction.OfPlayer);
             happy.Name = new NameSingle("HoloAI-Happy");
             GenSpawn.Spawn(happy, core.Position + new IntVec3(-3, 0, 1), map);
             testColonist.Position = core.Position + new IntVec3(3, 0, 1);

@@ -14,8 +14,9 @@
     <graphicData>
       <graphicClass>Graphic_Multi</graphicClass>
       <texPath>HoloAI/Buildings/HoloCore</texPath>
-      <!-- Taller than the 2x2 footprint: cabinet base sits on the tiles, the
-           projector plate and prism rise above for depth. West mirrors east. -->
+      <!-- Taller than the 2x2 footprint: the top-down deck fills the lower 2x2
+           of the canvas (the z offset re-centers it on the tiles), and the
+           headroom above holds the prism's glow. West mirrors east. -->
       <drawSize>(2, 2.5)</drawSize>
       <drawOffset>(0, 0, 0.25)</drawOffset>
       <shadowData>
