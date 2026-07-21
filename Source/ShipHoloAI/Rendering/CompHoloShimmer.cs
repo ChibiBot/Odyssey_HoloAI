@@ -16,7 +16,11 @@ namespace ShipHoloAI
     /// Per-frame pulse: redraws the current hair texture over the pawn as an additive
     /// glow whose alpha breathes on a sine. Drawn via PostDraw, so it bypasses the pawn
     /// render cache and animates even while the base sprite is atlased.
+    /// The attribute satisfies vanilla's startup audit for types holding
+    /// asset-type statics (the MaterialPropertyBlock below); everything here is
+    /// lazily built on the main thread in the draw path regardless.
     /// </summary>
+    [StaticConstructorOnStartup]
     public class CompHoloShimmer : ThingComp
     {
         private static readonly Vector2 OverlaySize = new Vector2(1.5f, 1.5f);

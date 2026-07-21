@@ -35,7 +35,11 @@ namespace ShipHoloAI
     ///  - optional lower-body dissolution into dithered light particles
     /// Serves cached materials on the Transparent shader, plus additive glow
     /// materials for the shimmer/emitter overlays.
+    /// The attribute satisfies vanilla's startup audit for types holding
+    /// asset-type statics (the Material caches below); all materials are built
+    /// lazily on the main thread in the render path regardless.
     /// </summary>
+    [StaticConstructorOnStartup]
     public static class HoloGraphicPool
     {
         private const float EdgeFadePx = 7f;
