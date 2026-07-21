@@ -24,6 +24,7 @@ namespace ShipHoloAI
         public static JobDef HoloAI_EmergencyTend;
         public static JobDef HoloAI_CleanFilth;
         public static RulePackDef HoloAI_Announcements;
+        public static ThingDef HoloAI_Mote_SpeechText;
         public static HoloPersonaDef HoloAI_Persona_PRISM;
         public static HoloPersonaDef HoloAI_Persona_VESTA;
         public static HoloPersonaDef HoloAI_Persona_HERMES;

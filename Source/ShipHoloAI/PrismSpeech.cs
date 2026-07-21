@@ -112,9 +112,28 @@ namespace ShipHoloAI
             string line = ResolveLineFor(persona, rootKeyword);
             if (!line.NullOrEmpty())
             {
-                MoteMaker.ThrowText(avatar.DrawPos + new Vector3(0f, 0f, 0.65f),
+                ThrowSpeechText(avatar.DrawPos + new Vector3(0f, 0f, 0.65f),
                     avatar.Map, line, SpeechColorFor(persona), 5f);
             }
+        }
+
+        /// <summary>MoteMaker.ThrowText, but spawning our outlined larger-font
+        /// mote (MoteSpeechText) instead of vanilla's tiny unoutlined one.</summary>
+        private static void ThrowSpeechText(Vector3 loc, Map map, string text, Color color,
+            float timeBeforeStartFadeout)
+        {
+            IntVec3 cell = loc.ToIntVec3();
+            if (!cell.InBounds(map))
+            {
+                return;
+            }
+            MoteText mote = (MoteText)ThingMaker.MakeThing(HoloAI_DefOf.HoloAI_Mote_SpeechText);
+            mote.exactPosition = loc;
+            mote.SetVelocity(Rand.Range(5, 35), Rand.Range(0.32f, 0.35f));
+            mote.text = text;
+            mote.textColor = color;
+            mote.overrideTimeBeforeStartFadeout = timeBeforeStartFadeout;
+            GenSpawn.Spawn(mote, cell, map);
         }
 
         public static void Say(Map map, string rootKeyword)
@@ -136,7 +155,7 @@ namespace ShipHoloAI
             Pawn_HoloAvatar avatar = core.Avatar;
             if (avatar != null && avatar.Spawned)
             {
-                MoteMaker.ThrowText(avatar.DrawPos + new Vector3(0f, 0f, 0.65f),
+                ThrowSpeechText(avatar.DrawPos + new Vector3(0f, 0f, 0.65f),
                     map, line, SpeechColorFor(persona), 6f);
             }
             string speaker = persona?.avatarName ?? "P.R.I.S.M.";
