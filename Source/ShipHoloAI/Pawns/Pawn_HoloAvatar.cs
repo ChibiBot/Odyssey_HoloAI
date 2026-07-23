@@ -18,6 +18,8 @@ namespace ShipHoloAI
 
         private HairDef hairDef;
         private Color? hairColorInt;
+        private BodyTypeDef bodyTypeInt;
+        private HeadTypeDef headTypeInt;
         private int offShipTicks;
 
         private static readonly IntRange ChatCooldownTicks = new IntRange(2500, 7500);
@@ -49,7 +51,42 @@ namespace ShipHoloAI
 
         public Color HoloHairColor => hairColorInt ?? DefaultHairColor;
 
-        /// <summary>Adopt a persona's identity: name, default hair, and hair color.</summary>
+        public BodyTypeDef CurrentBodyType => bodyTypeInt ?? BodyTypeDefOf.Female;
+
+        public HeadTypeDef CurrentHeadType => headTypeInt
+            ?? DefDatabase<HeadTypeDef>.GetNamedSilentFail("Female_AverageNormal");
+
+        /// <summary>Worn outfit variant for a body type; vanilla ships ShirtButton
+        /// for every core body, modded body types without a variant fall back to
+        /// the female cut.</summary>
+        public static string OutfitPathFor(BodyTypeDef body)
+        {
+            string path = "Things/Pawn/Humanlike/Apparel/ShirtButton/ShirtButton_"
+                + (body?.defName ?? "Female");
+            if (ContentFinder<Texture2D>.Get(path + "_south", reportFailure: false) == null)
+            {
+                path = "Things/Pawn/Humanlike/Apparel/ShirtButton/ShirtButton_Female";
+            }
+            return path;
+        }
+
+        /// <summary>Set gender/body/head together (the styling dialog's appearance
+        /// tab). Gender flips grammar in every interaction and announcement for
+        /// free; body and head resolve through the render tree's holoPart nodes.</summary>
+        public void SetAppearance(Gender newGender, BodyTypeDef body, HeadTypeDef head)
+        {
+            gender = newGender;
+            bodyTypeInt = body;
+            headTypeInt = head;
+            if (Spawned)
+            {
+                Drawer.renderer.SetAllGraphicsDirty();
+            }
+        }
+
+        /// <summary>Adopt a persona's identity: name, default hair/color, and the
+        /// canon appearance (female, default body and head) — a remembered player
+        /// override is reapplied on top by the core afterwards.</summary>
         public void ApplyPersonaStyle(HoloPersonaDef persona)
         {
             Name = new NameSingle(persona.avatarName ?? persona.label);
@@ -59,6 +96,9 @@ namespace ShipHoloAI
                 hairDef = personaHair;
             }
             hairColorInt = persona.hairColor;
+            gender = Gender.Female;
+            bodyTypeInt = null;
+            headTypeInt = null;
             if (Spawned)
             {
                 Drawer.renderer.SetAllGraphicsDirty();
@@ -212,6 +252,8 @@ namespace ShipHoloAI
             Scribe_Values.Look(ref nextChatTick, "nextChatTick");
             Scribe_Defs.Look(ref hairDef, "hairDef");
             Scribe_Values.Look(ref hairColorInt, "hairColor");
+            Scribe_Defs.Look(ref bodyTypeInt, "bodyType");
+            Scribe_Defs.Look(ref headTypeInt, "headType");
         }
     }
 }

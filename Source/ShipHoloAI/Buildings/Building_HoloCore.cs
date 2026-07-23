@@ -22,15 +22,14 @@ namespace ShipHoloAI
         // style) and permanently unlocks its persona here; switching among
         // archived personas afterward is instant and free.
         private List<HoloPersonaDef> archivedPersonas = new List<HoloPersonaDef>();
-        // Player restyles survive persona swaps: the outgoing avatar pawn is
-        // destroyed on swap, so her hair/color are remembered here per persona
-        // and reapplied when that persona is next generated.
-        private Dictionary<HoloPersonaDef, HairDef> styleMemoryHair = new Dictionary<HoloPersonaDef, HairDef>();
-        private Dictionary<HoloPersonaDef, Color> styleMemoryColor = new Dictionary<HoloPersonaDef, Color>();
-        private List<HoloPersonaDef> styleKeysWorking1;
-        private List<HairDef> styleHairsWorking;
-        private List<HoloPersonaDef> styleKeysWorking2;
-        private List<Color> styleColorsWorking;
+        // Player customization survives persona swaps: the outgoing avatar pawn
+        // is destroyed on swap, so her whole look (hair, color, gender, body,
+        // head) is remembered here per persona and reapplied when that persona
+        // is next generated.
+        private Dictionary<HoloPersonaDef, HoloStyleMemento> styleMemory =
+            new Dictionary<HoloPersonaDef, HoloStyleMemento>();
+        private List<HoloPersonaDef> styleKeysWorking;
+        private List<HoloStyleMemento> styleValuesWorking;
 
         private CompPowerTrader powerComp;
 
@@ -117,11 +116,11 @@ namespace ShipHoloAI
             avatar.gender = Gender.Female;
             avatar.holoCore = this;
             avatar.ApplyPersonaStyle(ActivePersona);
-            // A remembered player restyle beats the persona defaults.
-            if (styleMemoryColor.TryGetValue(ActivePersona, out Color color))
+            // A remembered player customization beats the persona defaults.
+            if (styleMemory.TryGetValue(ActivePersona, out HoloStyleMemento memento))
             {
-                styleMemoryHair.TryGetValue(ActivePersona, out HairDef hair);
-                avatar.ApplyStyleOverride(hair, color);
+                avatar.ApplyStyleOverride(memento.hair, memento.color);
+                avatar.SetAppearance(memento.gender, memento.bodyType, memento.headType);
             }
         }
 
@@ -180,12 +179,19 @@ namespace ShipHoloAI
 
         private void SwapPersona(HoloPersonaDef newPersona)
         {
-            // Remember the outgoing persona's current style before her pawn is
-            // destroyed, so a restyle survives the round trip through the archive.
+            // Remember the outgoing persona's current look before her pawn is
+            // destroyed, so customization survives the round trip through the
+            // archive.
             if (avatar != null)
             {
-                styleMemoryHair[ActivePersona] = avatar.CurrentHairDef;
-                styleMemoryColor[ActivePersona] = avatar.HoloHairColor;
+                styleMemory[ActivePersona] = new HoloStyleMemento
+                {
+                    hair = avatar.CurrentHairDef,
+                    color = avatar.HoloHairColor,
+                    gender = avatar.gender,
+                    bodyType = avatar.CurrentBodyType,
+                    headType = avatar.CurrentHeadType,
+                };
             }
             StoreAvatar();
             innerContainer.ClearAndDestroyContents();
@@ -338,10 +344,8 @@ namespace ShipHoloAI
             Scribe_Values.Look(ref projectionEnabled, "projectionEnabled", defaultValue: true);
             Scribe_Defs.Look(ref activePersona, "activePersona");
             Scribe_Collections.Look(ref archivedPersonas, "archivedPersonas", LookMode.Def);
-            Scribe_Collections.Look(ref styleMemoryHair, "styleMemoryHair",
-                LookMode.Def, LookMode.Def, ref styleKeysWorking1, ref styleHairsWorking);
-            Scribe_Collections.Look(ref styleMemoryColor, "styleMemoryColor",
-                LookMode.Def, LookMode.Value, ref styleKeysWorking2, ref styleColorsWorking);
+            Scribe_Collections.Look(ref styleMemory, "styleMemory",
+                LookMode.Def, LookMode.Deep, ref styleKeysWorking, ref styleValuesWorking);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 if (innerContainer == null)
@@ -352,13 +356,9 @@ namespace ShipHoloAI
                 {
                     archivedPersonas = new List<HoloPersonaDef>();
                 }
-                if (styleMemoryHair == null)
+                if (styleMemory == null)
                 {
-                    styleMemoryHair = new Dictionary<HoloPersonaDef, HairDef>();
-                }
-                if (styleMemoryColor == null)
-                {
-                    styleMemoryColor = new Dictionary<HoloPersonaDef, Color>();
+                    styleMemory = new Dictionary<HoloPersonaDef, HoloStyleMemento>();
                 }
                 // Pre-archive saves: whoever is resident was installed from a matrix
                 // that no longer exists — grandfather her into the archive.
@@ -377,6 +377,26 @@ namespace ShipHoloAI
         public ThingOwner GetDirectlyHeldThings()
         {
             return innerContainer;
+        }
+    }
+
+    /// <summary>One persona's remembered player customization — everything the
+    /// styling dialog can change.</summary>
+    public class HoloStyleMemento : IExposable
+    {
+        public HairDef hair;
+        public Color color;
+        public Gender gender = Gender.Female;
+        public BodyTypeDef bodyType;
+        public HeadTypeDef headType;
+
+        public void ExposeData()
+        {
+            Scribe_Defs.Look(ref hair, "hair");
+            Scribe_Values.Look(ref color, "color");
+            Scribe_Values.Look(ref gender, "gender", Gender.Female);
+            Scribe_Defs.Look(ref bodyType, "bodyType");
+            Scribe_Defs.Look(ref headType, "headType");
         }
     }
 }

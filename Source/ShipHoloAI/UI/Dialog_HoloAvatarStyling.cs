@@ -7,17 +7,19 @@ using Verse;
 namespace ShipHoloAI
 {
     /// <summary>
-    /// The avatar's own styling UI — core-game content only (HairDefs + colors),
-    /// no Ideology required and no Dialog_StylingStation inheritance, so every
-    /// player gets the full experience and the old temp-story-tracker hack is
-    /// gone entirely. Left: live hologram preview composited the same way the
-    /// render tree projects her. Right: hairstyle grid, color swatches, and RGB
-    /// sliders. Changes apply to the projected avatar live; Cancel restores the
-    /// style she opened with.
+    /// The avatar's own styling UI — core-game content only (HairDefs, colors,
+    /// BodyTypeDefs, HeadTypeDefs), no Ideology required and no
+    /// Dialog_StylingStation inheritance. Left: live hologram preview composited
+    /// the same way the render tree projects her, plus gender and body-type
+    /// toggles. Right: hairstyle grid, face (head type) grid, color swatches and
+    /// RGB sliders. Body and head lists enumerate the def databases, so modded
+    /// body types and face/head packs appear automatically — the same openness
+    /// Character Editor relies on. Changes apply to the projected avatar live;
+    /// Cancel restores everything she opened with.
     /// </summary>
     public class Dialog_HoloAvatarStyling : Window
     {
-        // Preview layer geometry/filters mirror PawnRenderTree_Hologram.xml.
+        // Preview layer filters mirror PawnRenderTree_Hologram.xml.
         private const float MeshSize = 1.5f;
         private const float HeadOffsetZ = 0.34f;
         private const float HairAlpha = 0.72f;
@@ -27,16 +29,12 @@ namespace ShipHoloAI
             new HoloFilter(new Color(0.80f, 0.93f, 1f), 0.95f, 0.30f);
         private static readonly HoloFilter HeadFilter =
             new HoloFilter(new Color(0.60f, 0.85f, 1f), 0.95f);
-        private const string BodyTexPath = "Things/Pawn/Humanlike/Bodies/Naked_Female";
-        private const string OutfitTexPath = "Things/Pawn/Humanlike/Apparel/ShirtButton/ShirtButton_Female";
-        private const string HeadTexPath = "Things/Pawn/Humanlike/Heads/Female/Female_Average_Normal";
 
-        private const float PreviewWidth = 230f;
-        private const float HairCellSize = 64f;
-        private const int HairColumns = 5;
+        private const float LeftWidth = 232f;
+        private const float HairCellSize = 58f;
+        private const float HeadCellSize = 58f;
         private const float SwatchSize = 24f;
 
-        // Persona signature colors first, then a general photonic palette.
         private static readonly Color[] Swatches =
         {
             new Color(0.05f, 0.68f, 1f), new Color(1f, 0.72f, 0.5f),
@@ -51,32 +49,68 @@ namespace ShipHoloAI
         };
 
         private readonly Pawn_HoloAvatar avatar;
-        private readonly HairDef originalHair;
-        private readonly Color originalColor;
+        private readonly HoloStyleMemento original = new HoloStyleMemento();
         private readonly List<HairDef> hairs;
+        private readonly List<BodyTypeDef> bodyTypes;
+        private List<HeadTypeDef> heads;
 
         private HairDef selectedHair;
         private Color selectedColor;
+        private Gender selectedGender;
+        private BodyTypeDef selectedBody;
+        private HeadTypeDef selectedHead;
         private Vector2 hairScroll;
+        private Vector2 headScroll;
         private bool accepted;
 
-        public override Vector2 InitialSize => new Vector2(720f, 640f);
+        public override Vector2 InitialSize => new Vector2(780f, 740f);
 
         public Dialog_HoloAvatarStyling(Pawn_HoloAvatar avatar)
         {
             this.avatar = avatar;
-            originalHair = avatar.CurrentHairDef;
-            originalColor = avatar.HoloHairColor;
-            selectedHair = originalHair;
-            selectedColor = originalColor;
+            original.hair = avatar.CurrentHairDef;
+            original.color = avatar.HoloHairColor;
+            original.gender = avatar.gender;
+            original.bodyType = avatar.CurrentBodyType;
+            original.headType = avatar.CurrentHeadType;
+            selectedHair = original.hair;
+            selectedColor = original.color;
+            selectedGender = original.gender;
+            selectedBody = original.bodyType;
+            selectedHead = original.headType;
+
             hairs = DefDatabase<HairDef>.AllDefsListForReading
                 .Where(h => !h.noGraphic && !h.texPath.NullOrEmpty())
                 .OrderBy(h => h.label)
                 .ToList();
+            // Core bodies in canonical order first, then any modded ones.
+            string[] coreOrder = { "Female", "Male", "Thin", "Fat", "Hulk" };
+            bodyTypes = DefDatabase<BodyTypeDef>.AllDefsListForReading
+                .Where(b => !b.bodyNakedGraphicPath.NullOrEmpty()
+                    && b.defName != "Baby" && b.defName != "Child")
+                .OrderBy(b => { int i = System.Array.IndexOf(coreOrder, b.defName); return i < 0 ? 99 : i; })
+                .ThenBy(b => b.defName)
+                .ToList();
+            RebuildHeadList();
+
             forcePause = true;
             doCloseX = true;
             absorbInputAroundWindow = true;
             closeOnClickedOutside = false;
+        }
+
+        /// <summary>Every head the def database offers for the chosen gender —
+        /// modded face/head packs included. Gene-locked and destroyed-head
+        /// variants are skipped.</summary>
+        private void RebuildHeadList()
+        {
+            heads = DefDatabase<HeadTypeDef>.AllDefsListForReading
+                .Where(h => !h.graphicPath.NullOrEmpty()
+                    && h.requiredGenes.NullOrEmpty()
+                    && (h.gender == selectedGender || h.gender == Gender.None)
+                    && !h.defName.Contains("Stump") && !h.defName.Contains("Skull"))
+                .OrderBy(h => h.defName)
+                .ToList();
         }
 
         public override void DoWindowContents(Rect inRect)
@@ -87,49 +121,59 @@ namespace ShipHoloAI
 
             float top = 40f;
             float bottom = inRect.height - 40f;
-            Rect previewRect = new Rect(0f, top, PreviewWidth, 330f);
+
+            // ---- Left column: preview + gender + body type ----
+            Rect previewRect = new Rect(0f, top, LeftWidth, 320f);
             DrawPreview(previewRect);
 
-            float rightX = PreviewWidth + 16f;
-            float rightWidth = inRect.width - rightX;
-
-            // Hairstyle grid.
-            Widgets.Label(new Rect(rightX, top, rightWidth, 24f), "HoloAI_StylingHair".Translate());
-            Rect gridOuter = new Rect(rightX, top + 26f, rightWidth, 304f);
-            int rows = Mathf.CeilToInt(hairs.Count / (float)HairColumns);
-            Rect gridView = new Rect(0f, 0f, gridOuter.width - 20f, rows * (HairCellSize + 4f));
-            Widgets.BeginScrollView(gridOuter, ref hairScroll, gridView);
-            for (int i = 0; i < hairs.Count; i++)
+            float ly = previewRect.yMax + 10f;
+            Rect femaleRect = new Rect(0f, ly, LeftWidth / 2f - 3f, 30f);
+            Rect maleRect = new Rect(LeftWidth / 2f + 3f, ly, LeftWidth / 2f - 3f, 30f);
+            if (DrawToggleButton(femaleRect, "Female".Translate(), selectedGender == Gender.Female))
             {
-                HairDef hair = hairs[i];
-                Rect cell = new Rect(
-                    (i % HairColumns) * (HairCellSize + 4f),
-                    (i / HairColumns) * (HairCellSize + 4f),
-                    HairCellSize, HairCellSize);
-                Widgets.DrawBoxSolid(cell, new Color(0.10f, 0.13f, 0.18f, 0.9f));
-                Texture2D tex = ContentFinder<Texture2D>.Get(hair.texPath + "_south", reportFailure: false);
-                if (tex != null)
+                SetGender(Gender.Female);
+            }
+            if (DrawToggleButton(maleRect, "Male".Translate(), selectedGender == Gender.Male))
+            {
+                SetGender(Gender.Male);
+            }
+
+            ly += 38f;
+            Widgets.Label(new Rect(0f, ly, LeftWidth, 24f), "HoloAI_StylingBody".Translate());
+            ly += 24f;
+            float bx = 0f;
+            foreach (BodyTypeDef body in bodyTypes)
+            {
+                float w = Mathf.Max(64f, Text.CalcSize(body.defName).x + 18f);
+                if (bx + w > LeftWidth)
                 {
-                    GUI.color = new Color(selectedColor.r, selectedColor.g, selectedColor.b);
-                    Widgets.DrawTextureFitted(cell.ContractedBy(2f), tex, 1f);
-                    GUI.color = Color.white;
+                    bx = 0f;
+                    ly += 32f;
                 }
-                GUI.color = hair == selectedHair
-                    ? new Color(0.05f, 0.68f, 1f)
-                    : new Color(1f, 1f, 1f, 0.2f);
-                Widgets.DrawBox(cell);
-                GUI.color = Color.white;
-                TooltipHandler.TipRegion(cell, hair.LabelCap);
-                if (Widgets.ButtonInvisible(cell))
+                if (DrawToggleButton(new Rect(bx, ly, w, 28f), body.defName, selectedBody == body))
                 {
-                    selectedHair = hair;
+                    selectedBody = body;
                     ApplyLive();
                 }
+                bx += w + 6f;
             }
-            Widgets.EndScrollView();
 
-            // Color swatches.
-            float swatchTop = top + 340f;
+            // ---- Right column ----
+            float rightX = LeftWidth + 16f;
+            float rightWidth = inRect.width - rightX;
+
+            Widgets.Label(new Rect(rightX, top, rightWidth, 24f), "HoloAI_StylingHair".Translate());
+            DrawDefGrid(new Rect(rightX, top + 26f, rightWidth, 190f), hairs, ref hairScroll,
+                HairCellSize, h => h.texPath, h => h.LabelCap,
+                h => h == selectedHair, h => { selectedHair = h; ApplyLive(); }, tintThumb: true);
+
+            float headTop = top + 226f;
+            Widgets.Label(new Rect(rightX, headTop, rightWidth, 24f), "HoloAI_StylingFace".Translate());
+            DrawDefGrid(new Rect(rightX, headTop + 26f, rightWidth, 128f), heads, ref headScroll,
+                HeadCellSize, h => h.graphicPath, h => h.defName.Replace("_", " "),
+                h => h == selectedHead, h => { selectedHead = h; ApplyLive(); }, tintThumb: false);
+
+            float swatchTop = headTop + 164f;
             Widgets.Label(new Rect(rightX, swatchTop, rightWidth, 24f), "HoloAI_StylingColor".Translate());
             float sy = swatchTop + 26f;
             for (int i = 0; i < Swatches.Length; i++)
@@ -149,7 +193,6 @@ namespace ShipHoloAI
                 }
             }
 
-            // RGB sliders for anything the swatches don't cover.
             float sliderTop = sy + 2f * (SwatchSize + 6f) + 10f;
             Color slid = selectedColor;
             slid.r = Widgets.HorizontalSlider(new Rect(rightX, sliderTop, rightWidth - 10f, 20f), slid.r, 0f, 1f, true, null, "R");
@@ -161,11 +204,11 @@ namespace ShipHoloAI
                 ApplyLive();
             }
 
-            // Bottom buttons.
+            // ---- Bottom buttons ----
             if (Widgets.ButtonText(new Rect(0f, bottom, 140f, 32f), "CancelButton".Translate()))
             {
                 RestoreOriginal();
-                accepted = true; // restored already; PostClose must not double-fire
+                accepted = true; // already restored; PostClose must not double-fire
                 Close();
             }
             if (Widgets.ButtonText(new Rect(inRect.width - 140f, bottom, 140f, 32f), "AcceptButton".Translate()))
@@ -175,9 +218,81 @@ namespace ShipHoloAI
             }
         }
 
+        private void SetGender(Gender gender)
+        {
+            if (selectedGender == gender)
+            {
+                return;
+            }
+            selectedGender = gender;
+            // Swap the gendered core body along with the toggle; androgynous
+            // types (Thin/Fat/Hulk and most modded ones) stay put.
+            if (selectedBody == BodyTypeDefOf.Female && gender == Gender.Male)
+            {
+                selectedBody = BodyTypeDefOf.Male;
+            }
+            else if (selectedBody == BodyTypeDefOf.Male && gender == Gender.Female)
+            {
+                selectedBody = BodyTypeDefOf.Female;
+            }
+            RebuildHeadList();
+            if (!heads.Contains(selectedHead))
+            {
+                selectedHead = heads.FirstOrDefault(h => h.defName.Contains("Average"))
+                    ?? heads.FirstOrDefault();
+            }
+            ApplyLive();
+        }
+
+        private delegate string PathGetter<T>(T def);
+
+        private void DrawDefGrid<T>(Rect outer, List<T> defs, ref Vector2 scroll, float cell,
+            PathGetter<T> path, System.Func<T, string> tip,
+            System.Func<T, bool> isSelected, System.Action<T> select, bool tintThumb) where T : Def
+        {
+            int columns = Mathf.Max(1, Mathf.FloorToInt((outer.width - 20f) / (cell + 4f)));
+            int rows = Mathf.CeilToInt(defs.Count / (float)columns);
+            Rect view = new Rect(0f, 0f, outer.width - 20f, rows * (cell + 4f));
+            Widgets.BeginScrollView(outer, ref scroll, view);
+            for (int i = 0; i < defs.Count; i++)
+            {
+                T def = defs[i];
+                Rect cellRect = new Rect((i % columns) * (cell + 4f), (i / columns) * (cell + 4f), cell, cell);
+                Widgets.DrawBoxSolid(cellRect, new Color(0.10f, 0.13f, 0.18f, 0.9f));
+                Texture2D tex = ContentFinder<Texture2D>.Get(path(def) + "_south", reportFailure: false);
+                if (tex != null)
+                {
+                    GUI.color = tintThumb
+                        ? new Color(selectedColor.r, selectedColor.g, selectedColor.b)
+                        : new Color(0.75f, 0.90f, 1f);
+                    Widgets.DrawTextureFitted(cellRect.ContractedBy(2f), tex, 1f);
+                    GUI.color = Color.white;
+                }
+                GUI.color = isSelected(def)
+                    ? new Color(0.05f, 0.68f, 1f)
+                    : new Color(1f, 1f, 1f, 0.2f);
+                Widgets.DrawBox(cellRect);
+                GUI.color = Color.white;
+                TooltipHandler.TipRegion(cellRect, tip(def));
+                if (Widgets.ButtonInvisible(cellRect))
+                {
+                    select(def);
+                }
+            }
+            Widgets.EndScrollView();
+        }
+
+        private bool DrawToggleButton(Rect rect, string label, bool active)
+        {
+            if (active)
+            {
+                Widgets.DrawBoxSolid(rect, new Color(0.05f, 0.35f, 0.55f, 0.5f));
+            }
+            return Widgets.ButtonText(rect, label);
+        }
+
         /// <summary>Composites the hologram exactly as the render tree projects
-        /// her — body, outfit, head, then the SELECTED hair in the SELECTED color
-        /// through the real hologram filter — so the preview is truthful.</summary>
+        /// her, from the SELECTED body/outfit/head/hair — the preview is truthful.</summary>
         private void DrawPreview(Rect rect)
         {
             Widgets.DrawBoxSolid(rect, new Color(0.015f, 0.04f, 0.09f, 0.9f));
@@ -191,9 +306,9 @@ namespace ShipHoloAI
             Rect bodyRect = new Rect(rect.x, rect.y + topPad + headLift, size, size);
             Rect headRect = new Rect(bodyRect.x, bodyRect.y - headLift, size, size);
 
-            DrawLayer(bodyRect, BodyTexPath, BodyFilter);
-            DrawLayer(bodyRect, OutfitTexPath, OutfitFilter);
-            DrawLayer(headRect, HeadTexPath, HeadFilter);
+            DrawLayer(bodyRect, selectedBody?.bodyNakedGraphicPath, BodyFilter);
+            DrawLayer(bodyRect, Pawn_HoloAvatar.OutfitPathFor(selectedBody), OutfitFilter);
+            DrawLayer(headRect, selectedHead?.graphicPath, HeadFilter);
             if (selectedHair != null && !selectedHair.noGraphic && !selectedHair.texPath.NullOrEmpty())
             {
                 DrawLayer(headRect, selectedHair.texPath, new HoloFilter(selectedColor, HairAlpha));
@@ -202,6 +317,10 @@ namespace ShipHoloAI
 
         private static void DrawLayer(Rect rect, string texPath, HoloFilter filter)
         {
+            if (texPath.NullOrEmpty())
+            {
+                return;
+            }
             Material mat = HoloGraphicPool.Get(texPath, filter).MatSouth;
             if (mat != null && mat.mainTexture != null)
             {
@@ -217,11 +336,13 @@ namespace ShipHoloAI
         private void ApplyLive()
         {
             avatar.ApplyStyleOverride(selectedHair, selectedColor);
+            avatar.SetAppearance(selectedGender, selectedBody, selectedHead);
         }
 
         private void RestoreOriginal()
         {
-            avatar.ApplyStyleOverride(originalHair, originalColor);
+            avatar.ApplyStyleOverride(original.hair, original.color);
+            avatar.SetAppearance(original.gender, original.bodyType, original.headType);
         }
 
         public override void PostClose()
@@ -229,7 +350,6 @@ namespace ShipHoloAI
             base.PostClose();
             if (!accepted)
             {
-                // Closed via X / escape: treat as cancel.
                 RestoreOriginal();
             }
         }

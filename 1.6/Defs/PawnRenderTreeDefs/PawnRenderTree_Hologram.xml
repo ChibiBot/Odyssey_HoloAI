@@ -18,6 +18,7 @@
           <workerClass>PawnRenderNodeWorker</workerClass>
           <tagDef>Body</tagDef>
           <texPath>Things/Pawn/Humanlike/Bodies/Naked_Female</texPath>
+          <holoPart>body</holoPart>
           <colorType>Custom</colorType>
           <color>(0.55, 0.82, 1.0, 0.95)</color>
           <dissolveFrom>0.38</dissolveFrom>
@@ -31,18 +32,20 @@
           <nodeClass>ShipHoloAI.PawnRenderNode_HoloPart</nodeClass>
           <workerClass>PawnRenderNodeWorker</workerClass>
           <texPath>Things/Pawn/Humanlike/Apparel/ShirtButton/ShirtButton_Female</texPath>
+          <holoPart>outfit</holoPart>
           <colorType>Custom</colorType>
           <color>(0.80, 0.93, 1.0, 0.95)</color>
           <dissolveFrom>0.30</dissolveFrom>
           <overrideMeshSize>(1.5, 1.5)</overrideMeshSize>
           <baseLayer>20</baseLayer>
         </li>
-        <li>
+        <li Class="ShipHoloAI.PawnRenderNodeProperties_Holo">
           <debugLabel>HoloHead</debugLabel>
           <nodeClass>ShipHoloAI.PawnRenderNode_HoloPart</nodeClass>
           <workerClass>PawnRenderNodeWorker</workerClass>
           <tagDef>Head</tagDef>
           <texPath>Things/Pawn/Humanlike/Heads/Female/Female_Average_Normal</texPath>
+          <holoPart>head</holoPart>
           <colorType>Custom</colorType>
           <color>(0.60, 0.85, 1.0, 0.95)</color>
           <overrideMeshSize>(1.5, 1.5)</overrideMeshSize>

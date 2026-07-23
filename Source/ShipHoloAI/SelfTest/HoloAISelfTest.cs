@@ -102,6 +102,21 @@ namespace ShipHoloAI
                         Check("hairstyle cycles", core.Avatar.CurrentHairDef != before);
                         // Remembered for the restyle-persistence check at restore time.
                         restyledPrismHair = core.Avatar.CurrentHairDef;
+                        // Full appearance change: male hulk with a male head — the
+                        // render tree must resolve every part, and the whole look
+                        // must survive the persona carousel (checked at restore).
+                        core.Avatar.SetAppearance(Gender.Male, BodyTypeDefOf.Hulk,
+                            DefDatabase<HeadTypeDef>.GetNamedSilentFail("Male_AverageNormal"));
+                        Check("appearance applies (gender/body/head resolve)",
+                            core.Avatar.gender == Gender.Male
+                            && core.Avatar.CurrentBodyType == BodyTypeDefOf.Hulk
+                            && core.Avatar.CurrentHeadType != null
+                            && ContentFinder<Texture2D>.Get(
+                                core.Avatar.CurrentBodyType.bodyNakedGraphicPath + "_south",
+                                reportFailure: false) != null
+                            && ContentFinder<Texture2D>.Get(
+                                core.Avatar.CurrentHeadType.graphicPath + "_south",
+                                reportFailure: false) != null);
                         Log.Message("[HoloAI SelfTest] hair: " + before?.defName + " -> "
                             + core.Avatar.CurrentHairDef?.defName);
                     }
@@ -1178,12 +1193,15 @@ namespace ShipHoloAI
                 && core.Avatar.Name?.ToStringFull == "P.R.I.S.M.");
             Check("restore keeps the outgoing persona archived",
                 core.IsUnlocked(HoloAI_DefOf.HoloAI_Persona_HERMES));
-            // The hairstyle cycled at tick 1400 must survive the whole persona
-            // carousel: PRISM -> HERMES -> ... -> PRISM regenerates a fresh pawn,
-            // so this passes only if the core's style memory reapplied it.
+            // The look customized at tick 1400 (cycled hair + male hulk) must
+            // survive the whole persona carousel: PRISM -> HERMES -> ... -> PRISM
+            // regenerates a fresh pawn, so this passes only if the core's style
+            // memory reapplied everything.
             Check("player restyle survives persona swaps",
                 restyledPrismHair != null && core.Avatar != null
-                && core.Avatar.CurrentHairDef == restyledPrismHair);
+                && core.Avatar.CurrentHairDef == restyledPrismHair
+                && core.Avatar.gender == Gender.Male
+                && core.Avatar.CurrentBodyType == BodyTypeDefOf.Hulk);
             Check("break MTB factor back to x1 without I.X.I.A.",
                 testColonist == null || !testColonist.Spawned
                 || Patch_PrisonBreakMtb.BreakMtbFactorFor(testColonist) == 1f);
