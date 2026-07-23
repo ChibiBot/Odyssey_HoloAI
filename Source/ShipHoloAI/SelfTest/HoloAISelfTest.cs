@@ -307,7 +307,7 @@ namespace ShipHoloAI
             string[] roots =
             {
                 "announce_threatbig", "announce_threatsmall", "announce_negative",
-                "announce_lowfuel", "bark",
+                "announce_lowfuel", "bark", "spawn",
             };
             foreach (HoloPersonaDef persona in DefDatabase<HoloPersonaDef>.AllDefsListForReading)
             {

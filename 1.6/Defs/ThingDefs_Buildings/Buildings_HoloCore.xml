@@ -10,7 +10,9 @@
     <designationCategory>Odyssey</designationCategory>
     <uiOrder>2310</uiOrder>
     <constructionSkillPrerequisite>6</constructionSkillPrerequisite>
-    <rotatable>true</rotatable>
+    <!-- Non-rotatable: the console face always reads south. (The east/north
+         textures remain on disk for Graphic_Multi's loader but are unused.) -->
+    <rotatable>false</rotatable>
     <graphicData>
       <graphicClass>Graphic_Multi</graphicClass>
       <texPath>HoloAI/Buildings/HoloCore</texPath>

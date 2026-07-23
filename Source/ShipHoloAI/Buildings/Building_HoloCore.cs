@@ -92,6 +92,8 @@ namespace ShipHoloAI
             innerContainer.Remove(avatar);
             GenSpawn.Spawn(avatar, cell, Map);
             FleckMaker.ThrowLightningGlow(cell.ToVector3Shifted(), Map, 1.2f);
+            // Each persona announces herself on materialization, in her own voice.
+            PrismSpeech.Bark(avatar, "spawn");
         }
 
         public void StoreAvatar()
@@ -210,6 +212,18 @@ namespace ShipHoloAI
 
         private bool TryFindProjectionCell(out IntVec3 result)
         {
+            // She is a shipboard projection: the cell must be ON the ship. A core
+            // hugging the hull has radius-2 cells on the dirt outside — without
+            // the substructure clause she could materialize off-ship (and then
+            // awkwardly snap back). Substructure-first, with the old looser rule
+            // only as a fallback so a core somehow off the grid still projects.
+            if (CellFinder.TryFindRandomCellNear(Position, Map, 2,
+                    c => c.Standable(Map) && !c.Fogged(Map)
+                        && Map.terrainGrid.FoundationAt(c)?.IsSubstructure == true,
+                    out result))
+            {
+                return true;
+            }
             return CellFinder.TryFindRandomCellNear(Position, Map, 2,
                 c => c.Standable(Map) && !c.Fogged(Map), out result);
         }
