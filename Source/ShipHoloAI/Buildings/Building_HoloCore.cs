@@ -277,16 +277,26 @@ namespace ShipHoloAI
                     defaultLabel = "HoloAI_Summon".Translate(),
                     defaultDesc = "HoloAI_SummonDesc".Translate(),
                     icon = HoloAIIcons.Summon,
+                    // She is light: summoning TELEPORTS her (no walk job that could
+                    // drag her across — or off — the deck), and only gravship
+                    // substructure is a legal landing.
                     targetingParams = new TargetingParameters
                     {
                         canTargetLocations = true,
                         canTargetPawns = false,
                         canTargetBuildings = false,
+                        validator = t => t.Cell.InBounds(Map)
+                            && t.Cell.Standable(Map)
+                            && !t.Cell.Fogged(Map)
+                            && Map.terrainGrid.FoundationAt(t.Cell)?.IsSubstructure == true,
                     },
                     action = target =>
                     {
-                        Job job = JobMaker.MakeJob(JobDefOf.Goto, target.Cell);
-                        avatar.jobs.StartJob(job, JobCondition.InterruptForced);
+                        FleckMaker.ThrowLightningGlow(avatar.DrawPos, Map, 0.8f);
+                        avatar.jobs?.StopAll();
+                        avatar.Position = target.Cell;
+                        avatar.Notify_Teleported();
+                        FleckMaker.ThrowLightningGlow(avatar.DrawPos, Map, 0.8f);
                     },
                 };
             }

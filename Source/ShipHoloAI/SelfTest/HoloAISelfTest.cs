@@ -167,6 +167,7 @@ namespace ShipHoloAI
                 case 9300:
                     TestUnattackable();
                     TestStylingTrackers();
+                    TestSummonTeleport(map);
                     StartTeleportTest(map);
                     SpawnMinifiedCore(map);
                     break;
@@ -470,6 +471,40 @@ namespace ShipHoloAI
                 Log.Message("[HoloAI SelfTest] styling dialog threw: " + e);
                 Check("styling dialog constructs and closes cleanly", pass: false);
                 Check("cancelling the styling dialog restores the style", pass: false);
+            }
+        }
+
+        /// <summary>Summon is a validated TELEPORT: off-ship cells must be rejected
+        /// by the targeting validator, and a legal substructure target must move
+        /// her instantly (no walk job that could drag her off the deck).</summary>
+        private void TestSummonTeleport(Map map)
+        {
+            Pawn_HoloAvatar avatar = core.Avatar;
+            Command_Target summon = avatar != null && avatar.Spawned
+                ? core.GetGizmos().OfType<Command_Target>().FirstOrDefault()
+                : null;
+            if (summon == null)
+            {
+                Check("summon rejects off-ship targets", pass: false);
+                Check("summon teleports to the legal cell", pass: false);
+                return;
+            }
+            bool foundOffShip = CellFinder.TryFindRandomCellNear(siteCenter, map, 30,
+                c => c.Standable(map) && map.terrainGrid.FoundationAt(c) == null,
+                out IntVec3 offShip);
+            Check("summon rejects off-ship targets",
+                foundOffShip && !summon.targetingParams.validator(new TargetInfo(offShip, map)));
+            if (CellFinder.TryFindRandomCellNear(core.Position, map, 4,
+                    c => c.Standable(map) && c != avatar.Position
+                        && map.terrainGrid.FoundationAt(c)?.IsSubstructure == true,
+                    out IntVec3 dest))
+            {
+                summon.action(new LocalTargetInfo(dest));
+                Check("summon teleports to the legal cell", avatar.Position == dest);
+            }
+            else
+            {
+                Check("summon teleports to the legal cell", pass: false);
             }
         }
 
