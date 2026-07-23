@@ -9,4 +9,21 @@
     </value>
   </Operation>
 
+  <!-- Vanilla Gravship Expanded - Chapter 1 replaces the progression with its
+       own engine tiers (Gravjumper/Gravhulk), each carrying its own facility
+       whitelist — without this, the holocore links only to the starter engine
+       and "unlinks" the moment a VGE ship upgrades. Patches run over the whole
+       merged XML, so load order does not matter here. -->
+  <Operation Class="PatchOperationFindMod">
+    <mods>
+      <li>Vanilla Gravship Expanded - Chapter 1</li>
+    </mods>
+    <match Class="PatchOperationAdd">
+      <xpath>Defs/ThingDef[defName="VGE_GravjumperEngine" or defName="VGE_GravhulkEngine"]/comps/li[@Class="CompProperties_AffectedByFacilities"]/linkableFacilities</xpath>
+      <value>
+        <li>HoloAI_HoloCore</li>
+      </value>
+    </match>
+  </Operation>
+
 </Patch>
