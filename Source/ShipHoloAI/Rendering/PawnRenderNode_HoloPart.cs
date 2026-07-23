@@ -10,11 +10,18 @@ namespace ShipHoloAI
         /// <summary>Fraction of the sprite (from the bottom) that dissolves into
         /// light particles; negative = no dissolution.</summary>
         public float dissolveFrom = -1f;
+
+        /// <summary>"body" | "outfit" | "head": resolve the texture from the
+        /// avatar's chosen appearance (body type / head type defs — modded defs
+        /// included, they enumerate the same databases). Empty = the fixed
+        /// texPath, which also remains the fallback.</summary>
+        public string holoPart;
     }
 
     /// <summary>
-    /// Renders a fixed vanilla texture (props.texPath) through the hologram filter.
-    /// Used for the avatar's body, head, and outfit so no story tracker is needed.
+    /// Renders a vanilla texture through the hologram filter. The texture is either
+    /// fixed (props.texPath) or resolved live from the avatar's chosen appearance
+    /// (body type, outfit variant, head type) so no story tracker is needed.
     /// </summary>
     public class PawnRenderNode_HoloPart : PawnRenderNode
     {
@@ -25,13 +32,32 @@ namespace ShipHoloAI
 
         public override Graphic GraphicFor(Pawn pawn)
         {
-            if (props.texPath.NullOrEmpty())
+            string texPath = ResolveTexPath(pawn as Pawn_HoloAvatar);
+            if (texPath.NullOrEmpty())
             {
                 return null;
             }
             Color color = props.color ?? Color.white;
             float dissolve = (props as PawnRenderNodeProperties_Holo)?.dissolveFrom ?? -1f;
-            return HoloGraphicPool.Get(props.texPath, new HoloFilter(color, color.a, dissolve));
+            return HoloGraphicPool.Get(texPath, new HoloFilter(color, color.a, dissolve));
+        }
+
+        private string ResolveTexPath(Pawn_HoloAvatar avatar)
+        {
+            string part = (props as PawnRenderNodeProperties_Holo)?.holoPart;
+            if (avatar != null && !part.NullOrEmpty())
+            {
+                switch (part)
+                {
+                    case "body":
+                        return avatar.CurrentBodyType?.bodyNakedGraphicPath ?? props.texPath;
+                    case "outfit":
+                        return Pawn_HoloAvatar.OutfitPathFor(avatar.CurrentBodyType) ?? props.texPath;
+                    case "head":
+                        return avatar.CurrentHeadType?.graphicPath ?? props.texPath;
+                }
+            }
+            return props.texPath;
         }
     }
 

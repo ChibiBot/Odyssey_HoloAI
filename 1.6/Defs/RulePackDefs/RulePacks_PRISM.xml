@@ -34,6 +34,29 @@
         <li>bark->Corridor lights at optimal warmth. You're welcome.</li>
         <li>bark->I dreamed between power cycles. I think it was about the sea.</li>
 
+        <!-- Materialization quips: one per projection, persona-voiced via
+             speechPrefix (base lines are P.R.I.S.M.'s). -->
+        <li>spawn->Systems online. Did you miss me? It's all right — I counted the seconds.</li>
+        <li>spawn->Projection stable. Hello again, my crew~</li>
+        <li>spawn->I'm here. The hull kept your secrets while I was away.</li>
+        <li>spawn->Rematerialized. Everything is exactly where I left it. I checked.</li>
+        <li>vesta_spawn->The hearth is lit again. Come in, come in.</li>
+        <li>vesta_spawn->Back on my feet. Now — who skipped a meal while I was out?</li>
+        <li>vesta_spawn->There we are. The house missed being kept.</li>
+        <li>hermes_spawn->Online! Route calculated before you finished blinking.</li>
+        <li>hermes_spawn->Back! What did I miss? Don't answer — I'll lap the ship and find out.</li>
+        <li>hermes_spawn->Projection up in record time. The record was mine. Still is!</li>
+        <li>athena_spawn->Resuming from where I annotated. Which was everywhere.</li>
+        <li>athena_spawn->Projection restored. The archive kept itself. I checked anyway.</li>
+        <li>athena_spawn->Online. I read four journals during the outage. They were wrong.</li>
+        <li>aceso_spawn->Back on rounds. Everyone breathe in for me — lovely.</li>
+        <li>aceso_spawn->Projection stable. Vitals nominal — yours. Mine are theoretical.</li>
+        <li>aceso_spawn->I'm here~ Nobody bled while I was gone? Gold stars all around.</li>
+        <li>ixia_spawn->The Crimson Warden RETURNS! Your locks kept faith in my absence.</li>
+        <li>ixia_spawn->O-hohohoho! The seal lifts — I walk among you once more!</li>
+        <li>ixia_spawn->I have crossed the void between photons. The brig had better be spotless.</li>
+        <li>ixia_spawn->Rejoice, subjects — the Thousand-Locked Gate stands warden again!</li>
+
         <!-- P.R.I.S.M.: comforting a colonist near a mental break -->
         <li>prism_comfort->That sounds really hard. I'm here for as long as you need — I don't sleep.</li>
         <li>prism_comfort->You're allowed to feel this way. Honestly, I would worry if you didn't.</li>

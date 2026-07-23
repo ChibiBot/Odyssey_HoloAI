@@ -18,6 +18,8 @@ namespace ShipHoloAI
 
         private HairDef hairDef;
         private Color? hairColorInt;
+        private BodyTypeDef bodyTypeInt;
+        private HeadTypeDef headTypeInt;
         private int offShipTicks;
 
         private static readonly IntRange ChatCooldownTicks = new IntRange(2500, 7500);
@@ -38,12 +40,6 @@ namespace ShipHoloAI
         {
             get
             {
-                // While the styling dialog is open, a temp story tracker holds the
-                // live selection — mirror it so the render node updates in real time.
-                if (story?.hairDef != null)
-                {
-                    return story.hairDef;
-                }
                 if (hairDef == null)
                 {
                     hairDef = DefDatabase<HairDef>.GetNamedSilentFail("Flowy")
@@ -53,19 +49,44 @@ namespace ShipHoloAI
             }
         }
 
-        public Color HoloHairColor
+        public Color HoloHairColor => hairColorInt ?? DefaultHairColor;
+
+        public BodyTypeDef CurrentBodyType => bodyTypeInt ?? BodyTypeDefOf.Female;
+
+        public HeadTypeDef CurrentHeadType => headTypeInt
+            ?? DefDatabase<HeadTypeDef>.GetNamedSilentFail("Female_AverageNormal");
+
+        /// <summary>Worn outfit variant for a body type; vanilla ships ShirtButton
+        /// for every core body, modded body types without a variant fall back to
+        /// the female cut.</summary>
+        public static string OutfitPathFor(BodyTypeDef body)
         {
-            get
+            string path = "Things/Pawn/Humanlike/Apparel/ShirtButton/ShirtButton_"
+                + (body?.defName ?? "Female");
+            if (ContentFinder<Texture2D>.Get(path + "_south", reportFailure: false) == null)
             {
-                if (story != null)
-                {
-                    return story.HairColor;
-                }
-                return hairColorInt ?? DefaultHairColor;
+                path = "Things/Pawn/Humanlike/Apparel/ShirtButton/ShirtButton_Female";
+            }
+            return path;
+        }
+
+        /// <summary>Set gender/body/head together (the styling dialog's appearance
+        /// tab). Gender flips grammar in every interaction and announcement for
+        /// free; body and head resolve through the render tree's holoPart nodes.</summary>
+        public void SetAppearance(Gender newGender, BodyTypeDef body, HeadTypeDef head)
+        {
+            gender = newGender;
+            bodyTypeInt = body;
+            headTypeInt = head;
+            if (Spawned)
+            {
+                Drawer.renderer.SetAllGraphicsDirty();
             }
         }
 
-        /// <summary>Adopt a persona's identity: name, default hair, and hair color.</summary>
+        /// <summary>Adopt a persona's identity: name, default hair/color, and the
+        /// canon appearance (female, default body and head) — a remembered player
+        /// override is reapplied on top by the core afterwards.</summary>
         public void ApplyPersonaStyle(HoloPersonaDef persona)
         {
             Name = new NameSingle(persona.avatarName ?? persona.label);
@@ -75,6 +96,25 @@ namespace ShipHoloAI
                 hairDef = personaHair;
             }
             hairColorInt = persona.hairColor;
+            gender = Gender.Female;
+            bodyTypeInt = null;
+            headTypeInt = null;
+            if (Spawned)
+            {
+                Drawer.renderer.SetAllGraphicsDirty();
+            }
+        }
+
+        /// <summary>Restore a player restyle remembered by the core — overrides the
+        /// persona defaults ApplyPersonaStyle just set (see Building_HoloCore's
+        /// per-persona style memory).</summary>
+        public void ApplyStyleOverride(HairDef hair, Color color)
+        {
+            if (hair != null)
+            {
+                hairDef = hair;
+            }
+            hairColorInt = color;
             if (Spawned)
             {
                 Drawer.renderer.SetAllGraphicsDirty();
@@ -97,60 +137,12 @@ namespace ShipHoloAI
             Drawer.renderer.SetAllGraphicsDirty();
         }
 
-        /// <summary>
-        /// Attach minimal story/style trackers (humanlike-only normally; the styling
-        /// dialog dereferences them in its constructor) and open the instant-apply
-        /// styling UI. Ideology must be active. skinColorOverride is mandatory —
-        /// story.SkinColor throws on a genes-less pawn without it.
-        /// </summary>
+        /// <summary>Open the custom styling UI — core-game hair defs and colors
+        /// only, so it works identically with or without Ideology and needs none
+        /// of the old temp story-tracker machinery.</summary>
         public void OpenStylingUI()
         {
-            AttachStyleTrackers();
-            Find.WindowStack.Add(new Dialog_HoloStyling(this));
-        }
-
-        public void AttachStyleTrackers()
-        {
-            // Read the color BEFORE the story tracker exists: HoloHairColor routes
-            // through the tracker once one is attached, so reading it afterward
-            // returns the fresh tracker's default — silently stripping the persona
-            // color, and the stripped value then survives DetachStyleTrackers even
-            // when the styling dialog is cancelled.
-            Color hairColor = HoloHairColor;
-            story = new Pawn_StoryTracker(this)
-            {
-                hairDef = CurrentHairDef,
-                skinColorOverride = new Color(0.78f, 0.94f, 1f),
-                bodyType = BodyTypeDefOf.Female,
-                headType = DefDatabase<HeadTypeDef>.GetNamedSilentFail("Female_AverageNormal"),
-            };
-            story.HairColor = hairColor;
-            style = new Pawn_StyleTracker(this)
-            {
-                beardDef = BeardDefOf.NoBeard,
-            };
-            if (ModsConfig.IdeologyActive)
-            {
-                style.FaceTattoo = TattooDefOf.NoTattoo_Face;
-                style.BodyTattoo = TattooDefOf.NoTattoo_Body;
-            }
-        }
-
-        /// <summary>Copy the dialog's picks back and drop the temp trackers so they
-        /// never leak into a save (Pawn.ExposeData would scribe them).</summary>
-        public void DetachStyleTrackers()
-        {
-            if (story != null)
-            {
-                if (story.hairDef != null)
-                {
-                    hairDef = story.hairDef;
-                }
-                hairColorInt = story.HairColor;
-            }
-            story = null;
-            style = null;
-            Drawer.renderer.SetAllGraphicsDirty();
+            Find.WindowStack.Add(new Dialog_HoloAvatarStyling(this));
         }
 
         public void SetChatCooldown()
@@ -239,26 +231,14 @@ namespace ShipHoloAI
             {
                 yield return gizmo;
             }
-            if (ModsConfig.IdeologyActive)
+            // One styling UI for everyone — core hair defs + colors, no DLC gate.
+            yield return new Command_Action
             {
-                yield return new Command_Action
-                {
-                    defaultLabel = "HoloAI_Restyle".Translate(),
-                    defaultDesc = "HoloAI_RestyleDesc".Translate(),
-                    icon = HoloAIIcons.Restyle,
-                    action = OpenStylingUI,
-                };
-            }
-            else
-            {
-                yield return new Command_Action
-                {
-                    defaultLabel = "HoloAI_Hairstyle".Translate() + ": " + (CurrentHairDef?.LabelCap ?? "-"),
-                    defaultDesc = "HoloAI_HairstyleDesc".Translate(),
-                    icon = HoloAIIcons.Hairstyle,
-                    action = CycleHairstyle,
-                };
-            }
+                defaultLabel = "HoloAI_Restyle".Translate(),
+                defaultDesc = "HoloAI_RestyleDesc".Translate(),
+                icon = HoloAIIcons.Restyle,
+                action = OpenStylingUI,
+            };
             // Warden-specialist personas (I.X.I.A.) personally handle prisoner
             // recruitment and slave suppression instead of buffing crew via aura —
             // JobGiver_HoloWarden fires this automatically the instant a target is
@@ -272,6 +252,8 @@ namespace ShipHoloAI
             Scribe_Values.Look(ref nextChatTick, "nextChatTick");
             Scribe_Defs.Look(ref hairDef, "hairDef");
             Scribe_Values.Look(ref hairColorInt, "hairColor");
+            Scribe_Defs.Look(ref bodyTypeInt, "bodyType");
+            Scribe_Defs.Look(ref headTypeInt, "headType");
         }
     }
 }

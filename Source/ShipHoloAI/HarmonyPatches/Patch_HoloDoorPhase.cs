@@ -55,6 +55,49 @@ namespace ShipHoloAI
         }
     }
 
+    // The three checks below make her door-proof at the PATHFINDING level, not just
+    // the follower level: locks, mod door subclasses, and permission logic all
+    // funnel through these, and any of them returning "blocked" means the
+    // pathfinder never yields a route at all — the job dies instantly and repeats,
+    // which players see as the standing-error spam. (Field report: with Vanilla
+    // Gravship Expanded only vac checkpoints kept working — their pass check
+    // exempts non-breathing pawns, which is exactly this class of fix.)
+    [HarmonyPatch(typeof(Building_Door), nameof(Building_Door.PawnCanOpen))]
+    public static class Patch_Door_PawnCanOpen
+    {
+        public static void Postfix(Pawn p, ref bool __result)
+        {
+            if (!__result && p is Pawn_HoloAvatar)
+            {
+                __result = true;
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(Building_Door), nameof(Building_Door.CanPhysicallyPass))]
+    public static class Patch_Door_CanPhysicallyPass
+    {
+        public static void Postfix(Pawn p, ref bool __result)
+        {
+            if (!__result && p is Pawn_HoloAvatar)
+            {
+                __result = true;
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(Building_Door), nameof(Building_Door.BlocksPawn))]
+    public static class Patch_Door_BlocksPawn
+    {
+        public static void Postfix(Pawn p, ref bool __result)
+        {
+            if (__result && p is Pawn_HoloAvatar)
+            {
+                __result = false;
+            }
+        }
+    }
+
     [HarmonyPatch(typeof(Building_Door), nameof(Building_Door.CheckFriendlyTouched))]
     public static class Patch_Door_CheckFriendlyTouched
     {

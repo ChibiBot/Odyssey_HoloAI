@@ -32,6 +32,7 @@ namespace ShipHoloAI
         private Pawn wardenTestPrisoner;
         private Pawn wardenTestSlave;
         private Filth testFilth;
+        private HairDef restyledPrismHair;
 
         public HoloAISelfTest(Game game)
         {
@@ -99,6 +100,23 @@ namespace ShipHoloAI
                         Check("default hairstyle resolved", before != null);
                         core.Avatar.CycleHairstyle();
                         Check("hairstyle cycles", core.Avatar.CurrentHairDef != before);
+                        // Remembered for the restyle-persistence check at restore time.
+                        restyledPrismHair = core.Avatar.CurrentHairDef;
+                        // Full appearance change: male hulk with a male head — the
+                        // render tree must resolve every part, and the whole look
+                        // must survive the persona carousel (checked at restore).
+                        core.Avatar.SetAppearance(Gender.Male, BodyTypeDefOf.Hulk,
+                            DefDatabase<HeadTypeDef>.GetNamedSilentFail("Male_AverageNormal"));
+                        Check("appearance applies (gender/body/head resolve)",
+                            core.Avatar.gender == Gender.Male
+                            && core.Avatar.CurrentBodyType == BodyTypeDefOf.Hulk
+                            && core.Avatar.CurrentHeadType != null
+                            && ContentFinder<Texture2D>.Get(
+                                core.Avatar.CurrentBodyType.bodyNakedGraphicPath + "_south",
+                                reportFailure: false) != null
+                            && ContentFinder<Texture2D>.Get(
+                                core.Avatar.CurrentHeadType.graphicPath + "_south",
+                                reportFailure: false) != null);
                         Log.Message("[HoloAI SelfTest] hair: " + before?.defName + " -> "
                             + core.Avatar.CurrentHairDef?.defName);
                     }
@@ -289,7 +307,7 @@ namespace ShipHoloAI
             string[] roots =
             {
                 "announce_threatbig", "announce_threatsmall", "announce_negative",
-                "announce_lowfuel", "bark",
+                "announce_lowfuel", "bark", "spawn",
             };
             foreach (HoloPersonaDef persona in DefDatabase<HoloPersonaDef>.AllDefsListForReading)
             {
@@ -419,32 +437,39 @@ namespace ShipHoloAI
             Check("avatar unattackable (force-attack menu)", !result);
         }
 
+        /// <summary>The custom styling dialog (core-game content, no Ideology
+        /// gate): must construct and close cleanly, and closing without Accept
+        /// must roll back any live style changes.</summary>
         private void TestStylingTrackers()
         {
             Pawn_HoloAvatar avatar = core.Avatar;
-            if (!ModsConfig.IdeologyActive || avatar == null || !avatar.Spawned)
+            if (avatar == null || !avatar.Spawned)
             {
-                Log.Message("[HoloAI SelfTest] styling test skipped (no Ideology or no avatar)");
+                Check("styling dialog constructs and closes cleanly", pass: false);
+                Check("cancelling the styling dialog restores the style", pass: false);
                 return;
             }
             try
             {
+                HairDef hairBefore = avatar.CurrentHairDef;
                 Color colorBefore = avatar.HoloHairColor;
-                avatar.AttachStyleTrackers();
-                _ = new Dialog_HoloStyling(avatar);
-                avatar.DetachStyleTrackers();
-                Check("styling dialog constructs and trackers detach",
-                    avatar.story == null && avatar.style == null);
-                // Regression: attach/detach with no user picks (= opening the dialog
-                // and hitting cancel) must not strip the persona hair color.
-                Check("styling round-trip preserves hair color",
-                    avatar.HoloHairColor == colorBefore);
+                Dialog_HoloAvatarStyling dialog = new Dialog_HoloAvatarStyling(avatar);
+                Find.WindowStack.Add(dialog);
+                // Simulate a live pick, then close without accepting: PostClose
+                // must roll the avatar back to the style she opened with.
+                HairDef other = DefDatabase<HairDef>.AllDefsListForReading
+                    .FirstOrDefault(h => h != hairBefore && !h.noGraphic && !h.texPath.NullOrEmpty());
+                avatar.ApplyStyleOverride(other, new Color(1f, 0.1f, 0.1f));
+                Find.WindowStack.TryRemove(dialog, doCloseSound: false);
+                Check("styling dialog constructs and closes cleanly", pass: true);
+                Check("cancelling the styling dialog restores the style",
+                    avatar.CurrentHairDef == hairBefore && avatar.HoloHairColor == colorBefore);
             }
             catch (System.Exception e)
             {
                 Log.Message("[HoloAI SelfTest] styling dialog threw: " + e);
-                Check("styling dialog constructs and trackers detach", pass: false);
-                Check("styling round-trip preserves hair color", pass: false);
+                Check("styling dialog constructs and closes cleanly", pass: false);
+                Check("cancelling the styling dialog restores the style", pass: false);
             }
         }
 
@@ -992,6 +1017,11 @@ namespace ShipHoloAI
         /// XP through the vanilla learning pipeline plus the cooldown memory.</summary>
         private void TestAthenaSeminar()
         {
+            Log.Message("[HoloAI SelfTest] persona diag @" + ticks + ": avatar="
+                + (core.Avatar == null ? "null" : core.Avatar.Spawned ? "spawned" : "stored")
+                + " persona=" + core.ActivePersona?.defName
+                + " avatarName=" + core.Avatar?.Name?.ToStringFull
+                + " coresOnMap=" + core.Map.listerBuildings.AllBuildingsColonistOfClass<Building_HoloCore>().Count());
             Check("avatar reprojected as A.T.H.E.N.A.",
                 core.Avatar != null && core.Avatar.Spawned
                 && core.ActivePersona?.defName == "HoloAI_Persona_ATHENA");
@@ -1099,7 +1129,12 @@ namespace ShipHoloAI
             Check("emergency tend applied at calibrated quality",
                 tended && quality >= 0.2f && quality <= 0.75f);
             // No cooldown: wound her again and the giver must answer immediately.
-            testColonist.TakeDamage(new DamageInfo(DamageDefOf.Cut, 8f));
+            // The wound is injected directly — TakeDamage can be absorbed by armor
+            // or damage-model mods on heavy modlists, silently voiding the check.
+            Hediff_Injury refireCut = (Hediff_Injury)HediffMaker.MakeHediff(HediffDefOf.Cut, testColonist);
+            refireCut.Severity = 8f;
+            testColonist.health.AddHediff(refireCut,
+                testColonist.RaceProps.body.corePart);
             ThinkResult again = new JobGiver_HoloMedic().TryIssueJobPackage(core.Avatar, default(JobIssueParams));
             Check("emergency tend has no cooldown (giver re-fires immediately)",
                 again.Job != null && again.Job.def == HoloAI_DefOf.HoloAI_EmergencyTend);
@@ -1163,6 +1198,15 @@ namespace ShipHoloAI
                 && core.Avatar.Name?.ToStringFull == "P.R.I.S.M.");
             Check("restore keeps the outgoing persona archived",
                 core.IsUnlocked(HoloAI_DefOf.HoloAI_Persona_HERMES));
+            // The look customized at tick 1400 (cycled hair + male hulk) must
+            // survive the whole persona carousel: PRISM -> HERMES -> ... -> PRISM
+            // regenerates a fresh pawn, so this passes only if the core's style
+            // memory reapplied everything.
+            Check("player restyle survives persona swaps",
+                restyledPrismHair != null && core.Avatar != null
+                && core.Avatar.CurrentHairDef == restyledPrismHair
+                && core.Avatar.gender == Gender.Male
+                && core.Avatar.CurrentBodyType == BodyTypeDefOf.Hulk);
             Check("break MTB factor back to x1 without I.X.I.A.",
                 testColonist == null || !testColonist.Spawned
                 || Patch_PrisonBreakMtb.BreakMtbFactorFor(testColonist) == 1f);

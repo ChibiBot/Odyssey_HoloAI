@@ -10,6 +10,12 @@
   <HoloAI_HairstyleDesc>Cycle the avatar's holographic hairstyle. Light is easily restyled.</HoloAI_HairstyleDesc>
   <HoloAI_Restyle>restyle</HoloAI_Restyle>
   <HoloAI_RestyleDesc>Open the styling interface to reshape the avatar's holographic hair and color. Light is easily restyled.</HoloAI_RestyleDesc>
+  <HoloAI_StylingTitle>Reshape hologram</HoloAI_StylingTitle>
+  <HoloAI_StylingHair>Hairstyle</HoloAI_StylingHair>
+  <HoloAI_StylingFace>Face</HoloAI_StylingFace>
+  <HoloAI_StylingBody>Build</HoloAI_StylingBody>
+  <HoloAI_StylingBodyStandard>Standard</HoloAI_StylingBodyStandard>
+  <HoloAI_StylingColor>Light color</HoloAI_StylingColor>
   <HoloAI_InstallPersonaGizmo>install persona</HoloAI_InstallPersonaGizmo>
   <HoloAI_InstallPersonaGizmoDesc>Choose which persona this holocore projects (currently {0}). Switching between archived personas is instant; installing a new persona matrix consumes the matrix and adds her to the core's archive forever.</HoloAI_InstallPersonaGizmoDesc>
   <HoloAI_PersonaSwitcherTitle>Persona selection</HoloAI_PersonaSwitcherTitle>
