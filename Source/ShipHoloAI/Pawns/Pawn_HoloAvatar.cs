@@ -81,6 +81,22 @@ namespace ShipHoloAI
             }
         }
 
+        /// <summary>Restore a player restyle remembered by the core — overrides the
+        /// persona defaults ApplyPersonaStyle just set (see Building_HoloCore's
+        /// per-persona style memory).</summary>
+        public void ApplyStyleOverride(HairDef hair, Color color)
+        {
+            if (hair != null)
+            {
+                hairDef = hair;
+            }
+            hairColorInt = color;
+            if (Spawned)
+            {
+                Drawer.renderer.SetAllGraphicsDirty();
+            }
+        }
+
         public void CycleHairstyle()
         {
             int current = System.Array.IndexOf(CuratedHairDefNames, CurrentHairDef?.defName);

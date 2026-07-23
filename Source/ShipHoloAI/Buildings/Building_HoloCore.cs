@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using RimWorld;
+using UnityEngine;
 using Verse;
 using Verse.AI;
 
@@ -21,6 +22,15 @@ namespace ShipHoloAI
         // style) and permanently unlocks its persona here; switching among
         // archived personas afterward is instant and free.
         private List<HoloPersonaDef> archivedPersonas = new List<HoloPersonaDef>();
+        // Player restyles survive persona swaps: the outgoing avatar pawn is
+        // destroyed on swap, so her hair/color are remembered here per persona
+        // and reapplied when that persona is next generated.
+        private Dictionary<HoloPersonaDef, HairDef> styleMemoryHair = new Dictionary<HoloPersonaDef, HairDef>();
+        private Dictionary<HoloPersonaDef, Color> styleMemoryColor = new Dictionary<HoloPersonaDef, Color>();
+        private List<HoloPersonaDef> styleKeysWorking1;
+        private List<HairDef> styleHairsWorking;
+        private List<HoloPersonaDef> styleKeysWorking2;
+        private List<Color> styleColorsWorking;
 
         private CompPowerTrader powerComp;
 
@@ -107,6 +117,12 @@ namespace ShipHoloAI
             avatar.gender = Gender.Female;
             avatar.holoCore = this;
             avatar.ApplyPersonaStyle(ActivePersona);
+            // A remembered player restyle beats the persona defaults.
+            if (styleMemoryColor.TryGetValue(ActivePersona, out Color color))
+            {
+                styleMemoryHair.TryGetValue(ActivePersona, out HairDef hair);
+                avatar.ApplyStyleOverride(hair, color);
+            }
         }
 
         /// <summary>True when this core can project the persona without a matrix:
@@ -164,6 +180,13 @@ namespace ShipHoloAI
 
         private void SwapPersona(HoloPersonaDef newPersona)
         {
+            // Remember the outgoing persona's current style before her pawn is
+            // destroyed, so a restyle survives the round trip through the archive.
+            if (avatar != null)
+            {
+                styleMemoryHair[ActivePersona] = avatar.CurrentHairDef;
+                styleMemoryColor[ActivePersona] = avatar.HoloHairColor;
+            }
             StoreAvatar();
             innerContainer.ClearAndDestroyContents();
             avatar = null;
@@ -315,6 +338,10 @@ namespace ShipHoloAI
             Scribe_Values.Look(ref projectionEnabled, "projectionEnabled", defaultValue: true);
             Scribe_Defs.Look(ref activePersona, "activePersona");
             Scribe_Collections.Look(ref archivedPersonas, "archivedPersonas", LookMode.Def);
+            Scribe_Collections.Look(ref styleMemoryHair, "styleMemoryHair",
+                LookMode.Def, LookMode.Def, ref styleKeysWorking1, ref styleHairsWorking);
+            Scribe_Collections.Look(ref styleMemoryColor, "styleMemoryColor",
+                LookMode.Def, LookMode.Value, ref styleKeysWorking2, ref styleColorsWorking);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
                 if (innerContainer == null)
@@ -324,6 +351,14 @@ namespace ShipHoloAI
                 if (archivedPersonas == null)
                 {
                     archivedPersonas = new List<HoloPersonaDef>();
+                }
+                if (styleMemoryHair == null)
+                {
+                    styleMemoryHair = new Dictionary<HoloPersonaDef, HairDef>();
+                }
+                if (styleMemoryColor == null)
+                {
+                    styleMemoryColor = new Dictionary<HoloPersonaDef, Color>();
                 }
                 // Pre-archive saves: whoever is resident was installed from a matrix
                 // that no longer exists — grandfather her into the archive.

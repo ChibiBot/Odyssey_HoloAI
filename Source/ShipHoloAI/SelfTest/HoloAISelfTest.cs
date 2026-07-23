@@ -32,6 +32,7 @@ namespace ShipHoloAI
         private Pawn wardenTestPrisoner;
         private Pawn wardenTestSlave;
         private Filth testFilth;
+        private HairDef restyledPrismHair;
 
         public HoloAISelfTest(Game game)
         {
@@ -99,6 +100,8 @@ namespace ShipHoloAI
                         Check("default hairstyle resolved", before != null);
                         core.Avatar.CycleHairstyle();
                         Check("hairstyle cycles", core.Avatar.CurrentHairDef != before);
+                        // Remembered for the restyle-persistence check at restore time.
+                        restyledPrismHair = core.Avatar.CurrentHairDef;
                         Log.Message("[HoloAI SelfTest] hair: " + before?.defName + " -> "
                             + core.Avatar.CurrentHairDef?.defName);
                     }
@@ -1099,7 +1102,12 @@ namespace ShipHoloAI
             Check("emergency tend applied at calibrated quality",
                 tended && quality >= 0.2f && quality <= 0.75f);
             // No cooldown: wound her again and the giver must answer immediately.
-            testColonist.TakeDamage(new DamageInfo(DamageDefOf.Cut, 8f));
+            // The wound is injected directly — TakeDamage can be absorbed by armor
+            // or damage-model mods on heavy modlists, silently voiding the check.
+            Hediff_Injury refireCut = (Hediff_Injury)HediffMaker.MakeHediff(HediffDefOf.Cut, testColonist);
+            refireCut.Severity = 8f;
+            testColonist.health.AddHediff(refireCut,
+                testColonist.RaceProps.body.corePart);
             ThinkResult again = new JobGiver_HoloMedic().TryIssueJobPackage(core.Avatar, default(JobIssueParams));
             Check("emergency tend has no cooldown (giver re-fires immediately)",
                 again.Job != null && again.Job.def == HoloAI_DefOf.HoloAI_EmergencyTend);
@@ -1163,6 +1171,12 @@ namespace ShipHoloAI
                 && core.Avatar.Name?.ToStringFull == "P.R.I.S.M.");
             Check("restore keeps the outgoing persona archived",
                 core.IsUnlocked(HoloAI_DefOf.HoloAI_Persona_HERMES));
+            // The hairstyle cycled at tick 1400 must survive the whole persona
+            // carousel: PRISM -> HERMES -> ... -> PRISM regenerates a fresh pawn,
+            // so this passes only if the core's style memory reapplied it.
+            Check("player restyle survives persona swaps",
+                restyledPrismHair != null && core.Avatar != null
+                && core.Avatar.CurrentHairDef == restyledPrismHair);
             Check("break MTB factor back to x1 without I.X.I.A.",
                 testColonist == null || !testColonist.Spawned
                 || Patch_PrisonBreakMtb.BreakMtbFactorFor(testColonist) == 1f);
