@@ -422,32 +422,39 @@ namespace ShipHoloAI
             Check("avatar unattackable (force-attack menu)", !result);
         }
 
+        /// <summary>The custom styling dialog (core-game content, no Ideology
+        /// gate): must construct and close cleanly, and closing without Accept
+        /// must roll back any live style changes.</summary>
         private void TestStylingTrackers()
         {
             Pawn_HoloAvatar avatar = core.Avatar;
-            if (!ModsConfig.IdeologyActive || avatar == null || !avatar.Spawned)
+            if (avatar == null || !avatar.Spawned)
             {
-                Log.Message("[HoloAI SelfTest] styling test skipped (no Ideology or no avatar)");
+                Check("styling dialog constructs and closes cleanly", pass: false);
+                Check("cancelling the styling dialog restores the style", pass: false);
                 return;
             }
             try
             {
+                HairDef hairBefore = avatar.CurrentHairDef;
                 Color colorBefore = avatar.HoloHairColor;
-                avatar.AttachStyleTrackers();
-                _ = new Dialog_HoloStyling(avatar);
-                avatar.DetachStyleTrackers();
-                Check("styling dialog constructs and trackers detach",
-                    avatar.story == null && avatar.style == null);
-                // Regression: attach/detach with no user picks (= opening the dialog
-                // and hitting cancel) must not strip the persona hair color.
-                Check("styling round-trip preserves hair color",
-                    avatar.HoloHairColor == colorBefore);
+                Dialog_HoloAvatarStyling dialog = new Dialog_HoloAvatarStyling(avatar);
+                Find.WindowStack.Add(dialog);
+                // Simulate a live pick, then close without accepting: PostClose
+                // must roll the avatar back to the style she opened with.
+                HairDef other = DefDatabase<HairDef>.AllDefsListForReading
+                    .FirstOrDefault(h => h != hairBefore && !h.noGraphic && !h.texPath.NullOrEmpty());
+                avatar.ApplyStyleOverride(other, new Color(1f, 0.1f, 0.1f));
+                Find.WindowStack.TryRemove(dialog, doCloseSound: false);
+                Check("styling dialog constructs and closes cleanly", pass: true);
+                Check("cancelling the styling dialog restores the style",
+                    avatar.CurrentHairDef == hairBefore && avatar.HoloHairColor == colorBefore);
             }
             catch (System.Exception e)
             {
                 Log.Message("[HoloAI SelfTest] styling dialog threw: " + e);
-                Check("styling dialog constructs and trackers detach", pass: false);
-                Check("styling round-trip preserves hair color", pass: false);
+                Check("styling dialog constructs and closes cleanly", pass: false);
+                Check("cancelling the styling dialog restores the style", pass: false);
             }
         }
 

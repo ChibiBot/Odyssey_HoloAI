@@ -38,12 +38,6 @@ namespace ShipHoloAI
         {
             get
             {
-                // While the styling dialog is open, a temp story tracker holds the
-                // live selection — mirror it so the render node updates in real time.
-                if (story?.hairDef != null)
-                {
-                    return story.hairDef;
-                }
                 if (hairDef == null)
                 {
                     hairDef = DefDatabase<HairDef>.GetNamedSilentFail("Flowy")
@@ -53,17 +47,7 @@ namespace ShipHoloAI
             }
         }
 
-        public Color HoloHairColor
-        {
-            get
-            {
-                if (story != null)
-                {
-                    return story.HairColor;
-                }
-                return hairColorInt ?? DefaultHairColor;
-            }
-        }
+        public Color HoloHairColor => hairColorInt ?? DefaultHairColor;
 
         /// <summary>Adopt a persona's identity: name, default hair, and hair color.</summary>
         public void ApplyPersonaStyle(HoloPersonaDef persona)
@@ -113,60 +97,12 @@ namespace ShipHoloAI
             Drawer.renderer.SetAllGraphicsDirty();
         }
 
-        /// <summary>
-        /// Attach minimal story/style trackers (humanlike-only normally; the styling
-        /// dialog dereferences them in its constructor) and open the instant-apply
-        /// styling UI. Ideology must be active. skinColorOverride is mandatory —
-        /// story.SkinColor throws on a genes-less pawn without it.
-        /// </summary>
+        /// <summary>Open the custom styling UI — core-game hair defs and colors
+        /// only, so it works identically with or without Ideology and needs none
+        /// of the old temp story-tracker machinery.</summary>
         public void OpenStylingUI()
         {
-            AttachStyleTrackers();
-            Find.WindowStack.Add(new Dialog_HoloStyling(this));
-        }
-
-        public void AttachStyleTrackers()
-        {
-            // Read the color BEFORE the story tracker exists: HoloHairColor routes
-            // through the tracker once one is attached, so reading it afterward
-            // returns the fresh tracker's default — silently stripping the persona
-            // color, and the stripped value then survives DetachStyleTrackers even
-            // when the styling dialog is cancelled.
-            Color hairColor = HoloHairColor;
-            story = new Pawn_StoryTracker(this)
-            {
-                hairDef = CurrentHairDef,
-                skinColorOverride = new Color(0.78f, 0.94f, 1f),
-                bodyType = BodyTypeDefOf.Female,
-                headType = DefDatabase<HeadTypeDef>.GetNamedSilentFail("Female_AverageNormal"),
-            };
-            story.HairColor = hairColor;
-            style = new Pawn_StyleTracker(this)
-            {
-                beardDef = BeardDefOf.NoBeard,
-            };
-            if (ModsConfig.IdeologyActive)
-            {
-                style.FaceTattoo = TattooDefOf.NoTattoo_Face;
-                style.BodyTattoo = TattooDefOf.NoTattoo_Body;
-            }
-        }
-
-        /// <summary>Copy the dialog's picks back and drop the temp trackers so they
-        /// never leak into a save (Pawn.ExposeData would scribe them).</summary>
-        public void DetachStyleTrackers()
-        {
-            if (story != null)
-            {
-                if (story.hairDef != null)
-                {
-                    hairDef = story.hairDef;
-                }
-                hairColorInt = story.HairColor;
-            }
-            story = null;
-            style = null;
-            Drawer.renderer.SetAllGraphicsDirty();
+            Find.WindowStack.Add(new Dialog_HoloAvatarStyling(this));
         }
 
         public void SetChatCooldown()
@@ -255,26 +191,14 @@ namespace ShipHoloAI
             {
                 yield return gizmo;
             }
-            if (ModsConfig.IdeologyActive)
+            // One styling UI for everyone — core hair defs + colors, no DLC gate.
+            yield return new Command_Action
             {
-                yield return new Command_Action
-                {
-                    defaultLabel = "HoloAI_Restyle".Translate(),
-                    defaultDesc = "HoloAI_RestyleDesc".Translate(),
-                    icon = HoloAIIcons.Restyle,
-                    action = OpenStylingUI,
-                };
-            }
-            else
-            {
-                yield return new Command_Action
-                {
-                    defaultLabel = "HoloAI_Hairstyle".Translate() + ": " + (CurrentHairDef?.LabelCap ?? "-"),
-                    defaultDesc = "HoloAI_HairstyleDesc".Translate(),
-                    icon = HoloAIIcons.Hairstyle,
-                    action = CycleHairstyle,
-                };
-            }
+                defaultLabel = "HoloAI_Restyle".Translate(),
+                defaultDesc = "HoloAI_RestyleDesc".Translate(),
+                icon = HoloAIIcons.Restyle,
+                action = OpenStylingUI,
+            };
             // Warden-specialist personas (I.X.I.A.) personally handle prisoner
             // recruitment and slave suppression instead of buffing crew via aura —
             // JobGiver_HoloWarden fires this automatically the instant a target is
