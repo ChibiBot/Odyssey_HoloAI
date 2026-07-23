@@ -111,7 +111,12 @@ namespace ShipHoloAI
 
         private void GeneratePersona()
         {
-            Pawn pawn = PawnGenerator.GeneratePawn(HoloAI_DefOf.HoloAI_PRISM, Faction.OfPlayer);
+            // Relations OFF: relation workers roll against existing pawns and crash
+            // on NameSingle names (PawnRelationWorker_Parent casts to NameTriple) —
+            // and every avatar IS a NameSingle pawn.
+            Pawn pawn = PawnGenerator.GeneratePawn(new PawnGenerationRequest(
+                HoloAI_DefOf.HoloAI_PRISM, Faction.OfPlayer,
+                canGeneratePawnRelations: false));
             avatar = (Pawn_HoloAvatar)pawn;
             avatar.gender = Gender.Female;
             avatar.holoCore = this;

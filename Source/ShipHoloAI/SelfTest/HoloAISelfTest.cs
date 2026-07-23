@@ -1017,6 +1017,11 @@ namespace ShipHoloAI
         /// XP through the vanilla learning pipeline plus the cooldown memory.</summary>
         private void TestAthenaSeminar()
         {
+            Log.Message("[HoloAI SelfTest] persona diag @" + ticks + ": avatar="
+                + (core.Avatar == null ? "null" : core.Avatar.Spawned ? "spawned" : "stored")
+                + " persona=" + core.ActivePersona?.defName
+                + " avatarName=" + core.Avatar?.Name?.ToStringFull
+                + " coresOnMap=" + core.Map.listerBuildings.AllBuildingsColonistOfClass<Building_HoloCore>().Count());
             Check("avatar reprojected as A.T.H.E.N.A.",
                 core.Avatar != null && core.Avatar.Spawned
                 && core.ActivePersona?.defName == "HoloAI_Persona_ATHENA");

@@ -83,10 +83,13 @@ namespace ShipHoloAI
                 .Where(h => !h.noGraphic && !h.texPath.NullOrEmpty())
                 .OrderBy(h => h.label)
                 .ToList();
-            // Core bodies in canonical order first, then any modded ones.
-            string[] coreOrder = { "Female", "Male", "Thin", "Fat", "Hulk" };
+            // The gendered core bodies are covered by the "Standard" toggle (which
+            // tracks the gender switch — no female-body male or vice versa); this
+            // list is the androgynous rest: core builds first, then modded ones.
+            string[] coreOrder = { "Thin", "Fat", "Hulk" };
             bodyTypes = DefDatabase<BodyTypeDef>.AllDefsListForReading
                 .Where(b => !b.bodyNakedGraphicPath.NullOrEmpty()
+                    && b != BodyTypeDefOf.Female && b != BodyTypeDefOf.Male
                     && b.defName != "Baby" && b.defName != "Child")
                 .OrderBy(b => { int i = System.Array.IndexOf(coreOrder, b.defName); return i < 0 ? 99 : i; })
                 .ThenBy(b => b.defName)
@@ -142,6 +145,16 @@ namespace ShipHoloAI
             Widgets.Label(new Rect(0f, ly, LeftWidth, 24f), "HoloAI_StylingBody".Translate());
             ly += 24f;
             float bx = 0f;
+            // "Standard" = the core body matching the gender toggle.
+            string stdLabel = "HoloAI_StylingBodyStandard".Translate();
+            float stdWidth = Mathf.Max(64f, Text.CalcSize(stdLabel).x + 18f);
+            if (DrawToggleButton(new Rect(bx, ly, stdWidth, 28f), stdLabel,
+                    selectedBody == BodyTypeDefOf.Female || selectedBody == BodyTypeDefOf.Male))
+            {
+                selectedBody = StandardBody;
+                ApplyLive();
+            }
+            bx += stdWidth + 6f;
             foreach (BodyTypeDef body in bodyTypes)
             {
                 float w = Mathf.Max(64f, Text.CalcSize(body.defName).x + 18f);
@@ -218,6 +231,9 @@ namespace ShipHoloAI
             }
         }
 
+        private BodyTypeDef StandardBody =>
+            selectedGender == Gender.Male ? BodyTypeDefOf.Male : BodyTypeDefOf.Female;
+
         private void SetGender(Gender gender)
         {
             if (selectedGender == gender)
@@ -225,15 +241,11 @@ namespace ShipHoloAI
                 return;
             }
             selectedGender = gender;
-            // Swap the gendered core body along with the toggle; androgynous
-            // types (Thin/Fat/Hulk and most modded ones) stay put.
-            if (selectedBody == BodyTypeDefOf.Female && gender == Gender.Male)
+            // Standard always tracks the gender toggle (never a cross-gender core
+            // body); androgynous builds (Thin/Fat/Hulk and modded) stay put.
+            if (selectedBody == BodyTypeDefOf.Female || selectedBody == BodyTypeDefOf.Male)
             {
-                selectedBody = BodyTypeDefOf.Male;
-            }
-            else if (selectedBody == BodyTypeDefOf.Male && gender == Gender.Female)
-            {
-                selectedBody = BodyTypeDefOf.Female;
+                selectedBody = StandardBody;
             }
             RebuildHeadList();
             if (!heads.Contains(selectedHead))
